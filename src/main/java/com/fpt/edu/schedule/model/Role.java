@@ -1,4 +1,4 @@
-package com.fpt.edu.shedule.model;
+package com.fpt.edu.schedule.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,10 +14,12 @@ import java.util.List;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private int id;
     private String roleName;
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roleList")
+    private List<UserName> userList;
 
-    private List<User> userList;
-
+    public Role(String roleName) {
+        this.roleName = roleName;
+    }
 }

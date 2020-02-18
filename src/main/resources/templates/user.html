@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Spring Boot Security Hello</title>
+</head>
+<body>
+<h2>User Page</h2>
+<h3>
+    Welcome : <span th:utext="${name}"></span>
+</h3>
+<a th:href="@{/admin}">Admin Page</a>
+<br/><br/>
+<form th:action="@{/logout1}" method="post">
+    <input type="submit" value="Logout" />
+</form>
+</body>
+</html>

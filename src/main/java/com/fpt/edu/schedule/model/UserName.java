@@ -1,4 +1,4 @@
-package com.fpt.edu.shedule.model;
+package com.fpt.edu.schedule.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-
-public class User {
+public class UserName {
 
     @Id
     private String id;

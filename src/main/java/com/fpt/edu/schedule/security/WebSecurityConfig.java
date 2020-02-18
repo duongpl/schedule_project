@@ -1,4 +1,4 @@
-package com.fpt.edu.shedule.security;
+package com.fpt.edu.schedule.security;
 
 
 import lombok.AllArgsConstructor;
