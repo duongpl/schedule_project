@@ -12,12 +12,12 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Room {
+public class ClassName {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     @JsonIgnore
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "className", cascade = CascadeType.ALL)
     private List<Schedule> scheduleList;
 }

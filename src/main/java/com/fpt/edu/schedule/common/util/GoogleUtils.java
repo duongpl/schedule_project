@@ -60,8 +60,8 @@ public class GoogleUtils {
         UserName existedUser = userRepository.findById(googlePojo.getId());
         if (existedUser == null) {
             userName = new UserName();
+            userName.setFullName(googlePojo.getGiven_name());
             userName.setId(googlePojo.getId());
-
             userName.setEmail(googlePojo.getEmail());
             ArrayList<Role> roleList = new ArrayList<>();
             roleList.add(roleRepository.findByRoleName("ROLE_USER"));
@@ -69,9 +69,9 @@ public class GoogleUtils {
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             userRepository.save(userName);
         } else {
-            existedUser.getRoleList().forEach( i -> {
-                        authorities.add(new SimpleGrantedAuthority(i.getRoleName()));
-                    });
+            existedUser.getRoleList().forEach(i -> {
+                authorities.add(new SimpleGrantedAuthority(i.getRoleName()));
+            });
         }
 
         UserDetails userDetail = new org.springframework.security.core.userdetails.User(googlePojo.getEmail(),

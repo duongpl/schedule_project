@@ -44,9 +44,9 @@ public class GoogleController {
         }
         String accessToken = googleUtils.getToken(code);
         GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
-        if (!googlePojo.getHd().equalsIgnoreCase("fpt.edu.vn")) {
-            throw new IllegalArgumentException("not have permission");
-        }
+//        if (!googlePojo.getHd().equalsIgnoreCase("fpt.edu.vn")) {
+//            throw new IllegalArgumentException("not have permission");
+//        }
         UserDetails userDetail = googleUtils.buildUser(googlePojo);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetail, null,
                 userDetail.getAuthorities());
