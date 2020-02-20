@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/reports")
 public class ReportController {
     ReportService reportService;
 
-    @GetMapping("/generateFile")
+    @GetMapping("/generate")
     public String generateFile(@RequestParam(name = "fileName") String fileName) {
         reportService.generateExcelFile(fileName);
         return "done";

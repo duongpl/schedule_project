@@ -20,4 +20,8 @@ public class ClassName {
     @JsonIgnore
     @OneToMany(mappedBy = "className", cascade = CascadeType.ALL)
     private List<Schedule> scheduleList;
+
+    public ClassName(String name) {
+        this.name = name;
+    }
 }
