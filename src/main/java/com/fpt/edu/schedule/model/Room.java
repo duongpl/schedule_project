@@ -20,4 +20,11 @@ public class Room {
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Schedule> scheduleList;
+
+    public Room(String name) {
+        this.name = name;
+    }
+
+    public Room(Room i) {
+    }
 }
