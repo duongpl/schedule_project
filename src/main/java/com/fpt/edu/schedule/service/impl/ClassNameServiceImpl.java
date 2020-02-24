@@ -15,4 +15,9 @@ public class ClassNameServiceImpl implements ClassNameService {
         classNameRepository.save(className);
 
     }
+
+    @Override
+    public ClassName getClassNameByName(String name) {
+       return classNameRepository.findByName(name);
+    }
 }

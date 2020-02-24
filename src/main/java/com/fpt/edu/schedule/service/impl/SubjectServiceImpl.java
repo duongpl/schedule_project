@@ -17,4 +17,9 @@ public class SubjectServiceImpl implements SubjectService {
         subjectRepository.save(subject);
 
     }
+
+    @Override
+    public Subject getSubjectByCode(String code) {
+        return subjectRepository.findByCode(code);
+    }
 }

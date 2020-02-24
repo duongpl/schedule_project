@@ -20,5 +20,8 @@ public class Slot {
     @JsonIgnore
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private List<Schedule> scheduleList;
+    public Slot(String name) {
+        this.name = name;
+    }
 
 }

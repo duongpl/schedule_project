@@ -5,4 +5,6 @@ import org.springframework.data.repository.Repository;
 
 public interface SubjectRepository extends Repository<Subject,Integer> {
     void save(Subject subject);
+
+    Subject findByCode(String code);
 }

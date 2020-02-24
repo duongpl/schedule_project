@@ -15,4 +15,9 @@ public class RoomServiceImpl implements RoomService {
     public void addRoom(Room room) {
         roomRepository.save(room);
     }
+
+    @Override
+    public Room getRoombyName(String name) {
+       return roomRepository.findByName(name);
+    }
 }
