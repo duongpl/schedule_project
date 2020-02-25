@@ -12,6 +12,12 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
+
+    @Override
+    public void addUser(UserName user) {
+        userRepository.save(user);
+    }
+
     @Override
     public List<UserName> getAllUser() {
         return userRepository.findAll() ;
