@@ -7,6 +7,7 @@ import com.fpt.edu.schedule.model.Subject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class ExpectedDTO {
     private List<String> subjects;
     private List<String> slots;
-    private String note;
+    private String note = "";
     private int maxClass;
     private String userId;
 }

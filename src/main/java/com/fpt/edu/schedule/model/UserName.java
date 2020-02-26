@@ -46,7 +46,7 @@ public class UserName {
     )
     @JsonIgnore
     private List<Slot> expectedSlot;
-
+    @JsonIgnore
     @OneToOne(mappedBy = "userName",cascade=CascadeType.ALL)
     private ExpectedNote expectedNote;
 
