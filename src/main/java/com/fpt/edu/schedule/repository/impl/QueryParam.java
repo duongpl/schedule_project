@@ -16,6 +16,6 @@ public class QueryParam {
 
     private Map<String, Object> criteria;
     private String sortField;
-    private boolean ascending;
-    private Map<String, List<String>> inCriteria;
+    private boolean ascending = true;
+    private Map<String, List<Object>> inCriteria;
 }
