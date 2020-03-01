@@ -15,19 +15,15 @@ import org.springframework.data.jpa.domain.Specification;
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.repository.impl.QueryParam;
 
-public class ClassNameSpecifications implements Specification<ClassName> {
+public class BaseSpecifications<T> implements Specification<T> {
 	private QueryParam queryParam;
 
-	public ClassNameSpecifications() {
-		this.queryParam = new QueryParam();
-	}
-
-	public ClassNameSpecifications(QueryParam queryParam) {
+	public BaseSpecifications(QueryParam queryParam) {
 		this.queryParam = queryParam;
 	}
 
 	@Override
-	public Predicate toPredicate(Root<ClassName> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+	public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 		Map<String, Object> criteria = queryParam.getCriteria();
 		List<Predicate> predicates = new ArrayList();
 		for (Map.Entry<String, Object> entry : criteria.entrySet()) {
