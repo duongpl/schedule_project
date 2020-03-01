@@ -3,6 +3,7 @@ package com.fpt.edu.schedule.service.impl;
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.repository.base.BaseRepository;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
+import com.fpt.edu.schedule.repository.base.ClassNameSpecifications;
 import com.fpt.edu.schedule.repository.impl.BaseRepositoryImpl;
 import com.fpt.edu.schedule.repository.impl.QueryParam;
 import com.fpt.edu.schedule.service.base.ClassNameService;
@@ -28,6 +29,8 @@ public class ClassNameServiceImpl extends BaseRepositoryImpl implements ClassNam
 
     @Override
     public List<ClassName> findByCriteria(QueryParam queryParam) {
-        return findAllByCriteria(queryParam);
+    	ClassNameSpecifications cns = new ClassNameSpecifications(queryParam);
+    	
+    	return classNameRepository.findAll(cns);
     }
 }

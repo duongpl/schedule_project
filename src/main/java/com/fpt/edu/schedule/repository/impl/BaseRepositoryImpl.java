@@ -19,7 +19,8 @@ import java.util.Map;
 public class BaseRepositoryImpl<T,V>  {
     BaseRepository<T,V> baseRepository;
     public List<T> findAllByCriteria(QueryParam queryParam) {
-        List<T> list = baseRepository.findAll(new Specification() {
+        @SuppressWarnings("unchecked")
+		List<T> list = baseRepository.findAll(new Specification() {
             @Override
             public Predicate toPredicate(Root root, CriteriaQuery criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> predicates = new ArrayList<>();

@@ -46,7 +46,7 @@ public class UserController {
     }
 
     //Test
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<ClassName> getUserById1(@RequestBody QueryParam queryParam) {
         try {
 
