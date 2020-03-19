@@ -17,7 +17,7 @@ import java.util.List;
 public class ClassNameController {
     ClassNameService classNameService;
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getUserById1(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<ClassName> getClassByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
             List<ClassName> classNameList =classNameService.findByCriteria(queryParam);

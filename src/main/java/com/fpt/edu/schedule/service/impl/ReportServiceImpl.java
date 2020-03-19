@@ -87,6 +87,9 @@ public class ReportServiceImpl implements ReportService {
     private void saveSchedule(String fileName) {
         try {
             FileInputStream file = new FileInputStream(new File(fileName));
+            if(file ==null){
+                throw new Exception("Not found this file!");
+            }
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();

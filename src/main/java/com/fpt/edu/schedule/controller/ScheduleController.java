@@ -39,16 +39,16 @@ public class ScheduleController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping
-    public ResponseEntity getScheduleByUserId(@RequestParam(value = "userId") String userId) {
-        try {
-            Schedule schedule = scheduleService.getScheduleByUserId(userId);
-            return new ResponseEntity(schedule,HttpStatus.OK);
-        } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping
+//    public ResponseEntity getScheduleByUserId(@RequestParam(value = "userId") String userId) {
+//        try {
+//            Schedule schedule = scheduleService.getScheduleByUserId(userId);
+//            return new ResponseEntity(schedule,HttpStatus.OK);
+//        } catch (InvalidRequestException e) {
+//            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//        catch (Exception e) {
+//            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }
