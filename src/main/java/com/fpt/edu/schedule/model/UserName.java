@@ -1,6 +1,8 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +14,8 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserName {
 
     @Id
@@ -42,8 +46,8 @@ public class UserName {
     )
     @JsonIgnore
     private List<Slot> expectedSlot;
-
-    @OneToOne(mappedBy = "userName")
+    @JsonIgnore
+    @OneToOne(mappedBy = "userName",cascade=CascadeType.ALL)
     private ExpectedNote expectedNote;
 
 }

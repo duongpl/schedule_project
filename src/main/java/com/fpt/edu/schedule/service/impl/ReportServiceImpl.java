@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.model.*;
+import com.fpt.edu.schedule.repository.base.ClassNameRepository;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -21,6 +22,7 @@ import java.util.Set;
 public class ReportServiceImpl implements ReportService {
     RoomService roomService;
     ClassNameService classNameService;
+    ClassNameRepository classNameRepository;
     SubjectService subjectService;
     ScheduleService scheduleService;
     SlotService slotService;
@@ -85,6 +87,9 @@ public class ReportServiceImpl implements ReportService {
     private void saveSchedule(String fileName) {
         try {
             FileInputStream file = new FileInputStream(new File(fileName));
+            if(file ==null){
+                throw new Exception("Not found this file!");
+            }
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
@@ -106,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
                     }
                     switch (column) {
                         case 1:
-                            schedule.setClassName(classNameService.getClassNameByName(cell.getStringCellValue().trim()));
+                            schedule.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
                             break;
                         case 2:
                             schedule.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
