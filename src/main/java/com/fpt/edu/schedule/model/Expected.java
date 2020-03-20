@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,14 +25,13 @@ public class Expected {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserName userName;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<ExpectedSlot> expectedSlots;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<ExpectedSubject> expectedSubjects;
-    @JsonIgnore
     @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
-    private ExpectedNote expectedNote;
+    private Expected expectedNote;
 
 }

@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.ExpectedRepository;
 import com.fpt.edu.schedule.repository.impl.QueryParam;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-
+/**
+ * @author Duc Anh
+ * @since 17/3/2020
+ */
 @Service
 @AllArgsConstructor
 public class ExpectedServiceImpl implements ExpectedService {
@@ -26,6 +30,11 @@ public class ExpectedServiceImpl implements ExpectedService {
     @Override
     public void addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
+        UserName userName = userService.getUserNameById(expected.getUserName().getId());
+        if(userName == null){
+            throw new InvalidRequestException("Don't find user!");
+        }
+        expected.setUserName(userName);
         expectedRepository.save(expected);
     }
 
