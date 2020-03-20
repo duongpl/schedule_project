@@ -27,6 +27,9 @@ public class Schedule {
     @JoinColumn(name = "user_id")
     private UserName userName;
     @ManyToOne
+    @JoinColumn(name = "semester_id")
+    private Semester semester;
+    @ManyToOne
     @JoinColumn(name = "class_id")
     private ClassName className;
 

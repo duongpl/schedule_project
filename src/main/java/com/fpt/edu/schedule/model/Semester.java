@@ -12,18 +12,16 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Subject {
+public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String code;
-    private String department;
+    private String title;
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
     @JsonIgnore
-    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
-    private List<Schedule> scheduleList;
-    public Subject(String code,String department) {
-        this.code = code;
-        this.department = department;
-    }
+    private List<Expected> expectedList;
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Schedule> schedules;
 
 }

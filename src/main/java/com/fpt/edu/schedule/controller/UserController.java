@@ -32,7 +32,7 @@ public class UserController {
 
     //Test
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getUserByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<UserName> getUserByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
             List<UserName> userNameList =userService.findByCriteria(queryParam);

@@ -1,13 +1,15 @@
 package com.fpt.edu.schedule.service.base;
 
-import com.fpt.edu.schedule.dto.ExpectedDTO;
-import com.fpt.edu.schedule.model.ExpectedNote;
-import com.fpt.edu.schedule.model.UserName;
+
+import com.fpt.edu.schedule.model.Expected;
+import com.fpt.edu.schedule.repository.impl.QueryParam;
+
+import java.util.List;
+
 
 public interface ExpectedService {
-    void addExpected(ExpectedDTO expectedDTO);
+    void addExpected(Expected expected);
 
-    ExpectedDTO getExpectedByUserId(String userId);
+    List<Expected> findByCriteria(QueryParam queryParam);
 
-    ExpectedNote getExpectedNoteByUserName(UserName userName);
 }

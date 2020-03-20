@@ -1,7 +1,7 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.dto.ExpectedDTO;
+import com.fpt.edu.schedule.model.Expected;
 import com.fpt.edu.schedule.service.base.ExpectedService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 public class ExpectedController  {
     ExpectedService expectedService;
     @PostMapping
-    public ResponseEntity addExpected(@RequestBody ExpectedDTO expectedDTO) {
+    public ResponseEntity addExpected(@RequestBody Expected expected) {
         try {
-            expectedService.addExpected(expectedDTO);
+            expectedService.addExpected(expected);
             return new ResponseEntity(HttpStatus.OK);
         } catch (InvalidRequestException e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -26,15 +26,5 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping
-    public ResponseEntity getExpectedByUserId(@RequestParam(value = "userId", defaultValue = "") String userId) {
-        try {
-            return new ResponseEntity(expectedService.getExpectedByUserId(userId),HttpStatus.OK);
-        } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 }

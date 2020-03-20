@@ -5,17 +5,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Date;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
-public class ExpectedNote {
+public class ExpectedSubject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int numberOfClass;
-    private String note;
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserName userName;
+    private int satisfactionLevel;
+    private Date createdDate;
+    @ManyToOne
+    @JoinColumn(name = "expected_id")
     private Expected expected;
-    }
+    private String subjectCode;
+
+}
