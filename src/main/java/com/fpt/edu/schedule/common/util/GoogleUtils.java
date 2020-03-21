@@ -64,7 +64,7 @@ public class GoogleUtils {
             userName.setFullName(googlePojo.getGiven_name());
             userName.setId(googlePojo.getId());
             userName.setEmail(googlePojo.getEmail());
-            userName.setStatus(Status.PENDING);
+            userName.setStatus(Status.DEACTIVATE);
             userName.setRole(roleRepository.findByRoleName("ROLE_USER"));
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             userRepository.save(userName);
