@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,8 +17,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String roleName;
-    @ManyToMany(mappedBy = "roleList")
-    private List<UserName> userList;
+    @JsonIgnore
+    @OneToOne(mappedBy = "role")
+    private UserName userName;
 
     public Role(String roleName) {
         this.roleName = roleName;

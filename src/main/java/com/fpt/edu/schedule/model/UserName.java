@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Getter
@@ -25,17 +26,21 @@ public class UserName {
     private String email;
     private String phone;
     private Status status;
-    @ManyToMany()
+    private String department;
+    @OneToOne()
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    @JsonIgnore
-    private List<Role> roleList;
+    private Role role;
 
     @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Expected> expectedList;;
+    @Transient
+    private boolean fillingExpected;
+    @Transient
+    private boolean headOfDepartment;
 
 
 }

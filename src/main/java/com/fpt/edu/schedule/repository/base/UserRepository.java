@@ -8,9 +8,8 @@ import java.util.List;
 
 public interface UserRepository extends Repository<UserName,String>,JpaSpecificationExecutor<UserName> {
 
-    void save(UserName user);
+    UserName save(UserName user);
 
     UserName findById(String id);
 
-    List<UserName> findAll();
 }

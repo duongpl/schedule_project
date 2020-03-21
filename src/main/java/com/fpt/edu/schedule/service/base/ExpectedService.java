@@ -8,7 +8,9 @@ import java.util.List;
 
 
 public interface ExpectedService {
-    void addExpected(Expected expected);
+    Expected addExpected(Expected expected);
+
+    Expected updateExpected(Expected expected);
 
     List<Expected> findByCriteria(QueryParam queryParam);
 

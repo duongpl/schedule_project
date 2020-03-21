@@ -16,6 +16,7 @@ public class ExpectedSlot {
     private int id;
     private int satisfactionLevel;
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "expected_id")
     private Expected expected;
     private String slotName;

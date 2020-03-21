@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
+import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.UserName;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
@@ -41,5 +42,22 @@ public class UserController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PutMapping
+    public ResponseEntity<UserName> updateUser(@RequestBody UserName userName) {
+        try {
+            return new ResponseEntity(userService.updateUserName(userName), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping("/admin/{userId}/updateStatus")
+    public ResponseEntity<UserName> updateStatus(@RequestParam Status status,@PathVariable("userId") String userId) {
+        try {
+            return new ResponseEntity(userService.updateStatus(status,userId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 }

@@ -25,13 +25,11 @@ public class Expected {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserName userName;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSlot> expectedSlots;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSubject> expectedSubjects;
     @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
-    private Expected expectedNote;
+    private ExpectedNote expectedNote;
 
 }

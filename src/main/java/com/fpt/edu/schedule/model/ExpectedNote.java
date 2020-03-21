@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,8 @@ public class ExpectedNote {
     private int id;
     private int numberOfClass;
     private String note;
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "expected_id")
     private Expected expected;
     }

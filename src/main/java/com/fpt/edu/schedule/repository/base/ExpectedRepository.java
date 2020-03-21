@@ -1,12 +1,14 @@
 package com.fpt.edu.schedule.repository.base;
 
+import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Expected;
 import com.fpt.edu.schedule.model.ExpectedNote;
 import com.fpt.edu.schedule.model.UserName;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.Repository;
 
-public interface ExpectedRepository extends Repository<Expected,Integer> {
+public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpecificationExecutor<Expected> {
     Expected findByUserName(UserName userName);
 
-    void save (Expected expected);
+    Expected save (Expected expected);
 }

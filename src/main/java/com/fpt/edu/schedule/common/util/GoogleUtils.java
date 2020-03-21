@@ -3,6 +3,7 @@ package com.fpt.edu.schedule.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.GooglePojo;
 import com.fpt.edu.schedule.model.Role;
 import com.fpt.edu.schedule.model.UserName;
@@ -63,15 +64,13 @@ public class GoogleUtils {
             userName.setFullName(googlePojo.getGiven_name());
             userName.setId(googlePojo.getId());
             userName.setEmail(googlePojo.getEmail());
-            ArrayList<Role> roleList = new ArrayList<>();
-            roleList.add(roleRepository.findByRoleName("ROLE_USER"));
-            userName.setRoleList(roleList);
+            userName.setStatus(Status.PENDING);
+            userName.setRole(roleRepository.findByRoleName("ROLE_USER"));
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
             userRepository.save(userName);
         } else {
-            existedUser.getRoleList().forEach(i -> {
-                authorities.add(new SimpleGrantedAuthority(i.getRoleName()));
-            });
+            authorities.add(new SimpleGrantedAuthority(existedUser.getRole().getRoleName()));
+
         }
 
         UserDetails userDetail = new org.springframework.security.core.userdetails.User(googlePojo.getEmail(),
