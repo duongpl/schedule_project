@@ -18,8 +18,8 @@ public class Role {
     private int id;
     private String roleName;
     @JsonIgnore
-    @OneToOne(mappedBy = "role")
-    private UserName userName;
+    @ManyToMany(mappedBy = "roleList")
+    private List<UserName> userList;
 
     public Role(String roleName) {
         this.roleName = roleName;

@@ -27,12 +27,12 @@ public class UserName {
     private String phone;
     private Status status;
     private String department;
-    @OneToOne()
+    @ManyToMany()
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private Role role;
+    private List<Role> roleList;
 
     @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
     @JsonIgnore

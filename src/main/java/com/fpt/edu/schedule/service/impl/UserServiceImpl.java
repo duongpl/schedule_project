@@ -28,9 +28,8 @@ public class UserServiceImpl implements UserService {
         for(Object u : userRepository.findAll(cns)){
             if(u instanceof UserName){
                 ((UserName) u).setFillingExpected(true);
-                if(((UserName) u).getRole().getRoleName().equals("ROLE_ADMIN")){
-                    ((UserName) u).setHeadOfDepartment(true);
-                }
+                ((UserName) u).setHeadOfDepartment(true);
+
             }
         }
         return userRepository.findAll(cns);

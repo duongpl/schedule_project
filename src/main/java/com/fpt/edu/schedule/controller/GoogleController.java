@@ -17,25 +17,21 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
-@Controller
+@RestController
 @SessionAttributes("name")
 public class GoogleController {
 
     private JavaMailSender javaMailSender;
     private GoogleUtils googleUtils;
 
-    @RequestMapping(value = {"/", "/login"})
-    public String login() {
-        return "login";
-    }
 
-    @RequestMapping("/login-google")
+
+    @PostMapping("login-google")
     public String loginGoogle(HttpServletRequest request, ModelMap modelMap) throws ClientProtocolException, IOException {
         String code = request.getParameter("code");
 
@@ -53,7 +49,7 @@ public class GoogleController {
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         modelMap.addAttribute("name", googlePojo.getEmail());
-        return "redirect:/user";
+        return googlePojo.getId();
     }
 
     @RequestMapping("/user")
