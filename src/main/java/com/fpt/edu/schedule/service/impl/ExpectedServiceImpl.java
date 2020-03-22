@@ -31,6 +31,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     @Override
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
+        expected.setUpdatedDate(new Date());
         UserName userName = userService.getUserNameById(expected.getUserName().getId());
         if(userName == null){
             throw new InvalidRequestException("Don't find user!");
@@ -44,7 +45,15 @@ public class ExpectedServiceImpl implements ExpectedService {
 
     @Override
     public Expected updateExpected(Expected expected) {
-        return null;
+        Expected existedExpected = expectedRepository.findById(expected.getId());
+        if(existedExpected ==null){
+            throw new InvalidRequestException("Don't find this");
+        }
+        existedExpected.setExpectedNote(expected.getExpectedNote()!=null ? expected.getExpectedNote() : existedExpected.getExpectedNote());
+        existedExpected.setExpectedSlots(expected.getExpectedSlots()!=null ? expected.getExpectedSlots() : existedExpected.getExpectedSlots());
+        existedExpected.setExpectedSubjects(expected.getExpectedSubjects()!=null ? expected.getExpectedSubjects() : existedExpected.getExpectedSubjects());
+        existedExpected.setUpdatedDate(new Date());
+        return expectedRepository.save(existedExpected);
     }
 
     @Override

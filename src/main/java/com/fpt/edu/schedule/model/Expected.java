@@ -19,6 +19,7 @@ public class Expected {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private Date createdDate;
+    private Date updatedDate;
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
