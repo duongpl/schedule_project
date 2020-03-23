@@ -10,7 +10,7 @@ public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpe
 
     Expected findById(int id);
 
-    Expected removeById(int id);
+    void removeExpectedById(int id);
 
 
 }

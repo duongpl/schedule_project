@@ -13,9 +13,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public void addSubject(Subject subject) {
-
         subjectRepository.save(subject);
-
     }
 
     @Override

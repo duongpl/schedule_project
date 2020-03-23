@@ -3,15 +3,16 @@ package com.fpt.edu.schedule.controller;
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.UserName;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
-
+@Transactional
 @CrossOrigin
 @RestController
 @AllArgsConstructor
@@ -49,7 +50,7 @@ public class UserController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/admin/{userId}/updateStatus")
+    @PutMapping("/{userId}/updateStatus")
     public ResponseEntity<UserName> updateStatus(@RequestParam Status status,@PathVariable("userId") String userId) {
         try {
             return new ResponseEntity(userService.updateStatus(status,userId), HttpStatus.OK);

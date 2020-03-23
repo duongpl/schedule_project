@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Getter
@@ -19,7 +18,6 @@ import java.util.List;
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserName {
-
     @Id
     private String id;
     private String fullName;
@@ -36,7 +34,10 @@ public class UserName {
 
     @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Expected> expectedList;;
+    private List<Expected> expectedList;
+    @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Report> reportList ;;
     @Transient
     private boolean fillingExpected;
     @Transient

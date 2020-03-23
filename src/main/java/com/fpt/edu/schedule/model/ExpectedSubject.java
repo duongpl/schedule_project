@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
-
 @Getter
 @Setter
 @Entity
@@ -23,4 +22,8 @@ public class ExpectedSubject {
     private Expected expected;
     private String subjectCode;
 
+    public void setSubjectCode(String subjectCode) {
+        System.out.println("abc");
+        this.subjectCode = subjectCode;
+    }
 }

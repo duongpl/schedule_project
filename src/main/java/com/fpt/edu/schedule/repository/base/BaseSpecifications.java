@@ -1,21 +1,15 @@
 package com.fpt.edu.schedule.repository.base;
 
-import java.awt.print.Pageable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.criteria.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.edu.schedule.model.Schedule;
-import com.fpt.edu.schedule.model.Subject;
-import com.fpt.edu.schedule.model.UserName;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.fpt.edu.schedule.model.ClassName;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class BaseSpecifications<T> implements Specification<T> {
     private QueryParam queryParam;

@@ -1,7 +1,7 @@
 package com.fpt.edu.schedule.service.base;
 
 import com.fpt.edu.schedule.model.ClassName;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.service.base;
 
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.UserName;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 
 import java.util.List;
 

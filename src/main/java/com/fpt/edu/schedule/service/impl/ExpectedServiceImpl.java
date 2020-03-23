@@ -2,10 +2,10 @@ package com.fpt.edu.schedule.service.impl;
 
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.model.*;
-import com.fpt.edu.schedule.repository.base.BaseSpecifications;
-import com.fpt.edu.schedule.repository.base.ExpectedRepository;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.model.Expected;
+import com.fpt.edu.schedule.model.UserName;
+import com.fpt.edu.schedule.repository.base.*;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ExpectedService;
 import com.fpt.edu.schedule.service.base.SlotService;
 import com.fpt.edu.schedule.service.base.SubjectService;
@@ -13,6 +13,7 @@ import com.fpt.edu.schedule.service.base.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -21,37 +22,53 @@ import java.util.List;
  * @since 17/3/2020
  */
 @Service
+@Transactional
 @AllArgsConstructor
 public class ExpectedServiceImpl implements ExpectedService {
     UserService userService;
     SubjectService subjectService;
     SlotService slotService;
     ExpectedRepository expectedRepository;
+    ExpectedSlotRepository expectedSlotRepository;
+    ExpectedSubjectRepository expectedSubjectRepository;
+    ExpectedNoteRepository expectedNoteRepository;
 
     @Override
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
         expected.setUpdatedDate(new Date());
         UserName userName = userService.getUserNameById(expected.getUserName().getId());
-        if(userName == null){
+        if (userName == null) {
             throw new InvalidRequestException("Don't find user!");
         }
         expected.setUserName(userName);
         expected.getExpectedNote().setExpected(expected);
-        expected.getExpectedSlots().stream().forEach( i -> i.setExpected(expected));
-        expected.getExpectedSubjects().stream().forEach( i -> i.setExpected(expected));
+        expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
+        expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));
         return expectedRepository.save(expected);
     }
 
     @Override
     public Expected updateExpected(Expected expected) {
         Expected existedExpected = expectedRepository.findById(expected.getId());
-        if(existedExpected ==null){
+        if (existedExpected == null) {
             throw new InvalidRequestException("Don't find this expected");
         }
-        existedExpected.setExpectedNote(expected.getExpectedNote()!=null ? expected.getExpectedNote() : existedExpected.getExpectedNote());
-        existedExpected.setExpectedSlots(expected.getExpectedSlots()!=null ? expected.getExpectedSlots() : existedExpected.getExpectedSlots());
-        existedExpected.setExpectedSubjects(expected.getExpectedSubjects()!=null ? expected.getExpectedSubjects() : existedExpected.getExpectedSubjects());
+        if (expected.getExpectedNote() != null) {
+            existedExpected.setExpectedNote(expected.getExpectedNote());
+            expectedNoteRepository.removeAllByExpected(existedExpected);
+            existedExpected.getExpectedNote().setExpected(existedExpected);
+        }
+        if (expected.getExpectedSlots() != null) {
+            existedExpected.setExpectedSlots(expected.getExpectedSlots());
+            expectedSlotRepository.removeAllByExpected(existedExpected);
+            existedExpected.getExpectedSlots().stream().forEach(i -> i.setExpected(existedExpected));
+        }
+        if (expected.getExpectedSubjects() != null) {
+            existedExpected.setExpectedSubjects(expected.getExpectedSubjects());
+            expectedSubjectRepository.removeAllByExpected(existedExpected);
+            existedExpected.getExpectedSubjects().stream().forEach(i -> i.setExpected(existedExpected));
+        }
         existedExpected.setUpdatedDate(new Date());
         return expectedRepository.save(existedExpected);
     }
@@ -64,13 +81,12 @@ public class ExpectedServiceImpl implements ExpectedService {
     }
 
     @Override
-    public Expected removeExpectedById(int expectedId) {
+    public void removeExpectedById(int expectedId) {
         Expected existedExpected = expectedRepository.findById(expectedId);
-        if(existedExpected ==null){
+        if (existedExpected == null) {
             throw new InvalidRequestException("Don't find this expected");
         }
-        expectedRepository.removeById(expectedId);
-        return expectedRepository.removeById(expectedId);
+        expectedRepository.removeExpectedById(existedExpected.getId());
     }
 
 

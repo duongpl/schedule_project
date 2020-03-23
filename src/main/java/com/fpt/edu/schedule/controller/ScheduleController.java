@@ -3,7 +3,7 @@ package com.fpt.edu.schedule.controller;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Schedule;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ScheduleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

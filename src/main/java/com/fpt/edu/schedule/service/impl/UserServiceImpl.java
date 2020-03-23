@@ -6,7 +6,7 @@ import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.UserName;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.UserRepository;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

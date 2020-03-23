@@ -3,7 +3,7 @@ package com.fpt.edu.schedule.service.impl;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.RoomRepository;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

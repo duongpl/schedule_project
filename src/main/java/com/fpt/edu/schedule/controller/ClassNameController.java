@@ -1,7 +1,8 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.model.ClassName;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.ClassNameRepository;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ClassNameService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,10 @@ import java.util.List;
 @RequestMapping("/api/v1/classes")
 public class ClassNameController {
     ClassNameService classNameService;
+    ClassNameRepository classNameRepository;
     @PostMapping("/filter")
     public ResponseEntity<ClassName> getClassByCriteria(@RequestBody QueryParam queryParam) {
         try {
-
             List<ClassName> classNameList =classNameService.findByCriteria(queryParam);
             return new ResponseEntity(classNameList, HttpStatus.OK);
         } catch (Exception e) {

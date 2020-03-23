@@ -18,7 +18,7 @@ public class ExpectedNote {
     private int numberOfClass;
     private String note;
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "expected_id")
     private Expected expected;
     }

@@ -6,16 +6,17 @@ import com.fpt.edu.schedule.model.UserName;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.ScheduleRepository;
 import com.fpt.edu.schedule.repository.base.UserRepository;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ScheduleService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class ScheduleServiceImpl implements ScheduleService {
     UserRepository userRepository;
     ScheduleRepository scheduleRepository;

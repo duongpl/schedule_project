@@ -1,7 +1,9 @@
 package com.fpt.edu.schedule.service.impl;
 
+import com.fpt.edu.schedule.common.enums.Status;
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.*;
-import com.fpt.edu.schedule.repository.base.ClassNameRepository;
+import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -11,13 +13,13 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 @Service
+@Transactional
 @AllArgsConstructor
 public class ReportServiceImpl implements ReportService {
     RoomService roomService;
@@ -26,6 +28,8 @@ public class ReportServiceImpl implements ReportService {
     SubjectService subjectService;
     ScheduleService scheduleService;
     SlotService slotService;
+    ReportRepository reportRepository;
+    UserRepository userRepository;
 
     @Override
     public void generateExcelFile(String fileName) {
@@ -69,7 +73,7 @@ public class ReportServiceImpl implements ReportService {
                     }
                 }
             }
-            saveInformation(roomNameList, classNameList, subjectNameList,slotList);
+            saveInformation(roomNameList, classNameList, subjectNameList, slotList);
             saveSchedule(fileName);
             file.close();
         } catch (Exception e) {
@@ -77,7 +81,53 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    private void saveInformation(Set<String> roomSet, Set<String> classNameList, Set<String> subjectList,Set<String> slotList) {
+    @Override
+    public Report addReport(Report report) {
+        report.setCreatedDate(new Date());
+        report.setStatus(Status.PENDING);
+        UserName userName = userRepository.findById(report.getUserName().getId());
+        if (userName == null) {
+            throw new InvalidRequestException("Don't find user!");
+        }
+        return reportRepository.save(report);
+    }
+
+    @Override
+    public Report updateReport(Report report) {
+        Report existedReport = reportRepository.findReportById(report.getId());
+        if (existedReport == null) {
+            throw new InvalidRequestException("Don't find this report !");
+        }
+        existedReport.setContent(report.getContent() != null ? report.getContent() : existedReport.getContent());
+        return reportRepository.save(existedReport);
+    }
+
+    @Override
+    public Report updateStatus(Status status, int reportId) {
+        Report existedReport = reportRepository.findReportById(reportId);
+        if (existedReport == null) {
+            throw new InvalidRequestException("Don't find this report !");
+        }
+        existedReport.setStatus(status);
+        return reportRepository.save(existedReport);
+    }
+
+    @Override
+    public void removeReportById(int id) {
+        Report existedReport = reportRepository.findReportById(id);
+        if (existedReport == null) {
+            throw new InvalidRequestException("Don't find this report");
+        }
+        reportRepository.removeById(id);
+    }
+
+    @Override
+    public List<Report> findByCriteria(QueryParam queryParam) {
+        BaseSpecifications cns = new BaseSpecifications(queryParam);
+        return reportRepository.findAll(cns);
+    }
+
+    private void saveInformation(Set<String> roomSet, Set<String> classNameList, Set<String> subjectList, Set<String> slotList) {
         roomSet.forEach(i -> roomService.addRoom(new Room(i)));
         classNameList.forEach(i -> classNameService.addClassName(new ClassName(i)));
         subjectList.forEach(i -> subjectService.addSubject(new Subject(i, "CF")));
@@ -87,7 +137,7 @@ public class ReportServiceImpl implements ReportService {
     private void saveSchedule(String fileName) {
         try {
             FileInputStream file = new FileInputStream(new File(fileName));
-            if(file ==null){
+            if (file == null) {
                 throw new Exception("Not found this file!");
             }
             XSSFWorkbook workbook = new XSSFWorkbook(file);
@@ -117,7 +167,7 @@ public class ReportServiceImpl implements ReportService {
                             schedule.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
                             break;
                         case 3:
-                       schedule.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
+                            schedule.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
                             break;
                         case 5:
                             schedule.setRoom(roomService.getRoombyName(cell.getStringCellValue().trim()));

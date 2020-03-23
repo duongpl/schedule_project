@@ -27,5 +27,8 @@ public class Semester {
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Schedule> schedules;
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Report> reportList;
 
 }
