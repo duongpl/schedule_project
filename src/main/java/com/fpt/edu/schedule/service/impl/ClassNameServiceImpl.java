@@ -22,7 +22,6 @@ public class ClassNameServiceImpl  implements ClassNameService {
     @Override
     public List<ClassName> findByCriteria(QueryParam queryParam) {
     	BaseSpecifications cns = new BaseSpecifications(queryParam);
-
     	return classNameRepository.findAll(cns);
     }
 }

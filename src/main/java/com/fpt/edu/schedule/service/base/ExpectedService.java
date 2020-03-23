@@ -14,4 +14,6 @@ public interface ExpectedService {
 
     List<Expected> findByCriteria(QueryParam queryParam);
 
+    Expected removeExpectedById(int expectedId);
+
 }

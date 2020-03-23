@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Expected;
 import com.fpt.edu.schedule.repository.impl.QueryParam;
 import com.fpt.edu.schedule.service.base.ExpectedService;
@@ -32,8 +31,7 @@ public class ExpectedController  {
     @PutMapping
     public ResponseEntity updateExpected(@RequestBody Expected expected) {
         try {
-            expectedService.addExpected(expected);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(expectedService.updateExpected(expected),HttpStatus.OK);
         } catch (InvalidRequestException e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
@@ -42,11 +40,19 @@ public class ExpectedController  {
         }
     }
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getExpectedByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity getExpectedByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
             List<Expected> expectedList =expectedService.findByCriteria(queryParam);
             return new ResponseEntity(expectedList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping("/{expectedId}")
+    public ResponseEntity remove(@PathVariable("expectedId") int expectedId) {
+        try {
+            return new ResponseEntity(expectedService.removeExpectedById(expectedId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

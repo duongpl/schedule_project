@@ -47,7 +47,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     public Expected updateExpected(Expected expected) {
         Expected existedExpected = expectedRepository.findById(expected.getId());
         if(existedExpected ==null){
-            throw new InvalidRequestException("Don't find this");
+            throw new InvalidRequestException("Don't find this expected");
         }
         existedExpected.setExpectedNote(expected.getExpectedNote()!=null ? expected.getExpectedNote() : existedExpected.getExpectedNote());
         existedExpected.setExpectedSlots(expected.getExpectedSlots()!=null ? expected.getExpectedSlots() : existedExpected.getExpectedSlots());
@@ -61,6 +61,16 @@ public class ExpectedServiceImpl implements ExpectedService {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
 
         return expectedRepository.findAll(cns);
+    }
+
+    @Override
+    public Expected removeExpectedById(int expectedId) {
+        Expected existedExpected = expectedRepository.findById(expectedId);
+        if(existedExpected ==null){
+            throw new InvalidRequestException("Don't find this expected");
+        }
+        expectedRepository.removeById(expectedId);
+        return expectedRepository.removeById(expectedId);
     }
 
 

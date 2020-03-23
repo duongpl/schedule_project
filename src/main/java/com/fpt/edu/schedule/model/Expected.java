@@ -1,7 +1,5 @@
 package com.fpt.edu.schedule.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,11 +24,17 @@ public class Expected {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserName userName;
-    @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+
     private List<ExpectedSlot> expectedSlots;
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSubject> expectedSubjects;
     @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
     private ExpectedNote expectedNote;
 
+
+    public void setExpectedSlots(List<ExpectedSlot> expectedSlots) {
+        this.expectedSlots.addAll(expectedSlots);
+    }
 }
+
