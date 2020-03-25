@@ -17,7 +17,7 @@ public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String title;
+    private String name;
     private Date startDate;
     private Date endDate;
 

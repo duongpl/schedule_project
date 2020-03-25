@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
+
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

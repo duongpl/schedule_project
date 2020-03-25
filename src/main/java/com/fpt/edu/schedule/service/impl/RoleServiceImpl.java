@@ -6,8 +6,11 @@ import com.fpt.edu.schedule.service.base.RoleService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @AllArgsConstructor
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
     @Override

@@ -39,7 +39,7 @@ public class BaseSpecifications<T> implements Specification<T> {
                     }
                 } else {
                     if (entry.getValue() instanceof String) {
-                        predicates.add(criteriaBuilder.like(root.get(configKey(entry.getKey())).get(entry.getKey()), "%" + entry.getValue() + "%"));
+                        predicates.add(criteriaBuilder.like(root.get(entry.getKey()), "%" + entry.getValue() + "%"));
                     } else {
                         predicates.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
                     }
