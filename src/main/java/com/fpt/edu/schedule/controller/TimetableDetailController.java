@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/schedules")
-public class ScheduleController {
+public class TimetableDetailController {
     TimeTableDetailService timeTableDetailService;
     @GetMapping
     public ResponseEntity getAllSchedule() {
@@ -33,8 +33,8 @@ public class ScheduleController {
     public ResponseEntity<ClassName> getScheduleByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
-            List<TimetableDetail> userNameList = timeTableDetailService.findByCriteria(queryParam);
-            return new ResponseEntity(userNameList, HttpStatus.OK);
+            List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam);
+            return new ResponseEntity(timetableDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

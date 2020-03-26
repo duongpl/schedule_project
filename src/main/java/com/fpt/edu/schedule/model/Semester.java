@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,9 +16,9 @@ public class Semester {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String name;
-    private Date startDate;
-    private Date endDate;
+    private String season;
+    private String year;
+
 
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -31,4 +30,8 @@ public class Semester {
     @JsonIgnore
     private List<Report> reportList;
 
+    public Semester(String season,String year) {
+        this.season = season;
+        this.year = year;
+    }
 }
