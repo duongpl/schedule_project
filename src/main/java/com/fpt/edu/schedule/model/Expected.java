@@ -22,8 +22,8 @@ public class Expected {
     @JoinColumn(name = "semester_id")
     private Semester semester;
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserName userName;
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
 
     private List<ExpectedSlot> expectedSlots;

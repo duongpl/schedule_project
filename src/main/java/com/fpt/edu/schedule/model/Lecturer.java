@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserName {
+public class Lecturer {
     @Id
     private String id;
     private String fullName;
@@ -26,18 +26,18 @@ public class UserName {
     private Status status;
     private String department;
     @ManyToMany()
-    @JoinTable(name = "user_role",
+    @JoinTable(name = "lectire_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roleList;
 
-    @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Expected> expectedList;
-    @OneToMany(mappedBy = "userName", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Report> reportList ;;
+    private List<Report> reportList ;
     @Transient
     private boolean fillingExpected;
     @Transient

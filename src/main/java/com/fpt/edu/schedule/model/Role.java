@@ -20,7 +20,7 @@ public class Role {
     private String roleName;
     @JsonIgnore
     @ManyToMany(mappedBy = "roleList")
-    private List<UserName> userList;
+    private List<Lecturer> userList;
 
     public Role(String roleName) {
         this.roleName = roleName;

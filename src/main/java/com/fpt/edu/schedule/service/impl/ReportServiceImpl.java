@@ -26,10 +26,10 @@ public class ReportServiceImpl implements ReportService {
     ClassNameService classNameService;
     ClassNameRepository classNameRepository;
     SubjectService subjectService;
-    ScheduleService scheduleService;
+    TimeTableDetailService timeTableDetailService;
     SlotService slotService;
     ReportRepository reportRepository;
-    UserRepository userRepository;
+    LecturerRepository lecturerRepository;
 
     @Override
     public void generateExcelFile(String fileName) {
@@ -85,8 +85,8 @@ public class ReportServiceImpl implements ReportService {
     public Report addReport(Report report) {
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
-        UserName userName = userRepository.findById(report.getUserName().getId());
-        if (userName == null) {
+        Lecturer lecturer = lecturerRepository.findById(report.getLecturer().getId());
+        if (lecturer == null) {
             throw new InvalidRequestException("Don't find user!");
         }
         return reportRepository.save(report);
@@ -151,7 +151,7 @@ public class ReportServiceImpl implements ReportService {
                 if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
                     continue;
                 }
-                Schedule schedule = new Schedule();
+                TimetableDetail timetableDetail = new TimetableDetail();
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -161,20 +161,20 @@ public class ReportServiceImpl implements ReportService {
                     }
                     switch (column) {
                         case 1:
-                            schedule.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
+                            timetableDetail.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
                             break;
                         case 2:
-                            schedule.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
+                            timetableDetail.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
                             break;
                         case 3:
-                            schedule.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
+                            timetableDetail.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
                             break;
                         case 5:
-                            schedule.setRoom(roomService.getRoombyName(cell.getStringCellValue().trim()));
+                            timetableDetail.setRoom(roomService.getRoombyName(cell.getStringCellValue().trim()));
                             break;
                     }
                 }
-                scheduleService.addSchedule(schedule);
+                timeTableDetailService.addTimeTableDetail(timetableDetail);
             }
             file.close();
         } catch (Exception e) {

@@ -1,10 +1,10 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.common.enums.Status;
-import com.fpt.edu.schedule.model.UserName;
+import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.service.base.UserService;
+import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,16 +16,16 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/users")
-public class UserController {
-    UserService userService;
+@RequestMapping("/api/v1/lecturers")
+public class LecturerController {
+    LecturerService lecturerService;
     ClassNameRepository classNameRepository;
 
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserName> getUserById(@PathVariable("userId") String userId) {
+    @GetMapping("/{lecturerId}")
+    public ResponseEntity<Lecturer> getLecturerById(@PathVariable("lecturerId") String lecturerID) {
         try {
-            return new ResponseEntity(userService.getUserNameById(userId), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.getLecturerNameById(lecturerID), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -33,27 +33,27 @@ public class UserController {
 
     //Test
     @PostMapping("/filter")
-    public ResponseEntity<UserName> getUserByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<Lecturer> getLecturerByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
-            List<UserName> userNameList =userService.findByCriteria(queryParam);
-            return new ResponseEntity(userNameList, HttpStatus.OK);
+            List<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam);
+            return new ResponseEntity(lecturerList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
-    public ResponseEntity<UserName> updateUser(@RequestBody UserName userName) {
+    public ResponseEntity<Lecturer> updateLecturer(@RequestBody Lecturer lecturer) {
         try {
-            return new ResponseEntity(userService.updateUserName(userName), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.updateLecturerName(lecturer), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/{userId}/updateStatus")
-    public ResponseEntity<UserName> updateStatus(@RequestParam Status status,@PathVariable("userId") String userId) {
+    @PutMapping("/{lecturerId}/updateStatus")
+    public ResponseEntity<Lecturer> updateStatus(@RequestParam Status status, @PathVariable("lecturerId") String lecturerID) {
         try {
-            return new ResponseEntity(userService.updateStatus(status,userId), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.updateStatus(status,lecturerID), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.GooglePojo;
 import com.fpt.edu.schedule.model.Role;
-import com.fpt.edu.schedule.model.UserName;
+import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.RoleRepository;
-import com.fpt.edu.schedule.repository.base.UserRepository;
+import com.fpt.edu.schedule.repository.base.LecturerRepository;
 import lombok.AllArgsConstructor;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Form;
@@ -27,7 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GoogleUtils {
     private Environment env;
-    private UserRepository userRepository;
+    private LecturerRepository lecturerRepository;
     private RoleRepository roleRepository;
 
     public String getToken(final String code) throws ClientProtocolException, IOException {
@@ -56,20 +56,20 @@ public class GoogleUtils {
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
-        UserName userName;
+        Lecturer lecturer;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        UserName existedUser = userRepository.findById(googlePojo.getId());
+        Lecturer existedUser = lecturerRepository.findById(googlePojo.getId());
         if (existedUser == null) {
-            userName = new UserName();
-            userName.setFullName(googlePojo.getGiven_name());
-            userName.setId(googlePojo.getId());
-            userName.setEmail(googlePojo.getEmail());
+            lecturer = new Lecturer();
+            lecturer.setFullName(googlePojo.getGiven_name());
+            lecturer.setId(googlePojo.getId());
+            lecturer.setEmail(googlePojo.getEmail());
             ArrayList<Role> roleList = new ArrayList<>();
             roleList.add(roleRepository.findByRoleName("ROLE_USER"));
-            userName.setRoleList(roleList);
-            userName.setStatus(Status.DEACTIVATE);
+            lecturer.setRoleList(roleList);
+            lecturer.setStatus(Status.DEACTIVATE);
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            userRepository.save(userName);
+            lecturerRepository.save(lecturer);
         } else {
             existedUser.getRoleList().forEach(i -> {
                 authorities.add(new SimpleGrantedAuthority(i.getRoleName()));
