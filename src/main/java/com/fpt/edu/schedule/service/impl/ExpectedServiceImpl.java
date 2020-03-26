@@ -3,13 +3,13 @@ package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Expected;
-import com.fpt.edu.schedule.model.UserName;
+import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ExpectedService;
 import com.fpt.edu.schedule.service.base.SlotService;
 import com.fpt.edu.schedule.service.base.SubjectService;
-import com.fpt.edu.schedule.service.base.UserService;
+import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ import java.util.List;
 @Transactional
 @AllArgsConstructor
 public class ExpectedServiceImpl implements ExpectedService {
-    UserService userService;
+    LecturerService lecturerService;
     SubjectService subjectService;
     SlotService slotService;
     ExpectedRepository expectedRepository;
@@ -37,11 +37,11 @@ public class ExpectedServiceImpl implements ExpectedService {
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
         expected.setUpdatedDate(new Date());
-        UserName userName = userService.getUserNameById(expected.getUserName().getId());
-        if (userName == null) {
+        Lecturer lecturer = lecturerService.getLecturerNameById(expected.getLecturer().getId());
+        if (lecturer == null) {
             throw new InvalidRequestException("Don't find user!");
         }
-        expected.setUserName(userName);
+        expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
         expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
         expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));

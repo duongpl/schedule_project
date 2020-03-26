@@ -21,7 +21,7 @@ public class Report {
     private Date createdDate;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserName userName;
+    private Lecturer lecturer;
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
