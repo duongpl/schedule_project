@@ -32,6 +32,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedSlotRepository expectedSlotRepository;
     ExpectedSubjectRepository expectedSubjectRepository;
     ExpectedNoteRepository expectedNoteRepository;
+    SemesterRepository semesterRepository;
 
     @Override
     public Expected addExpected(Expected expected) {
@@ -39,8 +40,9 @@ public class ExpectedServiceImpl implements ExpectedService {
         expected.setUpdatedDate(new Date());
         Lecturer lecturer = lecturerService.getLecturerNameById(expected.getLecturer().getId());
         if (lecturer == null) {
-            throw new InvalidRequestException("Don't find user!");
+            throw new InvalidRequestException("Don't find lecturer!");
         }
+        expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
         expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));

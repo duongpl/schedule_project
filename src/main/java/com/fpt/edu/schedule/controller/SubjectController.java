@@ -16,7 +16,7 @@ import java.util.List;
 public class SubjectController {
     SubjectService subjectService;
     @PostMapping("/filter")
-    public ResponseEntity<Subject> getRoomByCriteria(@RequestParam("semesterId") int semesterId) {
+    public ResponseEntity<Subject> getSubjectByCriteria(@RequestParam("semesterId") int semesterId) {
         try {
             List<Subject> subjectList =subjectService.getAllSubjectBySemester(semesterId);
 
