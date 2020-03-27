@@ -28,7 +28,7 @@ public class Lecturer {
     private int quotaClass;
     private boolean fullTime;
     @ManyToMany()
-    @JoinTable(name = "lectire_role",
+    @JoinTable(name = "lecture_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
