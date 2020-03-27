@@ -4,7 +4,7 @@ import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.LecturerRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.repository.base.TimetableRepository;
+import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
 import com.fpt.edu.schedule.service.base.TimeTableDetailService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.List;
 @Transactional
 public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     LecturerRepository lecturerRepository;
-    TimetableRepository timetableRepository;
+    TimetableDetailRepository timetableDetailRepository;
 
     @Override
     public void addTimeTableDetail(TimetableDetail timetableDetail) {
@@ -26,14 +26,14 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
     @Override
     public List<TimetableDetail> getAllSchedule() {
-        return timetableRepository.findAll();
+        return timetableDetailRepository.findAll();
     }
 
     @Override
     public List<TimetableDetail> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
 
-        return timetableRepository.findAll(cns);
+        return timetableDetailRepository.findAll(cns);
     }
 
 

@@ -19,9 +19,9 @@ public class ReportController {
     ReportService reportService;
 
     @GetMapping("/generate")
-    public ResponseEntity generateFile(@RequestParam(name = "fileName") String fileName) {
+    public ResponseEntity generateFile(@RequestParam(name = "fileName") String fileName,@RequestParam(name = "semesterId") int semesterId) {
         try {
-            reportService.generateExcelFile(fileName);
+            reportService.generateExcelFile(fileName,semesterId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

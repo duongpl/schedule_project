@@ -27,22 +27,25 @@ public class ReportServiceImpl implements ReportService {
     ClassNameRepository classNameRepository;
     SubjectService subjectService;
     TimeTableDetailService timeTableDetailService;
+    TimetableDetailRepository timetableDetailRepository;
+    TimetableRepository timetableRepository;
     SlotService slotService;
     ReportRepository reportRepository;
     LecturerRepository lecturerRepository;
+    SemesterRepository semesterRepository;
 
     @Override
-    public void generateExcelFile(String fileName) {
+    public void generateExcelFile(String fileName, int semesterId) {
         try {
             FileInputStream file = new FileInputStream(new File(fileName));
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
-            Set<String> subjectNameList = new HashSet<>();
-            Set<String> roomNameList = new HashSet<>();
-            Set<String> classNameList = new HashSet<>();
-            Set<String> slotList = new HashSet<>();
+            Set<String> subjectNameSet = new HashSet<>();
+            Set<String> roomNameSet = new HashSet<>();
+            Set<String> classNameSet = new HashSet<>();
+            Set<String> slotSet = new HashSet<>();
             while (rowIterator.hasNext()) {
                 int column = 0;
                 Row row = rowIterator.next();
@@ -59,22 +62,34 @@ public class ReportServiceImpl implements ReportService {
                     }
                     switch (column) {
                         case 1:
-                            classNameList.add(cell.getStringCellValue().trim());
+                            if (classNameRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                                break;
+                            }
+                            classNameSet.add(cell.getStringCellValue().trim());
                             break;
                         case 2:
-                            subjectNameList.add(cell.getStringCellValue().trim());
+                            if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
+                                break;
+                            }
+                            subjectNameSet.add(cell.getStringCellValue().trim());
                             break;
                         case 3:
-                            slotList.add(cell.getStringCellValue().trim());
+                            if (slotService.getSlotByName(cell.getStringCellValue().trim()) != null) {
+                                break;
+                            }
+                            slotSet.add(cell.getStringCellValue().trim());
                             break;
                         case 5:
-                            roomNameList.add(cell.getStringCellValue().trim());
+                            if (roomService.getRoombyName(cell.getStringCellValue().trim()) != null) {
+                                break;
+                            }
+                            roomNameSet.add(cell.getStringCellValue().trim());
                             break;
                     }
                 }
             }
-            saveInformation(roomNameList, classNameList, subjectNameList, slotList);
-            saveSchedule(fileName);
+            saveInformation(roomNameSet, classNameSet, subjectNameSet, slotSet);
+            saveTimetable(fileName, semesterId);
             file.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,7 +149,7 @@ public class ReportServiceImpl implements ReportService {
         slotList.forEach(i -> slotService.addSlot(new Slot(i)));
     }
 
-    private void saveSchedule(String fileName) {
+    private void saveTimetable(String fileName, int semesterId) {
         try {
             FileInputStream file = new FileInputStream(new File(fileName));
             if (file == null) {
@@ -144,6 +159,13 @@ public class ReportServiceImpl implements ReportService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
+            Timetable existedTimetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
+
+            if (existedTimetable != null) {
+                timetableDetailRepository.deleteAllByTimetable(existedTimetable);
+                timetableRepository.deleteById(existedTimetable.getId());
+            }
+            Timetable timeTable = new Timetable();
             while (rowIterator.hasNext()) {
                 int column = 0;
                 Row row = rowIterator.next();
@@ -152,6 +174,7 @@ public class ReportServiceImpl implements ReportService {
                     continue;
                 }
                 TimetableDetail timetableDetail = new TimetableDetail();
+                timeTable.setSemester(semesterRepository.findById(semesterId));
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -173,9 +196,11 @@ public class ReportServiceImpl implements ReportService {
                             timetableDetail.setRoom(roomService.getRoombyName(cell.getStringCellValue().trim()));
                             break;
                     }
+                    timetableDetail.setTimetable(timeTable);
+                    timeTable.getTimetableDetails().add(timetableDetail);
                 }
-                timeTableDetailService.addTimeTableDetail(timetableDetail);
             }
+            timetableRepository.save(timeTable);
             file.close();
         } catch (Exception e) {
             e.printStackTrace();

@@ -6,7 +6,7 @@ import com.fpt.edu.schedule.repository.base.QueryParam;
 import java.util.List;
 
 public interface ReportService {
-    void generateExcelFile(String fileName);
+    void generateExcelFile(String fileName,int semesterId);
 
     Report addReport(Report report);
 

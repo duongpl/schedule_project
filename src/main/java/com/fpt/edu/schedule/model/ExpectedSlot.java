@@ -14,7 +14,7 @@ public class ExpectedSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int satisfactionLevel;
+    private int levelOfPrefer;
     @ManyToOne
     @JsonIgnore
     @JoinColumn

@@ -15,7 +15,7 @@ public class ExpectedSubject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int satisfactionLevel;
+    private int levelOfPrefer;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "expected_id")

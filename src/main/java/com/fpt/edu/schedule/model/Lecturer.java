@@ -25,6 +25,8 @@ public class Lecturer {
     private String phone;
     private Status status;
     private String department;
+    private int quotaClass;
+    private boolean fullTime;
     @ManyToMany()
     @JoinTable(name = "lectire_role",
             joinColumns = @JoinColumn(name = "user_id"),
