@@ -21,6 +21,7 @@ public class Lecturer {
     @Id
     private String id;
     private String fullName;
+    private String shortName;
     private String email;
     private String phone;
     private Status status;
