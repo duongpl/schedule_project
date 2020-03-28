@@ -8,7 +8,5 @@ import java.util.List;
 public interface TimeTableDetailService {
     void addTimeTableDetail(TimetableDetail timetableDetail);
 
-    List<TimetableDetail> getAllSchedule();
-
     List<TimetableDetail> findByCriteria(QueryParam queryParam);
 }

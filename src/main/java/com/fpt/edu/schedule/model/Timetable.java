@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,7 @@ public class Timetable {
     @JoinColumn(name = "semester_id")
     Semester semester;
     boolean temp;
+    @JsonIgnore
     @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL)
     private List<TimetableDetail> timetableDetails;
 

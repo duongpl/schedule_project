@@ -24,10 +24,6 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
     }
 
-    @Override
-    public List<TimetableDetail> getAllSchedule() {
-        return timetableDetailRepository.findAll();
-    }
 
     @Override
     public List<TimetableDetail> findByCriteria(QueryParam queryParam) {

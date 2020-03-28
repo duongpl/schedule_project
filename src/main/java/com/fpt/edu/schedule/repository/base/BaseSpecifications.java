@@ -3,10 +3,7 @@ package com.fpt.edu.schedule.repository.base;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +29,9 @@ public class BaseSpecifications<T> implements Specification<T> {
                     Map<String, Object> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
                     for (Map.Entry<String, Object> entry1 : mapEntry.entrySet()) {
                         if (entry.getValue() instanceof String) {
-                            predicates.add(criteriaBuilder.like(root.get(configKey(entry.getKey())).get(entry.getKey()), "%" + entry.getValue() + "%"));
+                            predicates.add(criteriaBuilder.like(getPath(root,entry.getKey()).get(entry.getKey()), "%" + entry.getValue() + "%"));
                         } else {
-                            predicates.add(criteriaBuilder.equal(root.get(configKey(entry.getKey())).get(entry1.getKey()), entry1.getValue()));
+                            predicates.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), entry1.getValue()));
                         }
                     }
                 } else {
@@ -53,8 +50,8 @@ public class BaseSpecifications<T> implements Specification<T> {
                     Map<String, List<Object>> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
                     for (Map.Entry<String, List<Object>> entry1 : mapEntry.entrySet()) {
                         entry1.getValue().forEach(i -> {
-                            Predicate predicate = (i instanceof String) ? criteriaBuilder.like(root.get(configKey(entry.getKey())).get(entry1.getKey()), "%" + i + "%")
-                                    : criteriaBuilder.equal(root.get(configKey(entry.getKey())).get(entry1.getKey()), i);
+                            Predicate predicate = (i instanceof String) ? criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%")
+                                    : criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i);
                             predicateList.add(predicate);
                         });
                     }
@@ -83,6 +80,23 @@ public class BaseSpecifications<T> implements Specification<T> {
             return split[split.length - 1];
         }
         return key;
+    }
+    protected Path<Comparable> getPath(Root<T> root,String key) {
+        Path<Comparable> path;
+        if (key.contains(".")) {
+            String[] split = key.split("\\.");
+            int keyPosition = 0;
+            path = root.get(split[keyPosition]);
+            for (String criteriaKeys : split) {
+                if (keyPosition > 0) {
+                    path = path.get(criteriaKeys);
+                }
+                keyPosition++;
+            }
+        } else {
+            path = root.get(key);
+        }
+        return path;
     }
 
 
