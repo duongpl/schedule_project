@@ -3,7 +3,6 @@ package com.fpt.edu.schedule.repository.base;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -18,7 +17,6 @@ public class QueryParam {
     private Map<String, Object> inCriteria;
 
     public QueryParam() {
-        criteria = new HashMap<>();
-        inCriteria = new HashMap<>();
+
     }
 }
