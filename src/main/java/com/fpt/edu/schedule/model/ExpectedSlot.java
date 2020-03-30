@@ -24,4 +24,9 @@ public class ExpectedSlot {
     @JsonProperty("name")
     private String slotName;
 
+    public ExpectedSlot(String slotName) {
+        this.slotName = slotName;
+
+    }
+
 }

@@ -2,17 +2,14 @@ package com.fpt.edu.schedule.service.impl;
 
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.model.Expected;
-import com.fpt.edu.schedule.model.ExpectedSubject;
-import com.fpt.edu.schedule.model.Lecturer;
-import com.fpt.edu.schedule.model.Subject;
+import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
-import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +32,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
     SemesterRepository semesterRepository;
-
+    private static final List<String> SLOT_LIST = Arrays.asList("M1","M2","M3","M4","M5","E1","E2","E3","E4","E5");
     @Override
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
@@ -44,10 +41,12 @@ public class ExpectedServiceImpl implements ExpectedService {
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find lecturer!");
         }
+        List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId());
         expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
         expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
+
         expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));
         return expectedRepository.save(expected);
     }
@@ -97,7 +96,11 @@ public class ExpectedServiceImpl implements ExpectedService {
             Expected newExpected = new Expected();
             List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
             List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
+            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i-> new ExpectedSlot(i)).collect(Collectors.toList());
             newExpected.setExpectedSubjects(expectedSubjectList);
+            newExpected.setExpectedSlots(expectedSlot);
+            newExpected.setLecturer(lecturerService.getLecturerNameById(lecturerId));
+            newExpected.setSemester(semesterRepository.findById(semesterId));
             return newExpected;
         }
         return expected;

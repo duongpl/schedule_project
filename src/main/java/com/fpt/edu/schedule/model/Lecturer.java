@@ -1,8 +1,6 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fpt.edu.schedule.common.enums.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +13,6 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Lecturer {
     @Id
     private String id;
