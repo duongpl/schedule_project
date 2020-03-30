@@ -28,6 +28,7 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
     @PutMapping
     public ResponseEntity updateExpected(@RequestBody Expected expected) {
         try {
