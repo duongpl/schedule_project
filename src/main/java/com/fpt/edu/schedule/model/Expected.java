@@ -22,9 +22,9 @@ public class Expected {
     @JoinColumn(name = "semester_id")
     private Semester semester;
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserName userName;
-    @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
+    @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
 
     private List<ExpectedSlot> expectedSlots;
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
@@ -32,9 +32,5 @@ public class Expected {
     @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
     private ExpectedNote expectedNote;
 
-
-    public void setExpectedSlots(List<ExpectedSlot> expectedSlots) {
-        this.expectedSlots.addAll(expectedSlots);
-    }
 }
 

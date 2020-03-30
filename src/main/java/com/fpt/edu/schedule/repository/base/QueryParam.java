@@ -1,16 +1,13 @@
-package com.fpt.edu.schedule.repository.impl;
+package com.fpt.edu.schedule.repository.base;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
-@NoArgsConstructor
+
 public class QueryParam {
 
 
@@ -18,4 +15,8 @@ public class QueryParam {
     private String sortField;
     private boolean ascending = true;
     private Map<String, Object> inCriteria;
+
+    public QueryParam() {
+
+    }
 }

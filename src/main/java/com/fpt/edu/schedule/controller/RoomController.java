@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Room;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

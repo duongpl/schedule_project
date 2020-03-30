@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Schedule {
+public class TimetableDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -24,13 +24,12 @@ public class Schedule {
     @JoinColumn(name = "room_id")
     private Room room;
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserName userName;
-    @ManyToOne
-    @JoinColumn(name = "semester_id")
-    private Semester semester;
+    @JoinColumn(name = "lecturer_id")
+    private Lecturer lecturer;
     @ManyToOne
     @JoinColumn(name = "class_id")
     private ClassName className;
-
+    @ManyToOne
+    @JoinColumn(name = "timetable_id")
+    private Timetable timetable;
 }

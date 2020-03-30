@@ -19,7 +19,7 @@ public class Room {
     private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Schedule> scheduleList;
+    private List<TimetableDetail> timetableDetailList;
 
     public Room(String name) {
         this.name = name;

@@ -1,12 +1,9 @@
 package com.fpt.edu.schedule.controller;
 
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-
-import com.fpt.edu.schedule.model.GooglePojo;
 import com.fpt.edu.schedule.common.util.GoogleUtils;
+import com.fpt.edu.schedule.model.GooglePojo;
+import com.fpt.edu.schedule.model.Lecturer;
+import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.apache.http.client.ClientProtocolException;
 import org.springframework.mail.SimpleMailMessage;
@@ -20,25 +17,24 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
 @RestController
-@SessionAttributes("name")
+@RequestMapping("/api/v1/google")
 public class GoogleController {
 
     private JavaMailSender javaMailSender;
     private GoogleUtils googleUtils;
+    LecturerService lecturerService;
 
 
+    @GetMapping("login")
+    public Lecturer getAccessToken(@RequestParam("accessToken") String accessToken, HttpServletRequest request) throws ClientProtocolException, IOException {
 
-    @PostMapping("login-google")
-    public String loginGoogle(HttpServletRequest request, ModelMap modelMap) throws ClientProtocolException, IOException {
-        String code = request.getParameter("code");
-
-        if (code == null || code.isEmpty()) {
-            return "redirect:/login?google=error";
-        }
-        String accessToken = googleUtils.getToken(code);
         GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
 //        if (!googlePojo.getHd().equalsIgnoreCase("fpt.edu.vn")) {
 //            throw new IllegalArgumentException("not have permission");
@@ -48,24 +44,7 @@ public class GoogleController {
                 userDetail.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        modelMap.addAttribute("name", googlePojo.getEmail());
-        return googlePojo.getId();
-    }
-
-    @RequestMapping("/user")
-    public String user() {
-
-        return "user";
-    }
-
-    @RequestMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
-
-    @RequestMapping("/403")
-    public String accessDenied() {
-        return "403";
+        return lecturerService.getLecturerNameById(googlePojo.getId());
     }
 
 

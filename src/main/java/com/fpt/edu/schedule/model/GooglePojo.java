@@ -19,5 +19,7 @@ public class GooglePojo {
     private String link;
     private String picture;
     private String hd;
+    private String locale;
+    private String gender;
 
 }

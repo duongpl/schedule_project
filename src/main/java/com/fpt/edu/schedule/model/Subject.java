@@ -20,7 +20,8 @@ public class Subject {
     private String department;
     @JsonIgnore
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
-    private List<Schedule> scheduleList;
+    private List<TimetableDetail> timetableDetailList;
+
     public Subject(String code,String department) {
         this.code = code;
         this.department = department;

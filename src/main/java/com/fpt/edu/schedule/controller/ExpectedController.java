@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Expected;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ExpectedService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +28,7 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
     @PutMapping
     public ResponseEntity updateExpected(@RequestBody Expected expected) {
         try {
@@ -52,7 +53,18 @@ public class ExpectedController  {
     @DeleteMapping("/{expectedId}")
     public ResponseEntity remove(@PathVariable("expectedId") int expectedId) {
         try {
-            return new ResponseEntity(expectedService.removeExpectedById(expectedId), HttpStatus.OK);
+            expectedService.removeExpectedById(expectedId);
+            return new ResponseEntity( HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping()
+    public ResponseEntity getByLecturerAndSemester(@RequestParam(name = "lecturerId") String lecturerId,
+                                                   @RequestParam(name = "semesterId") int semesterId) {
+        try {
+            expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId);
+            return new ResponseEntity( expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

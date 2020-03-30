@@ -1,9 +1,11 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 
 @Getter
@@ -14,11 +16,17 @@ public class ExpectedSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int satisfactionLevel;
+    private int levelOfPrefer;
     @ManyToOne
     @JsonIgnore
-    @JoinColumn(name = "expected_id")
+    @JoinColumn
     private Expected expected;
+    @JsonProperty("name")
     private String slotName;
+
+    public ExpectedSlot(String slotName) {
+        this.slotName = slotName;
+
+    }
 
 }

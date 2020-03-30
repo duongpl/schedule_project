@@ -15,10 +15,11 @@ public class ExpectedNote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int numberOfClass;
+    private int expectedNumOfClass;
+    private int maxConsecutiveSlot;
     private String note;
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "expected_id")
     private Expected expected;
     }

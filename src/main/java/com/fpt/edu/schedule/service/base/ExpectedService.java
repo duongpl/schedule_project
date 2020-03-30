@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.service.base;
 
 
 import com.fpt.edu.schedule.model.Expected;
-import com.fpt.edu.schedule.repository.impl.QueryParam;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ public interface ExpectedService {
 
     List<Expected> findByCriteria(QueryParam queryParam);
 
-    Expected removeExpectedById(int expectedId);
+    void removeExpectedById(int expectedId);
+
+    Expected getExpectedByLecturerAndSemester(String lecturerId,int semesterId);
 
 }
