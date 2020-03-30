@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +21,7 @@ public class ExpectedSubject {
     @ManyToOne
     @JoinColumn(name = "expected_id")
     private Expected expected;
+    @JsonProperty("name")
     private String subjectCode;
 
     public void setSubjectCode(String subjectCode) {
