@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.service.impl;
 
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.RoomRepository;
@@ -21,8 +22,12 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room getRoombyName(String name) {
-       return roomRepository.findByName(name);
+    public Room getRoomByName(String name) {
+       Room room = roomRepository.findByName(name);
+        if(room == null){
+            throw new InvalidRequestException("Don't find this room");
+        }
+        return room;
     }
 
     @Override

@@ -64,6 +64,7 @@ public class GoogleUtils {
             lecturer.setFullName(googlePojo.getGiven_name());
             lecturer.setId(googlePojo.getId());
             lecturer.setEmail(googlePojo.getEmail());
+            lecturer.setShortName(lecturer.getEmail().substring(0,lecturer.getEmail().indexOf('@')));
             ArrayList<Role> roleList = new ArrayList<>();
             roleList.add(roleRepository.findByRoleName("ROLE_USER"));
             lecturer.setRoleList(roleList);

@@ -16,4 +16,6 @@ public interface ExpectedService {
 
     void removeExpectedById(int expectedId);
 
+    Expected getExpectedByLecturerAndSemester(String lecturerId,int semesterId);
+
 }

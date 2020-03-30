@@ -36,7 +36,11 @@ public class LecturerServiceImpl implements LecturerService {
     }
     @Override
     public Lecturer getLecturerNameById(String id) {
-        return lecturerRepository.findById(id);
+        Lecturer lecturer =lecturerRepository.findById(id);
+        if(lecturer == null){
+            throw new  InvalidRequestException("Don't find this lecturer");
+        }
+        return lecturer;
     }
 
     @Override
@@ -62,6 +66,15 @@ public class LecturerServiceImpl implements LecturerService {
         }
         existedUser.setStatus(status);
         return lecturerRepository.save(existedUser);
+    }
+
+    @Override
+    public Lecturer findByShortName(String shortName) {
+        Lecturer lecturer =lecturerRepository.findByShortName(shortName);
+        if(lecturer == null){
+            throw new  InvalidRequestException("Don't find this lecturer");
+        }
+        return lecturer;
     }
 
 

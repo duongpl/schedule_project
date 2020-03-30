@@ -80,7 +80,7 @@ public class ReportServiceImpl implements ReportService {
                             slotSet.add(cell.getStringCellValue().trim());
                             break;
                         case 5:
-                            if (roomService.getRoombyName(cell.getStringCellValue().trim()) != null) {
+                            if (roomService.getRoomByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
                             roomNameSet.add(cell.getStringCellValue().trim());
@@ -193,7 +193,7 @@ public class ReportServiceImpl implements ReportService {
                             timetableDetail.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
                             break;
                         case 5:
-                            timetableDetail.setRoom(roomService.getRoombyName(cell.getStringCellValue().trim()));
+                            timetableDetail.setRoom(roomService.getRoomByName(cell.getStringCellValue().trim()));
                             break;
                     }
                     timetableDetail.setTimetable(timeTable);

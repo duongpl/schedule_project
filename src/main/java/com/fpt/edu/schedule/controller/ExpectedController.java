@@ -58,4 +58,14 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping()
+    public ResponseEntity getByLecturerAndSemester(@RequestParam(name = "lecturerId") String lecturerId,
+                                                   @RequestParam(name = "semesterId") int semesterId) {
+        try {
+            expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId);
+            return new ResponseEntity( expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

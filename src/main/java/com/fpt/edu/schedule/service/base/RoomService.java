@@ -8,7 +8,7 @@ import java.util.List;
 public interface RoomService {
     void addRoom(Room room);
 
-    Room getRoombyName(String name);
+    Room getRoomByName(String name);
 
     List<Room> findByCriteria(QueryParam queryParam);
 }

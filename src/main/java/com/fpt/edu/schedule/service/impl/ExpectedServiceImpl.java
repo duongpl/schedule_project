@@ -3,7 +3,9 @@ package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Expected;
+import com.fpt.edu.schedule.model.ExpectedSubject;
 import com.fpt.edu.schedule.model.Lecturer;
+import com.fpt.edu.schedule.model.Subject;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.*;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Duc Anh
@@ -84,6 +87,20 @@ public class ExpectedServiceImpl implements ExpectedService {
             throw new InvalidRequestException("Don't find this expected");
         }
         expectedRepository.removeExpectedById(existedExpected.getId());
+    }
+
+    @Override
+    public Expected getExpectedByLecturerAndSemester(String lecturerId, int semesterId) {
+        Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
+                lecturerService.getLecturerNameById(lecturerId));
+        if (expected == null) {
+            Expected newExpected = new Expected();
+            List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
+            List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
+            newExpected.setExpectedSubjects(expectedSubjectList);
+            return newExpected;
+        }
+        return expected;
     }
 
 

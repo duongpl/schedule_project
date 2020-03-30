@@ -28,4 +28,9 @@ public class ExpectedSubject {
         System.out.println("abc");
         this.subjectCode = subjectCode;
     }
+
+    public ExpectedSubject(String subjectCode) {
+        this.subjectCode = subjectCode;
+
+    }
 }

@@ -8,11 +8,12 @@ import org.springframework.data.repository.Repository;
 import java.util.List;
 
 public interface TimetableDetailRepository extends Repository<TimetableDetail, Integer>, JpaSpecificationExecutor<TimetableDetail> {
-    void save(TimetableDetail timetableDetail);
-
+    TimetableDetail save(TimetableDetail timetableDetail);
 
     List<TimetableDetail> findAll();
 
     void deleteAllByTimetable(Timetable timetable);
+
+    TimetableDetail findById(int id);
 
 }

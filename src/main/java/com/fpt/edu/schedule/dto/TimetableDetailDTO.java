@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TimetableDetailDTO {
     private int id;
-    private String lecturerName;
+    private String lecturerShortName;
     private String room;
     private String className;
     private String slot;

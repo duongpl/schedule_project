@@ -18,4 +18,6 @@ public interface LecturerService {
 
     Lecturer updateStatus(Status status, String userId);
 
+    Lecturer findByShortName(String shortName);
+
 }

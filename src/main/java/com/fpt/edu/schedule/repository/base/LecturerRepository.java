@@ -10,4 +10,6 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     Lecturer findById(String id);
 
+    Lecturer findByShortName(String shortName);
+
 }
