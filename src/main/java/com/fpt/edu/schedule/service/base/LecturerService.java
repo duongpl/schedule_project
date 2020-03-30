@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface LecturerService {
 
-    Lecturer addUser(Lecturer user);
+    Lecturer addLecture(Lecturer lecture);
+
+    void remove(String id);
 
     List<Lecturer> findByCriteria(QueryParam queryParam);
 
-    Lecturer getLecturerNameById(String id);
+    Lecturer getLecturerGoogleId(String id);
 
     Lecturer updateLecturerName(Lecturer lecturer);
 

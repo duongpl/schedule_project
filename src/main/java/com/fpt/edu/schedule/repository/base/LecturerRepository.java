@@ -8,8 +8,12 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     Lecturer save(Lecturer lecturer);
 
-    Lecturer findById(String id);
+    Lecturer findByGoogleId(String id);
 
     Lecturer findByShortName(String shortName);
+
+    Lecturer findByEmail(String email);
+
+    void removeByGoogleId(String id);
 
 }

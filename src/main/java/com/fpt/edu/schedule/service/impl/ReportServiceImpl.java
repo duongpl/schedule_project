@@ -100,7 +100,7 @@ public class ReportServiceImpl implements ReportService {
     public Report addReport(Report report) {
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
-        Lecturer lecturer = lecturerRepository.findById(report.getLecturer().getId());
+        Lecturer lecturer = lecturerRepository.findByGoogleId(report.getLecturer().getGoogleId());
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find user!");
         }

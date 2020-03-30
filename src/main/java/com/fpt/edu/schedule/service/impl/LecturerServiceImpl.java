@@ -18,8 +18,16 @@ public class LecturerServiceImpl implements LecturerService {
     LecturerRepository lecturerRepository;
 
     @Override
-    public Lecturer addUser(Lecturer user) {
-        return lecturerRepository.save(user);
+    public Lecturer addLecture(Lecturer lecturer) {
+        Lecturer newLecturer = new Lecturer();
+        newLecturer.setEmail(lecturer.getEmail());
+        newLecturer.setShortName(lecturer.getEmail().substring(0, lecturer.getEmail().indexOf('@')));
+        return lecturerRepository.save(lecturer);
+    }
+
+    @Override
+    public void remove(String id) {
+        lecturerRepository.removeByGoogleId(id);
     }
 
     @Override
@@ -35,8 +43,8 @@ public class LecturerServiceImpl implements LecturerService {
         return lecturerRepository.findAll(cns);
     }
     @Override
-    public Lecturer getLecturerNameById(String id) {
-        Lecturer lecturer =lecturerRepository.findById(id);
+    public Lecturer getLecturerGoogleId(String id) {
+        Lecturer lecturer =lecturerRepository.findByGoogleId(id);
         if(lecturer == null){
             throw new  InvalidRequestException("Don't find this lecturer");
         }
@@ -45,7 +53,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer updateLecturerName(Lecturer lecturer) {
-        Lecturer existedUser = lecturerRepository.findById(lecturer.getId());
+        Lecturer existedUser = lecturerRepository.findByGoogleId(lecturer.getGoogleId());
         if(existedUser == null){
             throw new InvalidRequestException("Don't find this user !");
         }
@@ -60,12 +68,13 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer updateStatus(Status status, String userId) {
-        Lecturer existedUser= lecturerRepository.findById(userId);
-        if(existedUser == null){
-            throw new InvalidRequestException("Don't find this user !");
-        }
-        existedUser.setStatus(status);
-        return lecturerRepository.save(existedUser);
+//        Lecturer existedUser= lecturerRepository.findById(userId);
+//        if(existedUser == null){
+//            throw new InvalidRequestException("Don't find this user !");
+//        }
+//        existedUser.setStatus(status);
+//        return lecturerRepository.save(existedUser);
+        return null;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class ExpectedSlotServiceImpl implements ExpectedSlotService {
     public ExpectedSlot update(ExpectedSlot expectedSlot) {
         ExpectedSlot existed = expectedSlotRepository.findById(expectedSlot.getId());
         if(existed == null){
-            throw new InvalidRequestException("Not found !");
+            throw new InvalidRequestException("Not found this expected slot !");
         }
         existed.setLevelOfPrefer(expectedSlot.getLevelOfPrefer());
         return expectedSlotRepository.save(existed);
