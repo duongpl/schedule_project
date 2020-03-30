@@ -6,10 +6,7 @@ import com.fpt.edu.schedule.model.Expected;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.service.base.ExpectedService;
-import com.fpt.edu.schedule.service.base.SlotService;
-import com.fpt.edu.schedule.service.base.SubjectService;
-import com.fpt.edu.schedule.service.base.LecturerService;
+import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +28,8 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedRepository expectedRepository;
     ExpectedSlotRepository expectedSlotRepository;
     ExpectedSubjectRepository expectedSubjectRepository;
+    ExpectedSlotService expectedSlotService;
+    ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
     SemesterRepository semesterRepository;
 
@@ -62,14 +61,10 @@ public class ExpectedServiceImpl implements ExpectedService {
             existedExpected.getExpectedNote().setExpected(existedExpected);
         }
         if (expected.getExpectedSlots() != null) {
-            existedExpected.setExpectedSlots(expected.getExpectedSlots());
-            expectedSlotRepository.removeAllByExpected(existedExpected);
-            existedExpected.getExpectedSlots().stream().forEach(i -> i.setExpected(existedExpected));
+            expected.getExpectedSlots().forEach(i -> expectedSlotService.update(i));
         }
         if (expected.getExpectedSubjects() != null) {
-            existedExpected.setExpectedSubjects(expected.getExpectedSubjects());
-            expectedSubjectRepository.removeAllByExpected(existedExpected);
-            existedExpected.getExpectedSubjects().stream().forEach(i -> i.setExpected(existedExpected));
+            expected.getExpectedSubjects().forEach(i -> expectedSubjectService.update(i));
         }
         existedExpected.setUpdatedDate(new Date());
         return expectedRepository.save(existedExpected);

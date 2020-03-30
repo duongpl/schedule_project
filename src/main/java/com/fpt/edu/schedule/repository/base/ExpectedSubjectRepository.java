@@ -7,4 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ExpectedSubjectRepository extends JpaRepository<ExpectedSubject,Integer> {
     void removeAllByExpected(Expected expected);
 
+    ExpectedSubject save(ExpectedSubject expectedSubject);
+
+    ExpectedSubject findById(int id);
+
 }
