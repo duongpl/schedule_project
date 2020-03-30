@@ -32,23 +32,32 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
     SemesterRepository semesterRepository;
-    private static final List<String> SLOT_LIST = Arrays.asList("M1","M2","M3","M4","M5","E1","E2","E3","E4","E5");
+    private static final List<String> SLOT_LIST = Arrays.asList("M1", "M2", "M3", "M4", "M5", "E1", "E2", "E3", "E4", "E5");
+
     @Override
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
         expected.setUpdatedDate(new Date());
-        Lecturer lecturer = lecturerService.getLecturerNameById(expected.getLecturer().getId());
-        if (lecturer == null) {
-            throw new InvalidRequestException("Don't find lecturer!");
-        }
+        Lecturer lecturer = new Lecturer();
+        List<String> slotRequests = expected.getExpectedSlots().stream().map(ExpectedSlot::getSlotName).collect(Collectors.toList());
+        List<String> subjectRequests = expected.getExpectedSubjects().stream().map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
         List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId());
+        List<Subject> subjectsNotContainInRequest = subjects.stream().filter(i -> !subjectRequests.contains(i.getCode())).collect(Collectors.toList());
+        List<String> slotNotContainInRequest = SLOT_LIST.stream().filter(o -> !slotRequests.contains(o)).collect(Collectors.toList());
+        subjectsNotContainInRequest.forEach(i -> {
+            expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode()));
+        });
+        slotNotContainInRequest.forEach(i-> {
+            expected.getExpectedSlots().add(new ExpectedSlot(i));
+        });
         expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
+
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
         expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
 
         expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));
-        return expectedRepository.save(expected);
+        return null;
     }
 
     @Override
@@ -96,7 +105,7 @@ public class ExpectedServiceImpl implements ExpectedService {
             Expected newExpected = new Expected();
             List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
             List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
-            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i-> new ExpectedSlot(i)).collect(Collectors.toList());
+            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i -> new ExpectedSlot(i)).collect(Collectors.toList());
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.getLecturerNameById(lecturerId));

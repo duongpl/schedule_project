@@ -21,6 +21,7 @@ public class Subject {
     @JsonIgnore
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
     private List<TimetableDetail> timetableDetailList;
+
     public Subject(String code,String department) {
         this.code = code;
         this.department = department;
