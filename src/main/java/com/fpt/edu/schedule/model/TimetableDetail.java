@@ -27,7 +27,7 @@ public class TimetableDetail {
     @JoinColumn(name = "lecturer_id")
     private Lecturer lecturer;
     @ManyToOne
-    @JoinColumn(name = "class_id")
+    @JoinColumn(name = "studentGroup_id")
     private StudentGroup studentGroup;
     @ManyToOne
     @JoinColumn(name = "timetable_id")
