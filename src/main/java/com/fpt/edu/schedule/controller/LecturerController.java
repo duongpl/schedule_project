@@ -30,7 +30,7 @@ public class LecturerController {
         }
     }
     @PostMapping()
-    public ResponseEntity<Lecturer> addNewLecture(@RequestBody Lecturer lecturer,@RequestHeader String currentLecturerId) {
+    public ResponseEntity<Lecturer> addNewLecture(@RequestBody Lecturer lecturer) {
         try {
             return new ResponseEntity(lecturerService.addLecture(lecturer), HttpStatus.OK);
         } catch (Exception e) {
