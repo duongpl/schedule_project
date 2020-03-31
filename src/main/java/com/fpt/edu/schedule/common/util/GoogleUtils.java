@@ -55,7 +55,6 @@ public class GoogleUtils {
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
-        Lecturer lecturer;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         Lecturer existedUser = lecturerRepository.findByEmail(googlePojo.getEmail());
         if (existedUser == null) {

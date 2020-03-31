@@ -32,8 +32,8 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             semesterService.save(new Semester("summer","2020"));
             semesterService.save(new Semester("spring","2020"));
         }
-        if(lecturerRepository.findByEmail("clok0001@gmai.com") == null){
-            lecturerRepository.save(new Lecturer("clok0001@gmai.com"));
+        if(lecturerRepository.findByEmail("clok0001@gmail.com") == null){
+            lecturerRepository.save(new Lecturer("clok0001@gmail.com"));
         }
     }
 }
