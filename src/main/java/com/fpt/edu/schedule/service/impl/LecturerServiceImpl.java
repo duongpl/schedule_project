@@ -8,6 +8,7 @@ import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.LecturerRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
+import com.fpt.edu.schedule.repository.base.RoleRepository;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,14 @@ import java.util.List;
 @Service
 public class LecturerServiceImpl implements LecturerService {
     LecturerRepository lecturerRepository;
+    RoleRepository roleRepository;
 
     @Override
     public Lecturer addLecture(Lecturer lecturer) {
         Lecturer newLecturer = new Lecturer();
         newLecturer.setEmail(lecturer.getEmail());
         newLecturer.setShortName(lecturer.getEmail().substring(0, lecturer.getEmail().indexOf('@')));
+        newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_ADMIN.getName()));;
         return lecturerRepository.save(lecturer);
     }
 
