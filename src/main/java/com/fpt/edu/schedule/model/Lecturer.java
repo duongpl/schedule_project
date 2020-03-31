@@ -43,7 +43,7 @@ public class Lecturer {
     @Transient
     private boolean headOfDepartment;
 
-
-
-
+    public Lecturer(String email) {
+        this.email = email;
+    }
 }
