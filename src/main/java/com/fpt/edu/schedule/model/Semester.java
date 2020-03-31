@@ -29,9 +29,10 @@ public class Semester {
     @JsonIgnore
     @OneToOne(mappedBy = "semester",cascade=CascadeType.ALL)
     private Timetable timeTable;
-    public Semester(String season,String year) {
+    public Semester(String season,String year,boolean now) {
         this.season = season;
         this.year = year;
+        this.now = now;
     }
     public boolean now;
 }

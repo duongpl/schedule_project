@@ -29,8 +29,8 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             roleService.addRole(new Role("ROLE_USER"));
         }
         if(semesterService.countAllSemester() == 0){
-            semesterService.save(new Semester("summer","2020"));
-            semesterService.save(new Semester("spring","2020"));
+            semesterService.save(new Semester("summer","2020",true));
+            semesterService.save(new Semester("spring","2020",false));
         }
         if(lecturerRepository.findByEmail("clok0001@gmail.com") == null){
             lecturerRepository.save(new Lecturer("clok0001@gmail.com"));
