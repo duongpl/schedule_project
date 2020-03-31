@@ -69,7 +69,7 @@ public class BaseSpecifications<T> implements Specification<T> {
             predicates.add(criteriaBuilder.or(predicateList.toArray(new Predicate[0])));
         }
         if (sortField != null && sortField.length() > 0) {
-            query.orderBy(queryParam.isAscending() ? criteriaBuilder.asc(root.get(sortField)) : criteriaBuilder.desc(root.get(sortField)));
+            query.orderBy(queryParam.isAscending() ? criteriaBuilder.asc(getPath(root,sortField)) : criteriaBuilder.desc(getPath(root,sortField)));
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
