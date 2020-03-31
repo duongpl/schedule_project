@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 
+import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Lecturer;
@@ -35,9 +36,12 @@ public class LecturerServiceImpl implements LecturerService {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         for(Object u : lecturerRepository.findAll(cns)){
             if(u instanceof Lecturer){
-                ((Lecturer) u).setFillingExpected(true);
-                ((Lecturer) u).setHeadOfDepartment(true);
-
+                if(1 == 1) {
+                    ((Lecturer) u).setFillingExpected(true);
+                }
+                if(((Lecturer) u).getRole().getRoleName().equals(Role.ROLE_ADMIN)) {
+                    ((Lecturer) u).setHeadOfDepartment(true);
+                }
             }
         }
         return lecturerRepository.findAll(cns);

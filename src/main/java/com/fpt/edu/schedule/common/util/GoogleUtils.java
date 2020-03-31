@@ -58,7 +58,7 @@ public class GoogleUtils {
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         Lecturer existedUser = lecturerRepository.findByEmail(googlePojo.getEmail());
         if (existedUser == null) {
-            throw new InvalidRequestException("Don't have permission");
+            throw new InvalidRequestException("Don't have permission access");
         }
         if (existedUser.isLogin()) {
             authorities.add(new SimpleGrantedAuthority(existedUser.getRole().getRoleName()));
