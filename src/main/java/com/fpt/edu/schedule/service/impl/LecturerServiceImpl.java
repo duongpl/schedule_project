@@ -25,8 +25,8 @@ public class LecturerServiceImpl implements LecturerService {
         Lecturer newLecturer = new Lecturer();
         newLecturer.setEmail(lecturer.getEmail());
         newLecturer.setShortName(lecturer.getEmail().substring(0, lecturer.getEmail().indexOf('@')));
-        newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_ADMIN.getName()));;
-        return lecturerRepository.save(lecturer);
+        newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_USER.getName()));;
+        return lecturerRepository.save(newLecturer);
     }
 
     @Override
