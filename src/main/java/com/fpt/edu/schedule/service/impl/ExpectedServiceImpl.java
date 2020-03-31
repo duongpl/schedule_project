@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -100,6 +101,8 @@ public class ExpectedServiceImpl implements ExpectedService {
             List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
             List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
             List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i-> new ExpectedSlot(i)).collect(Collectors.toList());
+            Collections.sort(expectedSubjectList);
+            Collections.sort(expectedSlot);
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.getLecturerNameById(lecturerId));

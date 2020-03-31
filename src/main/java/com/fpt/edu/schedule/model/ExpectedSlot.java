@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ExpectedSlot {
+public class ExpectedSlot implements Comparable<ExpectedSlot> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -29,4 +29,8 @@ public class ExpectedSlot {
 
     }
 
+    @Override
+    public int compareTo(ExpectedSlot expectedSlot) {
+        return this.slotName.compareTo(expectedSlot.slotName);
+    }
 }

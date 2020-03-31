@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ExpectedSubject {
+public class ExpectedSubject implements Comparable<ExpectedSubject> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -32,5 +32,11 @@ public class ExpectedSubject {
     public ExpectedSubject(String subjectCode) {
         this.subjectCode = subjectCode;
 
+    }
+
+
+    @Override
+    public int compareTo(ExpectedSubject expectedSubject) {
+        return  this.subjectCode.compareTo(expectedSubject.subjectCode);
     }
 }
