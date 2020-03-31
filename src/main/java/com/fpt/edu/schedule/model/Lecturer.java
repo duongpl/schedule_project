@@ -1,10 +1,10 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fpt.edu.schedule.common.enums.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,21 +15,22 @@ import java.util.List;
 @NoArgsConstructor
 public class Lecturer {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String googleId;
     private String fullName;
     private String shortName;
     private String email;
     private String phone;
-    private Status status;
     private String department;
     private int quotaClass;
     private boolean fullTime;
-    @ManyToMany()
-    @JoinTable(name = "lecture_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private List<Role> roleList;
+    private boolean login = false;
+    @Type(type = "text")
+    private String picture;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -42,5 +43,7 @@ public class Lecturer {
     @Transient
     private boolean headOfDepartment;
 
-
+    public Lecturer(String email) {
+        this.email = email;
+    }
 }

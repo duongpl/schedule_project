@@ -1,7 +1,9 @@
 package com.fpt.edu.schedule.config;
 
+import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Role;
 import com.fpt.edu.schedule.model.Semester;
+import com.fpt.edu.schedule.repository.base.LecturerRepository;
 import com.fpt.edu.schedule.service.base.RoleService;
 import com.fpt.edu.schedule.service.base.SemesterService;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
 
     private RoleService roleService;
     private SemesterService semesterService;
+    private LecturerRepository lecturerRepository;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -27,6 +30,10 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
         }
         if(semesterService.countAllSemester() == 0){
             semesterService.save(new Semester("summer","2020"));
+            semesterService.save(new Semester("spring","2020"));
+        }
+        if(lecturerRepository.findByEmail("clok0001@gmail.com") == null){
+            lecturerRepository.save(new Lecturer("clok0001@gmail.com"));
         }
     }
 }

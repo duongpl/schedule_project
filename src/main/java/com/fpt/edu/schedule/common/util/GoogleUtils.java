@@ -3,12 +3,11 @@ package com.fpt.edu.schedule.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.edu.schedule.common.enums.Status;
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.GooglePojo;
-import com.fpt.edu.schedule.model.Role;
 import com.fpt.edu.schedule.model.Lecturer;
-import com.fpt.edu.schedule.repository.base.RoleRepository;
 import com.fpt.edu.schedule.repository.base.LecturerRepository;
+import com.fpt.edu.schedule.repository.base.RoleRepository;
 import lombok.AllArgsConstructor;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.fluent.Form;
@@ -56,26 +55,22 @@ public class GoogleUtils {
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
-        Lecturer lecturer;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        Lecturer existedUser = lecturerRepository.findById(googlePojo.getId());
+        Lecturer existedUser = lecturerRepository.findByEmail(googlePojo.getEmail());
         if (existedUser == null) {
-            lecturer = new Lecturer();
-            lecturer.setFullName(googlePojo.getGiven_name());
-            lecturer.setId(googlePojo.getId());
-            lecturer.setEmail(googlePojo.getEmail());
-            lecturer.setShortName(lecturer.getEmail().substring(0,lecturer.getEmail().indexOf('@')));
-            ArrayList<Role> roleList = new ArrayList<>();
-            roleList.add(roleRepository.findByRoleName("ROLE_USER"));
-            lecturer.setRoleList(roleList);
-            lecturer.setStatus(Status.DEACTIVATE);
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            lecturerRepository.save(lecturer);
-        } else {
-            existedUser.getRoleList().forEach(i -> {
-                authorities.add(new SimpleGrantedAuthority(i.getRoleName()));
-            });
+            throw new InvalidRequestException("Don't have permission access");
         }
+        if (existedUser.isLogin()) {
+            authorities.add(new SimpleGrantedAuthority(existedUser.getRole().getRoleName()));
+        }
+        existedUser.setGoogleId(googlePojo.getId());
+        existedUser.setFullName(googlePojo.getGiven_name());
+        existedUser.setPicture(googlePojo.getPicture());
+        existedUser.setLogin(true);
+        existedUser.setRole(roleRepository.findByRoleName("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        lecturerRepository.save(existedUser);
+
 
         UserDetails userDetail = new org.springframework.security.core.userdetails.User(googlePojo.getEmail(),
                 "", enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);

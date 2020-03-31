@@ -33,6 +33,7 @@ public class ReportServiceImpl implements ReportService {
     ReportRepository reportRepository;
     LecturerRepository lecturerRepository;
     SemesterRepository semesterRepository;
+    RoomRepository roomRepository;
 
     @Override
     public void generateExcelFile(String fileName, int semesterId) {
@@ -80,7 +81,7 @@ public class ReportServiceImpl implements ReportService {
                             slotSet.add(cell.getStringCellValue().trim());
                             break;
                         case 5:
-                            if (roomService.getRoomByName(cell.getStringCellValue().trim()) != null) {
+                            if (roomRepository.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
                             roomNameSet.add(cell.getStringCellValue().trim());
@@ -100,7 +101,7 @@ public class ReportServiceImpl implements ReportService {
     public Report addReport(Report report) {
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
-        Lecturer lecturer = lecturerRepository.findById(report.getLecturer().getId());
+        Lecturer lecturer = lecturerRepository.findByGoogleId(report.getLecturer().getGoogleId());
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find user!");
         }

@@ -15,7 +15,7 @@ public class ExpectedSubjectServiceImpl implements ExpectedSubjectService {
     public ExpectedSubject update(ExpectedSubject expectedSlot) {
         ExpectedSubject existed = expectedSubjectRepository.findById(expectedSlot.getId());
         if(existed == null){
-            throw new InvalidRequestException("Not found !");
+            throw new InvalidRequestException("Not found this expected subject !");
         }
         existed.setLevelOfPrefer(expectedSlot.getLevelOfPrefer());
         return expectedSubjectRepository.save(existed);

@@ -22,11 +22,28 @@ public class LecturerController {
 
 
     @GetMapping("/{lecturerId}")
-    public ResponseEntity<Lecturer> getLecturerById(@PathVariable("lecturerId") String lecturerID) {
+    public ResponseEntity<Lecturer> getLecturerById(@PathVariable("lecturerId") String lecturerId) {
         try {
-            return new ResponseEntity(lecturerService.getLecturerNameById(lecturerID), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.getLecturerGoogleId(lecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping()
+    public ResponseEntity<Lecturer> addNewLecture(@RequestBody Lecturer lecturer,@RequestHeader String currentLecturerId) {
+        try {
+            return new ResponseEntity(lecturerService.addLecture(lecturer), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @DeleteMapping("/{googleId}")
+    public ResponseEntity<Lecturer> removeLecture(@PathVariable("googleId") String googleId) {
+        try {
+            lecturerService.remove(googleId);
+            return new ResponseEntity( HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

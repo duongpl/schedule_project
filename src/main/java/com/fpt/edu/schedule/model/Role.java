@@ -18,9 +18,9 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String roleName;
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     @JsonIgnore
-    @ManyToMany(mappedBy = "roleList")
-    private List<Lecturer> userList;
+    private List<Lecturer> lecturers;
 
     public Role(String roleName) {
         this.roleName = roleName;

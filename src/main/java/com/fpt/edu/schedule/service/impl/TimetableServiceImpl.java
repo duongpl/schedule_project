@@ -10,7 +10,7 @@ import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,11 +32,10 @@ public class TimetableServiceImpl implements TimetableService {
         List<TimetableDetail> timetableDetails = timetableRepository.findBySemester(semesterRepository.findById(semesterId)).getTimetableDetails();
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getFullName() : null, i.getRoom().getName(),
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        List<TimetableEdit> timetableEdits = new ArrayList<>();
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlot));
-        collect.entrySet().stream().map(i-> new TimetableEdit(i.getKey(),i.getValue())).collect(Collectors.toList());
-
-        return collect.entrySet().stream().map(i-> new TimetableEdit(i.getKey(),i.getValue())).collect(Collectors.toList());
+        List<TimetableEdit> timetableEdits =collect.entrySet().stream().map(i-> new TimetableEdit(i.getKey(),i.getValue())).collect(Collectors.toList());
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getSlot));
+        return timetableEdits;
 
     }
 }

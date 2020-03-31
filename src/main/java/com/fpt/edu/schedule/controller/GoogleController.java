@@ -44,7 +44,7 @@ public class GoogleController {
                 userDetail.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return lecturerService.getLecturerNameById(googlePojo.getId());
+        return lecturerService.getLecturerGoogleId(googlePojo.getId());
     }
 
 
