@@ -31,7 +31,7 @@ public class TimetableServiceImpl implements TimetableService {
     public List<TimetableEdit> getTimetableBySemester(int semesterId) {
         List<TimetableDetail> timetableDetails = timetableRepository.findBySemester(semesterRepository.findById(semesterId)).getTimetableDetails();
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getFullName() : null, i.getRoom().getName(),
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+                i.getStudentGroup().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlot));
         List<TimetableEdit> timetableEdits =collect.entrySet().stream().map(i-> new TimetableEdit(i.getKey(),i.getValue())).collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getSlot));

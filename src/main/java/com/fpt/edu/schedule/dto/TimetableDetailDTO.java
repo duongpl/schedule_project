@@ -13,7 +13,7 @@ public class TimetableDetailDTO {
     private int id;
     private String lecturerShortName;
     private String room;
-    private String className;
+    private String studentGroup;
     private String slot;
     private String subjectCode;
 }

@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.Lecturer;
-import com.fpt.edu.schedule.repository.base.ClassNameRepository;
+import com.fpt.edu.schedule.repository.base.StudentGroupRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/api/v1/lecturers")
 public class LecturerController {
     LecturerService lecturerService;
-    ClassNameRepository classNameRepository;
+    StudentGroupRepository studentGroupRepository;
 
 
     @GetMapping("/{lecturerId}")

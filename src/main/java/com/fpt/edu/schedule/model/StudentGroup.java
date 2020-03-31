@@ -12,16 +12,16 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ClassName {
+public class StudentGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     @JsonIgnore
-    @OneToMany(mappedBy = "className", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "studentGroup", cascade = CascadeType.ALL)
     private List<TimetableDetail> timetableDetailList;
 
-    public ClassName(String name) {
+    public StudentGroup(String name) {
         this.name = name;
     }
 }

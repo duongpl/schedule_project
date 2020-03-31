@@ -1,6 +1,5 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RoomService;
@@ -18,7 +17,7 @@ import java.util.List;
 public class RoomController {
     RoomService roomService;
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getRoomByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity getRoomByCriteria(@RequestBody QueryParam queryParam) {
         try {
             List<Room> roomList =roomService.findByCriteria(queryParam);
             return new ResponseEntity(roomList, HttpStatus.OK);

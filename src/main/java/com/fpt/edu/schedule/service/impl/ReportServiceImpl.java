@@ -23,8 +23,8 @@ import java.util.*;
 @AllArgsConstructor
 public class ReportServiceImpl implements ReportService {
     RoomService roomService;
-    ClassNameService classNameService;
-    ClassNameRepository classNameRepository;
+    StudentGroupService studentGroupService;
+    StudentGroupRepository studentGroupRepository;
     SubjectService subjectService;
     TimeTableDetailService timeTableDetailService;
     TimetableDetailRepository timetableDetailRepository;
@@ -45,7 +45,7 @@ public class ReportServiceImpl implements ReportService {
             rowIterator.next();
             Set<String> subjectNameSet = new HashSet<>();
             Set<String> roomNameSet = new HashSet<>();
-            Set<String> classNameSet = new HashSet<>();
+            Set<String> studentGroupSet = new HashSet<>();
             Set<String> slotSet = new HashSet<>();
             while (rowIterator.hasNext()) {
                 int column = 0;
@@ -63,10 +63,10 @@ public class ReportServiceImpl implements ReportService {
                     }
                     switch (column) {
                         case 1:
-                            if (classNameRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                            if (studentGroupRepository.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            classNameSet.add(cell.getStringCellValue().trim());
+                            studentGroupSet.add(cell.getStringCellValue().trim());
                             break;
                         case 2:
                             if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
@@ -89,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
                     }
                 }
             }
-            saveInformation(roomNameSet, classNameSet, subjectNameSet, slotSet);
+            saveInformation(roomNameSet, studentGroupSet, subjectNameSet, slotSet);
             saveTimetable(fileName, semesterId);
             file.close();
         } catch (Exception e) {
@@ -143,11 +143,11 @@ public class ReportServiceImpl implements ReportService {
         return reportRepository.findAll(cns);
     }
 
-    private void saveInformation(Set<String> roomSet, Set<String> classNameList, Set<String> subjectList, Set<String> slotList) {
+    private void saveInformation(Set<String> roomSet, Set<String> studentGroup, Set<String> subjectSet, Set<String> slotSet) {
         roomSet.forEach(i -> roomService.addRoom(new Room(i)));
-        classNameList.forEach(i -> classNameService.addClassName(new ClassName(i)));
-        subjectList.forEach(i -> subjectService.addSubject(new Subject(i, "CF")));
-        slotList.forEach(i -> slotService.addSlot(new Slot(i)));
+        studentGroup.forEach(i -> studentGroupService.addStudentGroup(new StudentGroup(i)));
+        subjectSet.forEach(i -> subjectService.addSubject(new Subject(i, "CF")));
+        slotSet.forEach(i -> slotService.addSlot(new Slot(i)));
     }
 
     private void saveTimetable(String fileName, int semesterId) {
@@ -185,7 +185,7 @@ public class ReportServiceImpl implements ReportService {
                     }
                     switch (column) {
                         case 1:
-                            timetableDetail.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
+                            timetableDetail.setStudentGroup(studentGroupRepository.findByName(cell.getStringCellValue().trim()));
                             break;
                         case 2:
                             timetableDetail.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));

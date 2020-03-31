@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
-import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.TimeTableDetailService;
@@ -19,7 +18,7 @@ public class TimetableDetailController {
     TimeTableDetailService timeTableDetailService;
 
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getScheduleByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity getScheduleByCriteria(@RequestBody QueryParam queryParam) {
         try {
             List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
