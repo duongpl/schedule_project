@@ -33,4 +33,5 @@ public class Semester {
         this.season = season;
         this.year = year;
     }
+    public boolean now;
 }

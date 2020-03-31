@@ -39,7 +39,7 @@ public class LecturerServiceImpl implements LecturerService {
                 if(1 == 1) {
                     ((Lecturer) u).setFillingExpected(true);
                 }
-                if(((Lecturer) u).getRole().getRoleName().equals(Role.ROLE_ADMIN)) {
+                if(((Lecturer) u).getRole().getRoleName().equals(Role.ROLE_ADMIN.getName())) {
                     ((Lecturer) u).setHeadOfDepartment(true);
                 }
             }
