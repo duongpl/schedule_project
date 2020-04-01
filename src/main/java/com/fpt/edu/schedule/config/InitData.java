@@ -33,7 +33,11 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             semesterService.save(new Semester("spring","2020",false));
         }
         if(lecturerRepository.findByEmail("clok0001@gmail.com") == null){
-            lecturerRepository.save(new Lecturer("clok0001@gmail.com"));
+            Lecturer lecturer = new Lecturer();
+            lecturer.setDepartment("CF");
+            lecturer.setEmail("clok0001@gmail.com");
+            lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
+            lecturerRepository.save(lecturer);
         }
     }
 }

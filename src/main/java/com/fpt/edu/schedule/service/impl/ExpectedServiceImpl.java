@@ -36,7 +36,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
         expected.setUpdatedDate(new Date());
-        Lecturer lecturer = lecturerService.getLecturerGoogleId(expected.getLecturer().getGoogleId());
+        Lecturer lecturer = lecturerService.findByGoogleId(expected.getLecturer().getGoogleId());
         List<String> slotRequests = expected.getExpectedSlots().stream().map(ExpectedSlot::getSlotName).collect(Collectors.toList());
         List<String> subjectRequests = expected.getExpectedSubjects().stream().map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
         List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId());
@@ -93,7 +93,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     @Override
     public Expected getExpectedByLecturerAndSemester(String lecturerId, int semesterId) {
         Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
-                lecturerService.getLecturerGoogleId(lecturerId));
+                lecturerService.findByGoogleId(lecturerId));
         if (expected == null) {
             Expected newExpected = new Expected();
             List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
@@ -101,7 +101,7 @@ public class ExpectedServiceImpl implements ExpectedService {
             List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i-> new ExpectedSlot(i)).collect(Collectors.toList());
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
-            newExpected.setLecturer(lecturerService.getLecturerGoogleId(lecturerId));
+            newExpected.setLecturer(lecturerService.findByGoogleId(lecturerId));
             newExpected.setSemester(semesterRepository.findById(semesterId));
             return newExpected;
         }

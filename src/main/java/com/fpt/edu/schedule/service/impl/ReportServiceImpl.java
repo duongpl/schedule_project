@@ -105,10 +105,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report addReport(Report report) {
+    public Report addReport(Report report,String lecturerId) {
+        report.setSemester(semesterRepository.getAllByNowIsTrue());
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
-        Lecturer lecturer = lecturerService.getLecturerGoogleId(report.getLecturer().getGoogleId());
+        Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
+        report.setLecturer(lecturer);
         return reportRepository.save(report);
     }
 
@@ -118,7 +120,6 @@ public class ReportServiceImpl implements ReportService {
         if (existedReport == null) {
             throw new InvalidRequestException("Don't find this report !");
         }
-        existedReport.setContent(report.getContent() != null ? report.getContent() : existedReport.getContent());
         existedReport.setStatus(report.getStatus());
         existedReport.setReplyContent(report.getReplyContent());
 

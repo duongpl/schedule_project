@@ -24,15 +24,15 @@ public class LecturerController {
     @GetMapping("/{lecturerId}")
     public ResponseEntity<Lecturer> getLecturerById(@PathVariable("lecturerId") String lecturerId) {
         try {
-            return new ResponseEntity(lecturerService.getLecturerGoogleId(lecturerId), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.findByGoogleId(lecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping()
-    public ResponseEntity<Lecturer> addNewLecture(@RequestBody Lecturer lecturer) {
+    public ResponseEntity<Lecturer> addNewLecture(@RequestBody Lecturer lecturer,@RequestHeader("GoogleId") String hodGoogleId) {
         try {
-            return new ResponseEntity(lecturerService.addLecture(lecturer), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.addLecture(lecturer,hodGoogleId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

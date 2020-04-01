@@ -42,9 +42,10 @@ public class ReportController {
         }
     }
     @PostMapping
-    public ResponseEntity<Report> addReport(@RequestBody Report report) {
+    public ResponseEntity<Report> addReport(@RequestBody Report report,
+                                            @RequestHeader("GoogleId") String currentLecturerId) {
         try {
-            return new ResponseEntity(reportService.addReport(report), HttpStatus.OK);
+            return new ResponseEntity(reportService.addReport(report,currentLecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

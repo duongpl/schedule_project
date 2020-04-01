@@ -22,15 +22,17 @@ public class LecturerServiceImpl implements LecturerService {
 
 
     @Override
-    public Lecturer addLecture(Lecturer lecturer) {
+    public Lecturer addLecture(Lecturer lecturer,String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
         if (lecturerRepository.findByEmail(lecturer.getEmail()) != null) {
             throw new InvalidRequestException("Already have this lecturer");
         }
+        Lecturer hod = findByGoogleId(hodGoogleId);
+
         newLecturer.setEmail(lecturer.getEmail());
-        newLecturer.setShortName(lecturer.getEmail().substring(0, lecturer.getEmail().indexOf('@')));
+        newLecturer.setDepartment(hod.getDepartment());
+        newLecturer.setShortName(newLecturer.getEmail().substring(0, newLecturer.getEmail().indexOf('@')));
         newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_USER.getName()));
-        ;
         return lecturerRepository.save(newLecturer);
     }
 
@@ -57,7 +59,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public Lecturer getLecturerGoogleId(String id) {
+    public Lecturer findByGoogleId(String id) {
         Lecturer lecturer = lecturerRepository.findByGoogleId(id);
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find this lecturer");
