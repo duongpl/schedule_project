@@ -38,56 +38,58 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
         timetableDetailDTOS.forEach(i -> {
+
+            // convert data
             switch (i.getSlot()) {
                 case "M1":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),1,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),1,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),1,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.FRI));
                     break;
                 case "M2":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),2,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),2,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),2,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 2, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 2, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 2, Day.FRI));
                     break;
                 case "M3":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),3,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),3,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),3,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 3, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 3, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 3, Day.FRI));
                     break;
                 case "E1":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),4,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),4,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),4,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 4, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 4, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 4, Day.FRI));
                     break;
                 case "E2":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),5,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),5,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),5,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 5, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 5, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 5, Day.FRI));
                     break;
                 case "E3":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),6,Day.MON));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),6,Day.WED));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),6,Day.FRI));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 6, Day.MON));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 6, Day.WED));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 6, Day.FRI));
                     break;
                 case "M4":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),1,Day.THU));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),1,Day.TUE));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),2,Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 2, Day.TUE));
                     break;
                 case "M5":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),3,Day.TUE));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),2,Day.THU));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),3,Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 3, Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 2, Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 3, Day.THU));
                     break;
                 case "E4":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),4,Day.THU));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),4,Day.TUE));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),5,Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 4, Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 4, Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 5, Day.TUE));
                     break;
                 case "E5":
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),5,Day.THU));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),6,Day.THU));
-                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(),i.getLecturerShortName(),i.getRoom(),i.getClassName(),i.getSlot(),i.getSubjectCode(),6,Day.TUE));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 5, Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 6, Day.THU));
+                    timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 6, Day.TUE));
                     break;
 
 

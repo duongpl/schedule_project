@@ -5,10 +5,7 @@ import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Lecturer;
-import com.fpt.edu.schedule.repository.base.BaseSpecifications;
-import com.fpt.edu.schedule.repository.base.LecturerRepository;
-import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.repository.base.RoleRepository;
+import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,9 @@ import java.util.List;
 public class LecturerServiceImpl implements LecturerService {
     LecturerRepository lecturerRepository;
     RoleRepository roleRepository;
+    SemesterRepository semesterRepository;
+    ExpectedRepository expectedRepository;
+
 
     @Override
     public Lecturer addLecture(Lecturer lecturer) {
@@ -42,7 +42,8 @@ public class LecturerServiceImpl implements LecturerService {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         for(Object u : lecturerRepository.findAll(cns)){
             if(u instanceof Lecturer){
-                if(1 == 1) {
+                if(expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
+                        getLecturerGoogleId(((Lecturer) u).getGoogleId())) != null) {
                     ((Lecturer) u).setFillingExpected(true);
                 }
                 if(((Lecturer) u).getRole().getRoleName().equals(Role.ROLE_ADMIN.getName())) {
@@ -63,7 +64,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer updateLecturerName(Lecturer lecturer) {
-        Lecturer existedUser = lecturerRepository.findByGoogleId(lecturer.getGoogleId());
+        Lecturer existedUser = lecturerRepository.findById(lecturer.getId());
         if(existedUser == null){
             throw new InvalidRequestException("Don't find this user !");
         }

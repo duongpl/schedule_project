@@ -26,7 +26,6 @@ public class ExpectedServiceImpl implements ExpectedService {
     SubjectService subjectService;
     SlotService slotService;
     ExpectedRepository expectedRepository;
-    ExpectedSlotRepository expectedSlotRepository;
     ExpectedSubjectRepository expectedSubjectRepository;
     ExpectedSlotService expectedSlotService;
     ExpectedSubjectService expectedSubjectService;

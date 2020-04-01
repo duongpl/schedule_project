@@ -16,4 +16,6 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     void removeByGoogleId(String id);
 
+    Lecturer findById(int id);
+
 }
