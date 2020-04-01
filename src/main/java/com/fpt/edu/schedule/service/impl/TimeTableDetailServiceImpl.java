@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.enums.Day;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.dto.TimeTableViewDTO;
+import com.fpt.edu.schedule.dto.TimetableView;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.model.Lecturer;
@@ -31,7 +31,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
 
     @Override
-    public List<TimeTableViewDTO> getTimetableForView(QueryParam queryParam) {
+    public List<TimetableView> getTimetableForView(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom().getName(),
@@ -94,8 +94,9 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             }
         });
         Map<Integer, List<TimetableDetailDTO>> collect = timetableDetailDTOSnew.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlotNumber));
-        System.out.println(timetableDetailDTOSnew.size());
-        return null;
+        List<TimetableView> timetableViews = collect.entrySet().stream().map(i -> new TimetableView(i.getKey(), i.getValue())).collect(Collectors.toList());
+        timetableViews.sort(Comparator.comparing(TimetableView::getSlotNumber));
+        return timetableViews;
     }
 
     @Override

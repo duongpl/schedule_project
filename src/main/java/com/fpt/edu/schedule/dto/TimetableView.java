@@ -1,16 +1,17 @@
 package com.fpt.edu.schedule.dto;
 
-import com.fpt.edu.schedule.common.enums.Day;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeTableViewDTO {
-    Day day;
-    TimetableEdit timetableEdit;
+public class TimetableView {
+    int slotNumber;
+    List<TimetableDetailDTO> timetable ;
 }

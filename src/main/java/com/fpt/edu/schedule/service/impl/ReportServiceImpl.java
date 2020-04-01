@@ -35,6 +35,7 @@ public class ReportServiceImpl implements ReportService {
     SemesterRepository semesterRepository;
     RoomRepository roomRepository;
     LecturerService lecturerService;
+    DepartmentRepository departmentRepository;
 
     @Override
     public void generateExcelFile(String fileName, int semesterId) {
@@ -52,9 +53,9 @@ public class ReportServiceImpl implements ReportService {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
-                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
-                    continue;
-                }
+//                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
+//                    continue;
+//                }
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -67,30 +68,35 @@ public class ReportServiceImpl implements ReportService {
                             if (classNameRepository.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            classNameSet.add(cell.getStringCellValue().trim());
+                            classNameService.addClassName(new ClassName(cell.getStringCellValue().trim()));
                             break;
                         case 2:
                             if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            subjectNameSet.add(cell.getStringCellValue().trim());
+                            subjectService.addSubject(new Subject(cell.getStringCellValue().trim(),row.getCell(3).getStringCellValue()));
                             break;
                         case 3:
                             if (slotService.getSlotByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            slotSet.add(cell.getStringCellValue().trim());
+                            slotService.addSlot(new Slot(cell.getStringCellValue().trim()));
+                            break;
+                        case 4:
+                            if (departmentRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                                break;
+                            }
+                           departmentRepository.save(new Department(cell.getStringCellValue().trim()));
                             break;
                         case 5:
                             if (roomRepository.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            roomNameSet.add(cell.getStringCellValue().trim());
+                            roomService.addRoom(new Room(cell.getStringCellValue().trim()));
                             break;
                     }
                 }
             }
-            saveInformation(roomNameSet, classNameSet, subjectNameSet, slotSet);
             saveTimetable(fileName, semesterId);
             file.close();
         } catch (Exception e) {
@@ -135,12 +141,6 @@ public class ReportServiceImpl implements ReportService {
         return reportRepository.findAll(cns);
     }
 
-    private void saveInformation(Set<String> roomSet, Set<String> classNameList, Set<String> subjectList, Set<String> slotList) {
-        roomSet.forEach(i -> roomService.addRoom(new Room(i)));
-        classNameList.forEach(i -> classNameService.addClassName(new ClassName(i)));
-        subjectList.forEach(i -> subjectService.addSubject(new Subject(i, "CF")));
-        slotList.forEach(i -> slotService.addSlot(new Slot(i)));
-    }
 
     private void saveTimetable(String fileName, int semesterId) {
         try {
@@ -163,9 +163,9 @@ public class ReportServiceImpl implements ReportService {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
-                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
-                    continue;
-                }
+//                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
+//                    continue;
+//                }
                 TimetableDetail timetableDetail = new TimetableDetail();
                 timeTable.setSemester(semesterRepository.findById(semesterId));
                 while (cellIterator.hasNext()) {

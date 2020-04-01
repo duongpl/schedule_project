@@ -1,6 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.dto.TimeTableViewDTO;
+import com.fpt.edu.schedule.dto.TimetableView;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.model.ClassName;
@@ -52,7 +52,7 @@ public class TimetableDetailController {
     public ResponseEntity getTimetableForView(@RequestBody QueryParam queryParam) {
         try {
 
-            List<TimeTableViewDTO> timetableDetails = timeTableDetailService.getTimetableForView(queryParam);
+            List<TimetableView> timetableDetails = timeTableDetailService.getTimetableForView(queryParam);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
