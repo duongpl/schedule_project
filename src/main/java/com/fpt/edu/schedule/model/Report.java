@@ -25,4 +25,5 @@ public class Report {
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
+    private String replyContent;
 }

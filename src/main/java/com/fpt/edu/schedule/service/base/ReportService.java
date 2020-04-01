@@ -1,8 +1,8 @@
 package com.fpt.edu.schedule.service.base;
 
-import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.Report;
 import com.fpt.edu.schedule.repository.base.QueryParam;
+
 import java.util.List;
 
 public interface ReportService {
@@ -12,7 +12,6 @@ public interface ReportService {
 
     Report updateReport(Report report);
 
-    Report updateStatus(Status status, int reportId);
 
     void removeReportById(int id);
 

@@ -129,9 +129,9 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getFullName() : null, i.getRoom().getName(),
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlot));
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getSlot));
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
         return timetableEdits;
     }
 

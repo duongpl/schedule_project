@@ -34,6 +34,7 @@ public class ReportServiceImpl implements ReportService {
     LecturerRepository lecturerRepository;
     SemesterRepository semesterRepository;
     RoomRepository roomRepository;
+    LecturerService lecturerService;
 
     @Override
     public void generateExcelFile(String fileName, int semesterId) {
@@ -101,10 +102,7 @@ public class ReportServiceImpl implements ReportService {
     public Report addReport(Report report) {
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
-        Lecturer lecturer = lecturerRepository.findByGoogleId(report.getLecturer().getGoogleId());
-        if (lecturer == null) {
-            throw new InvalidRequestException("Don't find user!");
-        }
+        Lecturer lecturer = lecturerService.getLecturerGoogleId(report.getLecturer().getGoogleId());
         return reportRepository.save(report);
     }
 
@@ -115,18 +113,12 @@ public class ReportServiceImpl implements ReportService {
             throw new InvalidRequestException("Don't find this report !");
         }
         existedReport.setContent(report.getContent() != null ? report.getContent() : existedReport.getContent());
+        existedReport.setStatus(report.getStatus());
+        existedReport.setReplyContent(report.getReplyContent());
+
         return reportRepository.save(existedReport);
     }
 
-    @Override
-    public Report updateStatus(Status status, int reportId) {
-        Report existedReport = reportRepository.findReportById(reportId);
-        if (existedReport == null) {
-            throw new InvalidRequestException("Don't find this report !");
-        }
-        existedReport.setStatus(status);
-        return reportRepository.save(existedReport);
-    }
 
     @Override
     public void removeReportById(int id) {

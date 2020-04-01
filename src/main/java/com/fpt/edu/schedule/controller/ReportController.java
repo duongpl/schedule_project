@@ -1,12 +1,15 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.Report;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ReportService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +20,8 @@ import java.util.List;
 @RequestMapping("/api/v1/reports")
 public class ReportController {
     ReportService reportService;
+    private JavaMailSender javaMailSender;
+
 
     @GetMapping("/generate")
     public ResponseEntity generateFile(@RequestParam(name = "fileName") String fileName,@RequestParam(name = "semesterId") int semesterId) {
@@ -52,14 +57,6 @@ public class ReportController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/{reportId}/updateStatus")
-    public ResponseEntity<Report> updateStatus(@RequestParam Status status, @PathVariable("reportId") int reportId) {
-        try {
-            return new ResponseEntity(reportService.updateStatus(status,reportId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
     @DeleteMapping("/{reportId}")
     public ResponseEntity remove(@PathVariable("reportId") int expectedId) {
         try {
@@ -69,4 +66,23 @@ public class ReportController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/sendMail")
+    public String sendMail(@RequestParam("lecturerId") String lecturerId) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        try {
+
+            msg.setSubject("Logout");
+            msg.setText("Ban vua logout");
+            javaMailSender.send(msg);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+
+        }
+        return "redirect:/login";
+    }
+
 }

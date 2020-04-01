@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimetableEdit {
-    String slot;
+    String room;
     List<TimetableDetailDTO> timetable ;
 }
