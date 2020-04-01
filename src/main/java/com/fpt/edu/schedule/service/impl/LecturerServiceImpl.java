@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @AllArgsConstructor
 @Service
 public class LecturerServiceImpl implements LecturerService {
@@ -23,12 +24,13 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public Lecturer addLecture(Lecturer lecturer) {
         Lecturer newLecturer = new Lecturer();
-        if(lecturerRepository.findByEmail(lecturer.getEmail())!=null){
+        if (lecturerRepository.findByEmail(lecturer.getEmail()) != null) {
             throw new InvalidRequestException("Already have this lecturer");
         }
         newLecturer.setEmail(lecturer.getEmail());
         newLecturer.setShortName(lecturer.getEmail().substring(0, lecturer.getEmail().indexOf('@')));
-        newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_USER.getName()));;
+        newLecturer.setRole(roleRepository.findByRoleName(Role.ROLE_USER.getName()));
+        ;
         return lecturerRepository.save(newLecturer);
     }
 
@@ -40,24 +42,25 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public List<Lecturer> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        for(Object u : lecturerRepository.findAll(cns)){
-            if(u instanceof Lecturer){
-                if(expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
-                        getLecturerGoogleId(((Lecturer) u).getGoogleId())) != null) {
-                    ((Lecturer) u).setFillingExpected(true);
-                }
-                if(((Lecturer) u).getRole().getRoleName().equals(Role.ROLE_ADMIN.getName())) {
-                    ((Lecturer) u).setHeadOfDepartment(true);
-                }
+        List<Lecturer> lecturers = lecturerRepository.findAll(cns);
+        for (Lecturer u : lecturers) {
+            if (expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
+                   lecturerRepository.findById(u.getId())) != null) {
+                u.setFillingExpected(true);
             }
+            if (u.getRole().getRoleName().equals(Role.ROLE_ADMIN.getName())) {
+                u.setHeadOfDepartment(true);
+            }
+
         }
-        return lecturerRepository.findAll(cns);
+        return lecturers;
     }
+
     @Override
     public Lecturer getLecturerGoogleId(String id) {
-        Lecturer lecturer =lecturerRepository.findByGoogleId(id);
-        if(lecturer == null){
-            throw new  InvalidRequestException("Don't find this lecturer");
+        Lecturer lecturer = lecturerRepository.findByGoogleId(id);
+        if (lecturer == null) {
+            throw new InvalidRequestException("Don't find this lecturer");
         }
         return lecturer;
     }
@@ -65,7 +68,7 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public Lecturer updateLecturerName(Lecturer lecturer) {
         Lecturer existedUser = lecturerRepository.findById(lecturer.getId());
-        if(existedUser == null){
+        if (existedUser == null) {
             throw new InvalidRequestException("Don't find this user !");
         }
         existedUser.setFullName(lecturer.getFullName() != null ? lecturer.getFullName() : existedUser.getFullName());
@@ -90,9 +93,9 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer findByShortName(String shortName) {
-        Lecturer lecturer =lecturerRepository.findByShortName(shortName);
-        if(lecturer == null){
-            throw new  InvalidRequestException("Don't find this lecturer");
+        Lecturer lecturer = lecturerRepository.findByShortName(shortName);
+        if (lecturer == null) {
+            throw new InvalidRequestException("Don't find this lecturer");
         }
         return lecturer;
     }

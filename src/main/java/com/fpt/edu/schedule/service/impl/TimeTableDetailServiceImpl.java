@@ -39,7 +39,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
         timetableDetailDTOS.forEach(i -> {
 
-            // convert data
+            // convert
             switch (i.getSlot()) {
                 case "M1":
                     timetableDetailDTOSnew.add(new TimetableDetailDTO(i.getId(), i.getLecturerShortName(), i.getRoom(), i.getClassName(), i.getSlot(), i.getSubjectCode(), 1, Day.MON));
