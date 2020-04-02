@@ -1,6 +1,5 @@
 package com.fpt.edu.schedule.service.base;
 
-import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 
@@ -18,7 +17,7 @@ public interface LecturerService {
 
     Lecturer updateLecturerName(Lecturer lecturer);
 
-    Lecturer updateStatus(Status status, String userId);
+    Lecturer transferRole(String hodGoogleId,String lecturerGoogleId);
 
     Lecturer findByShortName(String shortName);
 

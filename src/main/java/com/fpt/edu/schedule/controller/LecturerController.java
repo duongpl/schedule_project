@@ -1,6 +1,5 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
@@ -37,10 +36,10 @@ public class LecturerController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @DeleteMapping("/{googleId}")
-    public ResponseEntity<Lecturer> removeLecture(@PathVariable("googleId") String googleId) {
+    @DeleteMapping("/{lecturerId}")
+    public ResponseEntity<Lecturer> removeLecture(@PathVariable("lecturerId") String lecturerId) {
         try {
-            lecturerService.remove(googleId);
+            lecturerService.remove(lecturerId);
             return new ResponseEntity( HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,10 +65,11 @@ public class LecturerController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/{lecturerId}/updateStatus")
-    public ResponseEntity<Lecturer> updateStatus(@RequestParam Status status, @PathVariable("lecturerId") String lecturerID) {
+    @PutMapping("/transferRole")
+    public ResponseEntity<Lecturer> transferRole(@RequestHeader("GoogleId") String hodGoogleId,
+                                                 @RequestParam("lecturerGoogleId") String lecturerGoogleId) {
         try {
-            return new ResponseEntity(lecturerService.updateStatus(status,lecturerID), HttpStatus.OK);
+            return new ResponseEntity(lecturerService.transferRole(hodGoogleId,lecturerGoogleId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

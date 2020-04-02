@@ -14,7 +14,7 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     Lecturer findByEmail(String email);
 
-    void removeByGoogleId(String id);
+    void removeById(String id);
 
     Lecturer findById(int id);
 

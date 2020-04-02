@@ -2,7 +2,6 @@ package com.fpt.edu.schedule.service.impl;
 
 
 import com.fpt.edu.schedule.common.enums.Role;
-import com.fpt.edu.schedule.common.enums.Status;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.*;
@@ -38,7 +37,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public void remove(String id) {
-        lecturerRepository.removeByGoogleId(id);
+        lecturerRepository.removeById(id);
     }
 
     @Override
@@ -83,15 +82,18 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public Lecturer updateStatus(Status status, String userId) {
-//        Lecturer existedUser= lecturerRepository.findById(userId);
-//        if(existedUser == null){
-//            throw new InvalidRequestException("Don't find this user !");
-//        }
-//        existedUser.setStatus(status);
-//        return lecturerRepository.save(existedUser);
-        return null;
+    public Lecturer transferRole(String hodGoogleId, String lecturerGoogleId) {
+        Lecturer existedUser= findByGoogleId(lecturerGoogleId);
+        Lecturer hod = findByGoogleId(hodGoogleId);
+        if(!existedUser.getDepartment().equalsIgnoreCase(hod.getDepartment())){
+            throw new InvalidRequestException("Don't have same department !");
+        }
+        existedUser.setRole(roleRepository.findByRoleName(Role.ROLE_ADMIN.getName()));
+        hod.setRole(roleRepository.findByRoleName(Role.ROLE_USER.getName()));
+        lecturerRepository.save(hod);
+        return lecturerRepository.save(existedUser);
     }
+
 
     @Override
     public Lecturer findByShortName(String shortName) {
