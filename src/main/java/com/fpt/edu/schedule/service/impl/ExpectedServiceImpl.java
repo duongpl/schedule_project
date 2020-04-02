@@ -108,6 +108,24 @@ public class ExpectedServiceImpl implements ExpectedService {
         return expected;
     }
 
+    @Override
+    public Expected saveExistedExpected(String lecturerId, int semesterId) {
+        Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
+                lecturerService.findByGoogleId(lecturerId));
+        if(expected ==null){
+            throw new InvalidRequestException("This semester don't have your expected !");
+        }
+        Expected newExpected = new Expected();
+        newExpected.setLecturer(expected.getLecturer());
+        newExpected.setExpectedSubjects(expected.getExpectedSubjects());
+        newExpected.setExpectedSlots(expected.getExpectedSlots());
+        newExpected.setUpdatedDate(new Date());
+        newExpected.setCreatedDate(new Date());
+        newExpected.setExpectedNote(expected.getExpectedNote());
+        newExpected.setSemester(semesterRepository.getAllByNowIsTrue());
+
+        return expectedRepository.save(newExpected);
+    }
 
 
 }

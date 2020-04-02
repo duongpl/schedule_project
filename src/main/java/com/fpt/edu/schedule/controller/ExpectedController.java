@@ -50,6 +50,15 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/existed")
+    public ResponseEntity saveExistedExpected(@RequestParam(name = "semesterId") int semesterId
+            ,@RequestParam(name = "lecturerId") String lecturerId) {
+        try {
+            return new ResponseEntity(expectedService.saveExistedExpected(lecturerId,semesterId),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @DeleteMapping("/{expectedId}")
     public ResponseEntity remove(@PathVariable("expectedId") int expectedId) {
         try {
@@ -63,7 +72,6 @@ public class ExpectedController  {
     public ResponseEntity getByLecturerAndSemester(@RequestParam(name = "lecturerId") String lecturerId,
                                                    @RequestParam(name = "semesterId") int semesterId) {
         try {
-            expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId);
             return new ResponseEntity( expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

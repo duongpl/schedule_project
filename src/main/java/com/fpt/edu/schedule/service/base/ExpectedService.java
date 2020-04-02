@@ -18,4 +18,6 @@ public interface ExpectedService {
 
     Expected getExpectedByLecturerAndSemester(String lecturerId,int semesterId);
 
+    Expected saveExistedExpected(String lecturerId,int semesterId);
+
 }
