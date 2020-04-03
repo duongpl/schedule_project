@@ -43,7 +43,7 @@ public class SubjectServiceImpl implements SubjectService {
             throw new InvalidRequestException("Don't have subject for this semester !");
         }
         Lecturer hod = lecturerService.findByGoogleId(hodGoogleId);
-        Set<Subject> subjectSet = timetable.getTimetableDetails().stream().filter(i->i.getSubject().getCode()
+        Set<Subject> subjectSet = timetable.getTimetableDetails().stream().filter(i->i.getSubject().getDepartment()
                 .equals(hod.getDepartment())).map(i -> i.getSubject()).collect(Collectors.toSet());
         return new ArrayList<>(subjectSet);
     }

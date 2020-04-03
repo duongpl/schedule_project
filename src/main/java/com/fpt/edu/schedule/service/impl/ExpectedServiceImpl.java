@@ -93,7 +93,6 @@ public class ExpectedServiceImpl implements ExpectedService {
 
     @Override
     public Expected getExpectedByLecturerAndSemester(String lecturerId, int semesterId) {
-        Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
         Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
                 lecturerService.findByGoogleId(lecturerId));
         if (expected == null) {
