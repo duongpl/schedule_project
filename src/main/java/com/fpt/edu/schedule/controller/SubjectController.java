@@ -16,9 +16,10 @@ import java.util.List;
 public class SubjectController {
     SubjectService subjectService;
     @PostMapping("/filter")
-    public ResponseEntity<Subject> getSubjectByCriteria(@RequestParam("semesterId") int semesterId) {
+    public ResponseEntity<Subject> getSubjectByCriteria(@RequestParam("semesterId") int semesterId,
+                                                        @RequestHeader("GoogleId")String hodGoogleId) {
         try {
-            List<Subject> subjectList =subjectService.getAllSubjectBySemester(semesterId);
+            List<Subject> subjectList =subjectService.getAllSubjectBySemester(semesterId,hodGoogleId);
 
             return new ResponseEntity(subjectList, HttpStatus.OK);
         } catch (Exception e) {

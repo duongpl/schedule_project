@@ -31,7 +31,8 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
     SemesterRepository semesterRepository;
-    private static final List<String> SLOT_LIST = Arrays.asList("M1","M2","M3","M4","M5","E1","E2","E3","E4","E5");
+    private static final List<String> SLOT_LIST = Arrays.asList("M1", "M2", "M3", "M4", "M5", "E1", "E2", "E3", "E4", "E5");
+
     @Override
     public Expected addExpected(Expected expected) {
         expected.setCreatedDate(new Date());
@@ -39,11 +40,11 @@ public class ExpectedServiceImpl implements ExpectedService {
         Lecturer lecturer = lecturerService.findByGoogleId(expected.getLecturer().getGoogleId());
         List<String> slotRequests = expected.getExpectedSlots().stream().map(ExpectedSlot::getSlotName).collect(Collectors.toList());
         List<String> subjectRequests = expected.getExpectedSubjects().stream().map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
-        List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId());
-        List<Subject> subjectsNotContainInRequest =subjects.stream().filter(i -> !subjectRequests.contains(i.getCode())).collect(Collectors.toList());
+        List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId(), lecturer.getGoogleId());
+        List<Subject> subjectsNotContainInRequest = subjects.stream().filter(i -> !subjectRequests.contains(i.getCode())).collect(Collectors.toList());
         List<String> slotNotContainInRequest = SLOT_LIST.stream().filter(o -> !slotRequests.contains(o)).collect(Collectors.toList());
-        subjectsNotContainInRequest.forEach( i-> expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode())));
-        slotNotContainInRequest.forEach(i-> expected.getExpectedSlots().add(new ExpectedSlot(i)));
+        subjectsNotContainInRequest.forEach(i -> expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode())));
+        slotNotContainInRequest.forEach(i -> expected.getExpectedSlots().add(new ExpectedSlot(i)));
         expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
@@ -92,13 +93,14 @@ public class ExpectedServiceImpl implements ExpectedService {
 
     @Override
     public Expected getExpectedByLecturerAndSemester(String lecturerId, int semesterId) {
+        Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
         Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
                 lecturerService.findByGoogleId(lecturerId));
         if (expected == null) {
             Expected newExpected = new Expected();
-            List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId);
+            List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId,lecturerId);
             List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
-            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i-> new ExpectedSlot(i)).collect(Collectors.toList());
+            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i -> new ExpectedSlot(i)).collect(Collectors.toList());
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.findByGoogleId(lecturerId));
@@ -106,8 +108,8 @@ public class ExpectedServiceImpl implements ExpectedService {
 
             return newExpected;
         }
-        if(expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
-                lecturerService.findByGoogleId(lecturerId)) == null ){
+        if (expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
+                lecturerService.findByGoogleId(lecturerId)) == null) {
             expected.setCanReuse(true);
         }
         return expected;
@@ -117,7 +119,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     public Expected saveExistedExpected(String lecturerGoogleId, int semesterId) {
         Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
                 lecturerService.findByGoogleId(lecturerGoogleId));
-        if(expected ==null){
+        if (expected == null) {
             throw new InvalidRequestException("This semester don't have your expected !");
         }
         Expected newExpected = new Expected();
