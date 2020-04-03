@@ -109,9 +109,9 @@ public class ExpectedServiceImpl implements ExpectedService {
     }
 
     @Override
-    public Expected saveExistedExpected(String lecturerId, int semesterId) {
+    public Expected saveExistedExpected(String lecturerGoogleId, int semesterId) {
         Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
-                lecturerService.findByGoogleId(lecturerId));
+                lecturerService.findByGoogleId(lecturerGoogleId));
         if(expected ==null){
             throw new InvalidRequestException("This semester don't have your expected !");
         }

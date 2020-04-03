@@ -52,9 +52,9 @@ public class ExpectedController  {
     }
     @GetMapping("/existed")
     public ResponseEntity saveExistedExpected(@RequestParam(name = "semesterId") int semesterId
-            ,@RequestParam(name = "lecturerId") String lecturerId) {
+            ,@RequestParam(name = "lecturerGoogleId") String lecturerGoogleId) {
         try {
-            return new ResponseEntity(expectedService.saveExistedExpected(lecturerId,semesterId),HttpStatus.OK);
+            return new ResponseEntity(expectedService.saveExistedExpected(lecturerGoogleId,semesterId),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
