@@ -50,9 +50,9 @@ public class ExpectedController  {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping("/existed")
-    public ResponseEntity saveExistedExpected(@RequestParam(name = "semesterId") int semesterId
-            ,@RequestParam(name = "lecturerGoogleId") String lecturerGoogleId) {
+    @GetMapping("/reuse")
+    public ResponseEntity reuseExpected(@RequestParam(name = "semesterId") int semesterId
+            , @RequestParam(name = "lecturerGoogleId") String lecturerGoogleId) {
         try {
             return new ResponseEntity(expectedService.saveExistedExpected(lecturerGoogleId,semesterId),HttpStatus.OK);
         } catch (Exception e) {
