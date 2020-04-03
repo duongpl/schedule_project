@@ -52,6 +52,9 @@ public class BaseSpecifications<T> implements Specification<T> {
                     Map<String, List<Object>> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
                     List<Predicate> predicateList = new ArrayList<>();
                     for (Map.Entry<String, List<Object>> entry1 : mapEntry.entrySet()) {
+                        if(entry1.getValue().size() == 0){
+                            break;
+                        }
                         entry1.getValue().forEach(i -> {
                             Predicate predicate = (i instanceof String) ? criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%")
                                     : criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i);
@@ -62,7 +65,11 @@ public class BaseSpecifications<T> implements Specification<T> {
                     }
                 } else {
                     ArrayList<Object> array = (ArrayList)entry.getValue();
+                    if(array.size() == 0){
+                        break;
+                    }
                     array.forEach(i -> {
+
                         Predicate predicate = (i instanceof String) ? criteriaBuilder.like(root.get(entry.getKey()), "%" + i + "%")
                                 : criteriaBuilder.equal(root.get(entry.getKey()), i);
 //                        predicateList.add(predicate);
