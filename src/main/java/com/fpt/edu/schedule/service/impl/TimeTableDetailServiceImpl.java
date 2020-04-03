@@ -148,7 +148,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         criteria.put("room", roomMap);
         criteria.put("slot", slotMap);
         queryParam.setCriteria(criteria);
-        if (findByCriteria(queryParam).size() > 0) {
+        if (findByCriteria(queryParam).size() > 1) {
             throw new InvalidRequestException("Already have class in room !");
         }
         return timetableDetail.getRoom();
