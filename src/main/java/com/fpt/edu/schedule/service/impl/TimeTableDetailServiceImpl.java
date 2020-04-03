@@ -120,7 +120,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         }
         if (timetableDetail.getRoom() != null) {
             Room room = ("NOT_ASSIGN").equals(timetableDetail.getRoom()) ? null
-                    : roomService.getRoomByName(getValidRoom(timetableDetail, timetableDetailExisted));
+                    : roomService.getRoomByName(timetableDetail.getLecturerShortName());
             timetableDetailExisted.setRoom(room);
         }
         return timetableDetailRepository.save(timetableDetailExisted);
