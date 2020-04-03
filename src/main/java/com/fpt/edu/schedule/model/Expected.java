@@ -31,6 +31,8 @@ public class Expected {
     private List<ExpectedSubject> expectedSubjects;
     @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
     private ExpectedNote expectedNote;
+    @Transient
+    private boolean canReuse;
 
 }
 

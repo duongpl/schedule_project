@@ -103,7 +103,12 @@ public class ExpectedServiceImpl implements ExpectedService {
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.findByGoogleId(lecturerId));
             newExpected.setSemester(semesterRepository.findById(semesterId));
+
             return newExpected;
+        }
+        if(expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
+                lecturerService.findByGoogleId(lecturerId)) == null ){
+            expected.setCanReuse(true);
         }
         return expected;
     }

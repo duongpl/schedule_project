@@ -114,12 +114,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             throw new InvalidRequestException("Not found this timetable !");
         }
         if (timetableDetail.getLecturerShortName() != null) {
-            Lecturer lecturer = timetableDetail.getLecturerShortName().equals("NOT_ASSIGN") ? null
+            Lecturer lecturer = ("NOT_ASSIGN").equals(timetableDetail.getLecturerShortName()) ? null
                     : lecturerService.findByShortName(timetableDetail.getLecturerShortName());
             timetableDetailExisted.setLecturer(lecturer);
         }
         if (timetableDetail.getRoom() != null) {
-            Room room = timetableDetail.getRoom().equals("NOT_ASSIGN") ? null
+            Room room = ("NOT_ASSIGN").equals(timetableDetail.getRoom()) ? null
                     : roomService.getRoomByName(getValidRoom(timetableDetail, timetableDetailExisted));
             timetableDetailExisted.setRoom(room);
         }
