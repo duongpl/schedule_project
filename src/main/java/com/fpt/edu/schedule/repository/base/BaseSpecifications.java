@@ -44,29 +44,33 @@ public class BaseSpecifications<T> implements Specification<T> {
             }
         }
         if (inCriteria != null) {
-            List<Predicate> predicateList = new ArrayList<>();
+
+            List<Predicate> predicateList1 = new ArrayList<>();
+            Predicate predicate1 = null;
             for (Map.Entry<String, Object> entry : inCriteria.entrySet()) {
                 if(entry.getValue() instanceof Map){
                     Map<String, List<Object>> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
+                    List<Predicate> predicateList = new ArrayList<>();
                     for (Map.Entry<String, List<Object>> entry1 : mapEntry.entrySet()) {
                         entry1.getValue().forEach(i -> {
                             Predicate predicate = (i instanceof String) ? criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%")
                                     : criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i);
                             predicateList.add(predicate);
                         });
+                       predicate1 =  criteriaBuilder.or(predicateList.toArray(new Predicate[0]));
+                       predicateList1.add(predicate1);
                     }
-
                 } else {
                     ArrayList<Object> array = (ArrayList)entry.getValue();
                     array.forEach(i -> {
                         Predicate predicate = (i instanceof String) ? criteriaBuilder.like(root.get(entry.getKey()), "%" + i + "%")
                                 : criteriaBuilder.equal(root.get(entry.getKey()), i);
-                        predicateList.add(predicate);
+//                        predicateList.add(predicate);
                     });
                 }
             }
 
-            predicates.add(criteriaBuilder.or(predicateList.toArray(new Predicate[0])));
+            predicates.add(criteriaBuilder.and(predicateList1.toArray(new Predicate[0])));
         }
         if (sortField != null && sortField.length() > 0) {
             query.orderBy(queryParam.isAscending() ? criteriaBuilder.asc(getPath(root,sortField)) : criteriaBuilder.desc(getPath(root,sortField)));
