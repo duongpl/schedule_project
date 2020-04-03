@@ -9,7 +9,7 @@ public interface LecturerService {
 
     Lecturer addLecture(Lecturer lecture,String hodGoogleId);
 
-    void remove(String id);
+    void remove(int id);
 
     List<Lecturer> findByCriteria(QueryParam queryParam);
 

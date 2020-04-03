@@ -37,7 +37,7 @@ public class LecturerController {
         }
     }
     @DeleteMapping("/{lecturerId}")
-    public ResponseEntity<Lecturer> removeLecture(@PathVariable("lecturerId") String lecturerId) {
+    public ResponseEntity<Lecturer> removeLecture(@PathVariable("lecturerId") int lecturerId) {
         try {
             lecturerService.remove(lecturerId);
             return new ResponseEntity( HttpStatus.OK);

@@ -36,7 +36,7 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public void remove(String id) {
+    public void remove(int id) {
         lecturerRepository.removeById(id);
     }
 
