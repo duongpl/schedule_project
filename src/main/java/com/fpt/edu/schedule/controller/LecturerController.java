@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @CrossOrigin
@@ -36,6 +37,7 @@ public class LecturerController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @Transactional
     @DeleteMapping("/{lecturerId}")
     public ResponseEntity<Lecturer> removeLecture(@PathVariable("lecturerId") int lecturerId) {
         try {
