@@ -62,14 +62,14 @@ public class GoogleUtils {
         }
         if (existedUser.isLogin()) {
             authorities.add(new SimpleGrantedAuthority(existedUser.getRole().getRoleName()));
+        } else {
+            existedUser.setGoogleId(googlePojo.getId());
+            existedUser.setFullName(googlePojo.getGiven_name());
+            existedUser.setPicture(googlePojo.getPicture());
+            existedUser.setLogin(true);
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            lecturerRepository.save(existedUser);
         }
-        existedUser.setGoogleId(googlePojo.getId());
-        existedUser.setFullName(googlePojo.getGiven_name());
-        existedUser.setPicture(googlePojo.getPicture());
-        existedUser.setLogin(true);
-        existedUser.setRole(roleRepository.findByRoleName("ROLE_USER"));
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        lecturerRepository.save(existedUser);
 
 
         UserDetails userDetail = new org.springframework.security.core.userdetails.User(googlePojo.getEmail(),
