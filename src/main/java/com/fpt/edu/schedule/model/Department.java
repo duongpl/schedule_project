@@ -13,6 +13,9 @@ import javax.persistence.Id;
 @Setter
 @Entity
 @NoArgsConstructor
+/**
+ *
+ */
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Expected {
+public class Expected implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -29,10 +29,15 @@ public class Expected {
     private List<ExpectedSlot> expectedSlots;
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSubject> expectedSubjects;
-    @OneToOne(mappedBy = "expected",cascade=CascadeType.ALL)
+    @OneToOne(mappedBy = "expected", cascade = CascadeType.ALL)
     private ExpectedNote expectedNote;
     @Transient
     private boolean canReuse;
+
+    public Object clone() throws
+            CloneNotSupportedException {
+        return super.clone();
+    }
 
 }
 

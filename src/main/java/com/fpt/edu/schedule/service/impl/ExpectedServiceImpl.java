@@ -35,9 +35,16 @@ public class ExpectedServiceImpl implements ExpectedService {
 
     @Override
     public Expected addExpected(Expected expected) {
+        Expected existedExpected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(expected.getSemester().getId()),
+                lecturerService.findByGoogleId(expected.getLecturer().getGoogleId()));
+        if(existedExpected !=null){
+            throw new InvalidRequestException("Already have expected for this semester !");
+        }
         expected.setCreatedDate(new Date());
         expected.setUpdatedDate(new Date());
         Lecturer lecturer = lecturerService.findByGoogleId(expected.getLecturer().getGoogleId());
+
+        //get all subject and slot request
         List<String> slotRequests = expected.getExpectedSlots().stream().map(ExpectedSlot::getSlotName).collect(Collectors.toList());
         List<String> subjectRequests = expected.getExpectedSubjects().stream().map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
         List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId(), lecturer.getGoogleId());
@@ -48,8 +55,9 @@ public class ExpectedServiceImpl implements ExpectedService {
         expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
-        expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
 
+        //assign parent of each child
+        expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
         expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));
         return expectedRepository.save(expected);
     }
@@ -122,12 +130,20 @@ public class ExpectedServiceImpl implements ExpectedService {
             throw new InvalidRequestException("This semester don't have your expected !");
         }
         Expected newExpected = new Expected();
+        ExpectedNote expectedNote = expected.getExpectedNote();
         newExpected.setLecturer(expected.getLecturer());
-        newExpected.setExpectedSubjects(expected.getExpectedSubjects());
-        newExpected.setExpectedSlots(expected.getExpectedSlots());
+        //convert data
+        List<ExpectedSubject> expectedSubjects = expected.getExpectedSubjects().stream().map(i -> new ExpectedSubject(i.getSubjectCode(), i.getLevelOfPrefer(), newExpected))
+                .collect(Collectors.toList());
+        List<ExpectedSlot> expectedSlots = expected.getExpectedSlots().stream().map(i -> new ExpectedSlot(i.getSlotName(), i.getLevelOfPrefer(), newExpected))
+                .collect(Collectors.toList());
+
+        newExpected.setExpectedSubjects(expectedSubjects);
+        newExpected.setExpectedSlots(expectedSlots);
+        newExpected.setExpectedNote(new ExpectedNote(expectedNote.getExpectedNumOfClass(), expectedNote.getMaxConsecutiveSlot(), expectedNote.getNote(), newExpected));
+
         newExpected.setUpdatedDate(new Date());
         newExpected.setCreatedDate(new Date());
-        newExpected.setExpectedNote(expected.getExpectedNote());
         newExpected.setSemester(semesterRepository.getAllByNowIsTrue());
 
         return expectedRepository.save(newExpected);
