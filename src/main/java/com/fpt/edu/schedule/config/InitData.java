@@ -35,6 +35,7 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
         if(lecturerRepository.findByEmail("clok0001@gmail.com") == null){
             Lecturer lecturer = new Lecturer();
             lecturer.setDepartment("CF");
+            lecturer.setShortName("clok");
             lecturer.setEmail("clok0001@gmail.com");
             lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
             lecturerRepository.save(lecturer);

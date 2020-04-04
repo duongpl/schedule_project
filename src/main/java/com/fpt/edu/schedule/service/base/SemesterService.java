@@ -11,4 +11,6 @@ public interface SemesterService {
     Semester save(Semester semester);
 
     List<Semester> findByCriteria(QueryParam queryParam);
+
+    Semester findById(int id);
 }

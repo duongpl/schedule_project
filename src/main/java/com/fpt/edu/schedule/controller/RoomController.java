@@ -17,13 +17,16 @@ import java.util.List;
 @RequestMapping("/api/v1/rooms")
 public class RoomController {
     RoomService roomService;
+
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getRoomByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<ClassName> getRoomByCriteria(@RequestBody QueryParam queryParam,
+                                                       @RequestParam(value = "semesterId", defaultValue = "") String semesterId,
+                                                       @RequestHeader("GoogleId") String lecturerId) {
         try {
-            List<Room> roomList =roomService.findByCriteria(queryParam);
+            List<Room> roomList = roomService.findByCriteria(queryParam, semesterId,lecturerId);
             return new ResponseEntity(roomList, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

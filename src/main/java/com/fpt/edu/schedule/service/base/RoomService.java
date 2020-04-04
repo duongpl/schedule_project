@@ -10,5 +10,5 @@ public interface RoomService {
 
     Room getRoomByName(String name);
 
-    List<Room> findByCriteria(QueryParam queryParam);
+    List<Room> findByCriteria(QueryParam queryParam,String semesterId,String lecturerId);
 }

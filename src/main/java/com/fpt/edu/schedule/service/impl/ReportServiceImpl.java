@@ -45,22 +45,15 @@ public class ReportServiceImpl implements ReportService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
-            Set<String> subjectNameSet = new HashSet<>();
-            Set<String> roomNameSet = new HashSet<>();
-            Set<String> classNameSet = new HashSet<>();
-            Set<String> slotSet = new HashSet<>();
             while (rowIterator.hasNext()) {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
-//                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
-//                    continue;
-//                }
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
 
-                    if (cell.getCellTypeEnum().equals(CellType.BLANK)) {
+                    if (column == 6) {
                         break;
                     }
                     switch (column) {
@@ -164,9 +157,6 @@ public class ReportServiceImpl implements ReportService {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
-//                if (!row.getCell(3).getStringCellValue().equalsIgnoreCase("CF")) {
-//                    continue;
-//                }
                 TimetableDetail timetableDetail = new TimetableDetail();
                 timeTable.setSemester(semesterRepository.findById(semesterId));
                 while (cellIterator.hasNext()) {

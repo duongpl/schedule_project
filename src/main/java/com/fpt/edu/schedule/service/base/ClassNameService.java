@@ -8,7 +8,7 @@ import java.util.List;
 public interface ClassNameService {
     void addClassName(ClassName className);
 
-    List<ClassName> findByCriteria(QueryParam queryParam);
+    List<ClassName> findByCriteria(QueryParam queryParam,String semesterId,String lecturerId);
 
 
 }

@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.service.impl;
 
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.QueryParam;
@@ -34,5 +35,14 @@ public class SemesterServiceImpl implements SemesterService {
 
         return semesterRepository.findAll(cns);
 
+    }
+
+    @Override
+    public Semester findById(int id) {
+        Semester semester = semesterRepository.findById(id);
+        if(semester == null){
+            throw new InvalidRequestException("Don't find this semester");
+        }
+        return semester;
     }
 }
