@@ -31,6 +31,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
     SemesterRepository semesterRepository;
+    TimetableService timetableService;
     private static final List<String> SLOT_LIST = Arrays.asList("M1", "M2", "M3", "M4", "M5", "E1", "E2", "E3", "E4", "E5");
 
     @Override
@@ -86,7 +87,6 @@ public class ExpectedServiceImpl implements ExpectedService {
     @Override
     public List<Expected> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-
         return expectedRepository.findAll(cns);
     }
 

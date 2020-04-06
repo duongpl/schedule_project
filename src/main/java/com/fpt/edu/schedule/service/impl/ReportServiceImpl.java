@@ -6,17 +6,19 @@ import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.*;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 @Transactional
@@ -38,10 +40,14 @@ public class ReportServiceImpl implements ReportService {
     DepartmentRepository departmentRepository;
 
     @Override
-    public void generateExcelFile(String fileName, int semesterId) {
+    public void generateExcelFile(MultipartFile multipartFile, int semesterId) {
         try {
-            FileInputStream file = new FileInputStream(new File(fileName));
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
+            System.out.println(extension);
+            if(!extension.contains("xlsx")){
+                throw new InvalidRequestException("Wrong file format!");
+            }
+            XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
@@ -67,7 +73,7 @@ public class ReportServiceImpl implements ReportService {
                             if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                            subjectService.addSubject(new Subject(cell.getStringCellValue().trim(),row.getCell(3).getStringCellValue()));
+                            subjectService.addSubject(new Subject(cell.getStringCellValue().trim(), row.getCell(3).getStringCellValue()));
                             break;
                         case 3:
                             if (slotService.getSlotByName(cell.getStringCellValue().trim()) != null) {
@@ -79,7 +85,7 @@ public class ReportServiceImpl implements ReportService {
                             if (departmentRepository.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
-                           departmentRepository.save(new Department(cell.getStringCellValue().trim()));
+                            departmentRepository.save(new Department(cell.getStringCellValue().trim()));
                             break;
                         case 5:
                             if (roomRepository.findByName(cell.getStringCellValue().trim()) != null) {
@@ -90,15 +96,15 @@ public class ReportServiceImpl implements ReportService {
                     }
                 }
             }
-            saveTimetable(fileName, semesterId);
-            file.close();
+            saveTimetable(multipartFile, semesterId);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public Report addReport(Report report,String lecturerId) {
+    public Report addReport(Report report, String lecturerId) {
         report.setSemester(semesterRepository.getAllByNowIsTrue());
         report.setCreatedDate(new Date());
         report.setStatus(Status.PENDING);
@@ -136,13 +142,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
 
-    private void saveTimetable(String fileName, int semesterId) {
+    private void saveTimetable(MultipartFile multipartFile, int semesterId) {
         try {
-            FileInputStream file = new FileInputStream(new File(fileName));
-            if (file == null) {
-                throw new Exception("Not found this file!");
-            }
-            XSSFWorkbook workbook = new XSSFWorkbook(file);
+
+            XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
@@ -185,7 +188,6 @@ public class ReportServiceImpl implements ReportService {
                 }
             }
             timetableRepository.save(timeTable);
-            file.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

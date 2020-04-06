@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,10 +24,10 @@ public class ReportController {
     private JavaMailSender javaMailSender;
 
 
-    @GetMapping("/generate")
-    public ResponseEntity generateFile(@RequestParam(name = "fileName") String fileName,@RequestParam(name = "semesterId") int semesterId) {
+    @PostMapping("/generate")
+    public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam(name = "semesterId") int semesterId) {
         try {
-            reportService.generateExcelFile(fileName,semesterId);
+            reportService.generateExcelFile(multipartFile,semesterId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
