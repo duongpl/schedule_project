@@ -27,12 +27,24 @@ public class Semester {
     @JsonIgnore
     private List<Report> reportList;
     @JsonIgnore
-    @OneToOne(mappedBy = "semester",cascade=CascadeType.ALL)
+    @OneToOne(mappedBy = "semester", cascade = CascadeType.ALL)
     private Timetable timeTable;
-    public Semester(String season,String year,boolean now) {
+
+    public Semester(String season, String year, boolean now) {
         this.season = season;
         this.year = year;
         this.now = now;
     }
     public boolean now;
+    @Transient
+    private boolean hasData;
+
+    public boolean isHasData() {
+        if(this.timeTable != null){
+           return true;
+        }
+        return false;
+    }
+
+
 }
