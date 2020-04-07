@@ -49,7 +49,9 @@ public class ReportServiceImpl implements ReportService {
             if(!extension.contains("xlsx")){
                 throw new InvalidRequestException("Wrong file format!");
             }
-
+            if(1==1){
+                throw new InvalidRequestException("OK");
+            }
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
