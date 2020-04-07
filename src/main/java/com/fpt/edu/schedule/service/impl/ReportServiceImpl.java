@@ -40,6 +40,7 @@ public class ReportServiceImpl implements ReportService {
     DepartmentRepository departmentRepository;
     ExpectedRepository expectedRepository;
 
+
     @Override
     public void generateExcelFile(MultipartFile multipartFile, int semesterId) {
         try {
@@ -48,9 +49,7 @@ public class ReportServiceImpl implements ReportService {
             if(!extension.contains("xlsx")){
                 throw new InvalidRequestException("Wrong file format!");
             }
-            if(1==1){
-                throw new InvalidRequestException("Duoc rui");
-            }
+
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
@@ -134,7 +133,7 @@ public class ReportServiceImpl implements ReportService {
     public void removeReportById(int id) {
         Report existedReport = reportRepository.findReportById(id);
         if (existedReport == null) {
-            throw new InvalidRequestException("Don't find this report");
+            throw new InvalidRequestException(String.format("Don't find this report reportId:%s", id));
         }
         reportRepository.removeById(id);
     }

@@ -24,7 +24,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer addLecture(Lecturer lecturer,String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
         if (lecturerRepository.findByEmail(lecturer.getEmail()) != null) {
-            throw new InvalidRequestException("Already have this lecturer");
+            throw new InvalidRequestException(String.format("Already have this lecturer %s ",lecturer.getEmail()));
         }
         Lecturer hod = findByGoogleId(hodGoogleId);
 
