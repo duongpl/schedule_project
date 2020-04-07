@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +27,7 @@ public class Lecturer {
     private int quotaClass;
     private boolean fullTime;
     private boolean login = false;
+    private StatusLecturer status;
     @Type(type = "text")
     private String picture;
     @ManyToOne

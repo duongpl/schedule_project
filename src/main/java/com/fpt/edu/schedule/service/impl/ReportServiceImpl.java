@@ -1,6 +1,6 @@
 package com.fpt.edu.schedule.service.impl;
 
-import com.fpt.edu.schedule.common.enums.Status;
+import com.fpt.edu.schedule.common.enums.StatusReport;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
     public Report addReport(Report report, String lecturerId) {
         report.setSemester(semesterRepository.getAllByNowIsTrue());
         report.setCreatedDate(new Date());
-        report.setStatus(Status.PENDING);
+        report.setStatusReport(StatusReport.PENDING);
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
         report.setLecturer(lecturer);
         return reportRepository.save(report);
@@ -123,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
         if (existedReport == null) {
             throw new InvalidRequestException("Don't find this report !");
         }
-        existedReport.setStatus(report.getStatus());
+        existedReport.setStatusReport(report.getStatusReport());
         existedReport.setReplyContent(report.getReplyContent());
 
         return reportRepository.save(existedReport);

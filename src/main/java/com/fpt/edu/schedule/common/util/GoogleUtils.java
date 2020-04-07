@@ -3,6 +3,7 @@ package com.fpt.edu.schedule.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.GooglePojo;
 import com.fpt.edu.schedule.model.Lecturer;
@@ -57,12 +58,13 @@ public class GoogleUtils {
         boolean accountNonLocked = true;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         Lecturer existedUser = lecturerRepository.findByEmail(googlePojo.getEmail());
-        if (existedUser == null) {
+        if (existedUser == null || existedUser.getStatus().equals(StatusLecturer.DEACTIVATE)) {
             throw new InvalidRequestException("Don't have permission access");
         }
         if (existedUser.isLogin()) {
             authorities.add(new SimpleGrantedAuthority(existedUser.getRole().getRoleName()));
         } else {
+            existedUser.setStatus(StatusLecturer.ACTIVATE);
             existedUser.setGoogleId(googlePojo.getId());
             existedUser.setFullName(googlePojo.getGiven_name());
             existedUser.setPicture(googlePojo.getPicture());

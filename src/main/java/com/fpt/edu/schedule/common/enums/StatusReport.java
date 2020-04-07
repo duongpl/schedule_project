@@ -1,7 +1,8 @@
 package com.fpt.edu.schedule.common.enums;
 
-public enum Status {
+public enum StatusReport {
     APPROVED,
     REJECTED,
-    PENDING
+    PENDING,
+
 }

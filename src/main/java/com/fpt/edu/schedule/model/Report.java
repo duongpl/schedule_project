@@ -1,6 +1,6 @@
 package com.fpt.edu.schedule.model;
 
-import com.fpt.edu.schedule.common.enums.Status;
+import com.fpt.edu.schedule.common.enums.StatusReport;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private Status status;
+    private StatusReport statusReport;
     private String content;
     private Date createdDate;
     @ManyToOne

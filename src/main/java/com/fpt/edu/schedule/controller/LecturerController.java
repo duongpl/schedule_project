@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
@@ -72,6 +73,15 @@ public class LecturerController {
                                                  @RequestParam("lecturerGoogleId") String lecturerGoogleId) {
         try {
             return new ResponseEntity(lecturerService.transferRole(hodGoogleId,lecturerGoogleId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping("{lecturerGoogleId}/updateStatus")
+    public ResponseEntity<Lecturer> transferRole(@RequestParam StatusLecturer status,
+                                                 @PathVariable("lecturerGoogleId") String lecturerGoogleId ) {
+        try {
+            return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
