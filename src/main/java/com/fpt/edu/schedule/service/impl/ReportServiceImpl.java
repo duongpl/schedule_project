@@ -38,6 +38,7 @@ public class ReportServiceImpl implements ReportService {
     RoomRepository roomRepository;
     LecturerService lecturerService;
     DepartmentRepository departmentRepository;
+    ExpectedRepository expectedRepository;
 
     @Override
     public void generateExcelFile(MultipartFile multipartFile, int semesterId) {
@@ -46,6 +47,9 @@ public class ReportServiceImpl implements ReportService {
             System.out.println(extension);
             if(!extension.contains("xlsx")){
                 throw new InvalidRequestException("Wrong file format!");
+            }
+            if(1==1){
+                throw new InvalidRequestException("Duoc rui");
             }
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
@@ -153,6 +157,7 @@ public class ReportServiceImpl implements ReportService {
 
             if (existedTimetable != null) {
                 timetableDetailRepository.deleteAllByTimetable(existedTimetable);
+                expectedRepository.deleteAllBySemester(semesterRepository.findById(semesterId));
                 timetableRepository.deleteById(existedTimetable.getId());
             }
             Timetable timeTable = new Timetable();

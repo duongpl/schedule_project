@@ -16,5 +16,7 @@ public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpe
 
     Expected findBySemesterAndLecturer(Semester semester, Lecturer lecturer);
 
+    void deleteAllBySemester(Semester semester);
+
 
 }

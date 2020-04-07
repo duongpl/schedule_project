@@ -13,7 +13,7 @@ public class QueryParam {
 
     private Map<String, Object> criteria;
     private String sortField;
-        private boolean ascending = true;
+    private boolean ascending = true;
     private Map<String, Object> inCriteria;
 
     public QueryParam() {
