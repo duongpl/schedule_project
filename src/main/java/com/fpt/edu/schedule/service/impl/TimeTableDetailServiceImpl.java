@@ -2,9 +2,9 @@ package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.enums.Day;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.dto.TimetableView;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
+import com.fpt.edu.schedule.dto.TimetableView;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.model.TimetableDetail;
@@ -18,7 +18,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -120,7 +123,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         }
         if (timetableDetail.getRoom() != null) {
             Room room = ("NOT_ASSIGN").equals(timetableDetail.getRoom()) ? null
-                    : roomService.getRoomByName(timetableDetail.getRoom());
+                    : roomService.getRoomByName(getValidRoom(timetableDetail,timetableDetailExisted));
             timetableDetailExisted.setRoom(room);
         }
         return timetableDetailRepository.save(timetableDetailExisted);
@@ -139,17 +142,11 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     private String getValidRoom(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
-        QueryParam queryParam = new QueryParam();
-        Map<String, Object> criteria = new HashMap<>();
-        Map<String, Object> roomMap = new HashMap<>();
-        roomMap.put("name", timetableDetail.getRoom());
-        Map<String, Object> slotMap = new HashMap<>();
-        slotMap.put("name", timetableDetailExisted.getSlot().getName());
-        criteria.put("room", roomMap);
-        criteria.put("slot", slotMap);
-        queryParam.setCriteria(criteria);
-        if (findByCriteria(queryParam).size() > 1) {
-            throw new InvalidRequestException("Already have class in room !");
+        TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndRoomAndTimetable(timetableDetailExisted.getSlot(),
+                roomService.getRoomByName(timetableDetail.getRoom()),timetableDetailExisted.getTimetable());
+        if(timetableDetailCheck !=null){
+            throw new InvalidRequestException(String.format("This room already have timetable Room : %s, Slot : %s, Sbject : %s",
+                    timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode()));
         }
         return timetableDetail.getRoom();
     }
