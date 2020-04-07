@@ -16,7 +16,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private StatusReport statusReport;
+    private StatusReport status;
     private String content;
     private Date createdDate;
     @ManyToOne
