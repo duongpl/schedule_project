@@ -24,4 +24,6 @@ public interface LecturerService {
 
     Lecturer changeStatus(StatusLecturer status,String googleId);
 
+    List<Lecturer> findForUpdate(int timetableDetailId,QueryParam queryParam);
+
 }

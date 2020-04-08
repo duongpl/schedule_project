@@ -86,5 +86,15 @@ public class LecturerController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PostMapping("/forUpdate")
+    public ResponseEntity<Lecturer> findForUpdate(@RequestBody QueryParam queryParam,
+                                                  @RequestParam int timetableDetailId) {
+        try {
+            List<Lecturer> lecturerList = lecturerService.findForUpdate(timetableDetailId,queryParam);
+            return new ResponseEntity(lecturerList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

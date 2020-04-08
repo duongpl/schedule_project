@@ -15,4 +15,5 @@ public interface TimetableRepository extends Repository<Timetable, Integer>, Jpa
     @Query(value = "DELETE FROM timetable where id=?1  ", nativeQuery = true)
     void deleteById(int id);
 
+
 }

@@ -56,5 +56,10 @@ public class RoomServiceImpl implements RoomService {
 
     }
 
+    @Override
+    public List<Room> getRoomForUpdate(TimetableDetail timetableDetail) {
+        return null;
+    }
+
 
 }

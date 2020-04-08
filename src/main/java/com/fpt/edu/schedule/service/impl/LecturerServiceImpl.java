@@ -5,6 +5,7 @@ import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Lecturer;
+import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
@@ -13,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -23,6 +25,7 @@ public class LecturerServiceImpl implements LecturerService {
     ExpectedRepository expectedRepository;
     TimetableDetailRepository timetableDetailRepository;
     TimetableService timetableService;
+    TimetableRepository timetableRepository;
 
 
 
@@ -124,6 +127,19 @@ public class LecturerServiceImpl implements LecturerService {
         }
         lecturer.setStatus(status);
         return lecturerRepository.save(lecturer);
+    }
+
+    @Override
+    public List<Lecturer> findForUpdate(int timetableDetailId,QueryParam queryParam) {
+        TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
+        Timetable timetable = timetableDetail.getTimetable();
+        List<TimetableDetail> list = timetable.getTimetableDetails().stream().filter(i->
+                i.getSlot().equals(timetableDetail.getSlot())).collect(Collectors.toList());
+        List<Lecturer> lecturers = list.stream().map(TimetableDetail::getLecturer).collect(Collectors.toList());
+        BaseSpecifications cns = new BaseSpecifications(queryParam);
+        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository.findAll(cns).stream().filter(i->!lecturers.contains(i)).collect(Collectors.toList());
+
+        return lecturer;
     }
 
 
