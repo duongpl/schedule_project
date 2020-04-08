@@ -116,12 +116,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         if (timetableDetailExisted == null) {
             throw new InvalidRequestException("Not found this timetable !");
         }
-        if (timetableDetail.getLecturerShortName() != null && !timetableDetail.getLecturerShortName().equals(timetableDetailExisted.getLecturer().getShortName())) {
+        if (timetableDetail.getLecturerShortName() != null ) {
             Lecturer lecturer = ("NOT_ASSIGN").equals(timetableDetail.getLecturerShortName()) ? null
                     : lecturerService.findByShortName(getValidLecturer(timetableDetail,timetableDetailExisted));
             timetableDetailExisted.setLecturer(lecturer);
         }
-        if (timetableDetail.getRoom() != null && !timetableDetail.getRoom().equals(timetableDetailExisted.getRoom().getName())) {
+        if (timetableDetail.getRoom() != null) {
             Room room = ("NOT_ASSIGN").equals(timetableDetail.getRoom()) ? null
                     : roomService.getRoomByName(getValidRoom(timetableDetail,timetableDetailExisted));
             timetableDetailExisted.setRoom(room);
@@ -144,7 +144,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private String getValidRoom(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
         TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndRoomAndTimetable(timetableDetailExisted.getSlot(),
                 roomService.getRoomByName(timetableDetail.getRoom()),timetableDetailExisted.getTimetable());
-        if(timetableDetailCheck !=null){
+        if(timetableDetailCheck !=null && timetableDetailCheck.getRoom() !=null){
             throw new InvalidRequestException(String.format("This room already have timetable Room:%s ,Slot:%s ,Subject:%s ,Department:%s",
                     timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode(),timetableDetailCheck.getSubject().getDepartment()));
         }
@@ -153,7 +153,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private String getValidLecturer(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
         TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndLecturerAndTimetable(timetableDetailExisted.getSlot(),
                 lecturerService.findByShortName(timetableDetail.getLecturerShortName()),timetableDetailExisted.getTimetable());
-        if(timetableDetailCheck !=null){
+        if(timetableDetailCheck !=null && timetableDetailCheck.getLecturer() !=null){
             String message = String.format("This lecturer already have timetable in this slot Room:%s ,Slot:%s ,Subject:%s ,Department:%s, Lecturer:%s",
                     timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode(),timetableDetailCheck.getSubject().getDepartment(),timetableDetailCheck.getLecturer().getShortName());
             throw new InvalidRequestException(message);
