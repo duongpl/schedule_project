@@ -81,7 +81,7 @@ public class LecturerController {
     public ResponseEntity<Lecturer> transferRole(@RequestParam StatusLecturer status,
                                                  @PathVariable("lecturerGoogleId") String lecturerGoogleId ) {
         try {
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(lecturerService.changeStatus(status,lecturerGoogleId),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

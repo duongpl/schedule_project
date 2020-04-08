@@ -15,13 +15,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 @Service
-@Transactional
 @AllArgsConstructor
 public class ReportServiceImpl implements ReportService {
     RoomService roomService;
@@ -49,9 +47,6 @@ public class ReportServiceImpl implements ReportService {
             if(!extension.contains("xlsx")){
                 throw new InvalidRequestException("Wrong file format!");
             }
-            if(1==1){
-                throw new InvalidRequestException("OK");
-            }
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
@@ -63,6 +58,10 @@ public class ReportServiceImpl implements ReportService {
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
+                    System.out.println(cell.getStringCellValue().trim());
+                    if(1==1){
+                        throw new InvalidRequestException("OK");
+                    }
 
                     if (column == 6) {
                         break;
@@ -129,7 +128,6 @@ public class ReportServiceImpl implements ReportService {
 
         return reportRepository.save(existedReport);
     }
-
 
     @Override
     public void removeReportById(int id) {
