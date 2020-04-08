@@ -5,8 +5,10 @@ import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Lecturer;
+import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
+import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,9 @@ public class LecturerServiceImpl implements LecturerService {
     RoleRepository roleRepository;
     SemesterRepository semesterRepository;
     ExpectedRepository expectedRepository;
+    TimetableDetailRepository timetableDetailRepository;
+    TimetableService timetableService;
+
 
 
     @Override
@@ -108,6 +113,15 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public Lecturer changeStatus(StatusLecturer status, String googleId) {
         Lecturer lecturer = findByGoogleId(googleId);
+        if(status == StatusLecturer.DEACTIVATE) {
+            List<TimetableDetail> timetableDetail = timetableDetailRepository.findAllByLecturerAndTimetable(lecturer,
+                    timetableService.findBySemester(semesterRepository.getAllByNowIsTrue()));
+            // remove all timetable of this lecture
+            timetableDetail.stream().forEach(i -> {
+                i.setLecturer(null);
+                timetableDetailRepository.save(i);
+            });
+        }
         lecturer.setStatus(status);
         return lecturerRepository.save(lecturer);
     }

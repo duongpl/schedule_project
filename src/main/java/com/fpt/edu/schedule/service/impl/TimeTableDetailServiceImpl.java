@@ -144,7 +144,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private String getValidRoom(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
         TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndRoomAndTimetable(timetableDetailExisted.getSlot(),
                 roomService.getRoomByName(timetableDetail.getRoom()),timetableDetailExisted.getTimetable());
-        if(timetableDetailCheck !=null && timetableDetailCheck.getRoom() !=null){
+        if(timetableDetailCheck !=null && !timetableDetailCheck.getRoom().getName().equals(timetableDetail.getRoom()) ){
             throw new InvalidRequestException(String.format("This room already have timetable Room:%s ,Slot:%s ,Subject:%s ,Department:%s",
                     timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode(),timetableDetailCheck.getSubject().getDepartment()));
         }
