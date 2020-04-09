@@ -1,6 +1,5 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RoomService;
@@ -19,11 +18,20 @@ public class RoomController {
     RoomService roomService;
 
     @PostMapping("/filter")
-    public ResponseEntity<ClassName> getRoomByCriteria(@RequestBody QueryParam queryParam,
+    public ResponseEntity<Room> getRoomByCriteria(@RequestBody QueryParam queryParam,
                                                        @RequestParam(value = "semesterId", defaultValue = "") String semesterId,
                                                        @RequestHeader("GoogleId") String lecturerId) {
         try {
             List<Room> roomList = roomService.findByCriteria(queryParam, semesterId,lecturerId);
+            return new ResponseEntity(roomList, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/forUpdate")
+    public ResponseEntity<Room> getRoomForUpdate(@RequestParam("timetableDetailId") int timetableDetailId) {
+        try {
+            List<Room> roomList = roomService.getRoomForUpdate(timetableDetailId);
             return new ResponseEntity(roomList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -17,7 +17,8 @@ public class Timetable {
     private int id;
     @OneToOne
     @JoinColumn(name = "semester_id")
-    private Semester semester;
+    Semester semester;
+    boolean temp;
     @JsonIgnore
     @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL)
     private List<TimetableDetail> timetableDetails;

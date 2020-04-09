@@ -1,13 +1,13 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.repository.base.RoomRepository;
+import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import com.fpt.edu.schedule.service.base.RoomService;
 import com.fpt.edu.schedule.service.base.SemesterService;
@@ -26,6 +26,7 @@ public class RoomServiceImpl implements RoomService {
     TimetableService timetableService;
     SemesterService semesterService;
     LecturerService lecturerService;
+    TimetableDetailRepository timetableDetailRepository;
 
     @Override
     public void addRoom(Room room) {
@@ -49,16 +50,18 @@ public class RoomServiceImpl implements RoomService {
         }
         int semester = Integer.parseInt(semesterId);
         Timetable timetable = timetableService.findBySemester(semesterService.findById(semester));
-        Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
-        Set<Room> rooms = timetable.getTimetableDetails().stream().filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()))
-                .map(TimetableDetail::getRoom).collect(Collectors.toSet());
+        Set<Room> rooms = timetable.getTimetableDetails().stream().map(TimetableDetail::getRoom).collect(Collectors.toSet());
         return rooms.stream().collect(Collectors.toList());
-
     }
 
     @Override
-    public List<Room> getRoomForUpdate(TimetableDetail timetableDetail) {
-        return null;
+    public List<Room> getRoomForUpdate(int timetableDetailId) {
+        TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
+        Timetable timetable = timetableDetail.getTimetable();
+        Set<Room> rooms1 =timetable.getTimetableDetails().stream().map(TimetableDetail::getRoom).collect(Collectors.toSet());
+        Set<Room> rooms2 = timetable.getTimetableDetails().stream().filter(i->i.getSlot().getId() == timetableDetail.getSlot().getId()).map(TimetableDetail::getRoom).collect(Collectors.toSet());
+        List<Room> rooms3 = rooms1.stream().filter(i->!rooms2.contains(i)).collect(Collectors.toList());
+        return rooms3;
     }
 
 
