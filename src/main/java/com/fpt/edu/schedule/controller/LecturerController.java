@@ -18,8 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/api/v1/lecturers")
 public class LecturerController {
-    LecturerService lecturerService;
-    ClassNameRepository classNameRepository;
+     LecturerService lecturerService;
+     ClassNameRepository classNameRepository;
 
 
     @GetMapping("/{lecturerId}")

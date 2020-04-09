@@ -100,7 +100,6 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         });
         Map<Integer, List<TimetableDetailDTO>> collect = timetableDetailDTOSnew.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlotNumber));
         List<TimetableView> timetableViews = collect.entrySet().stream().map(i -> new TimetableView(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableViews.sort(Comparator.comparing(TimetableView::getSlotNumber));
         return timetableViews;
     }
 
@@ -133,7 +132,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName(): null, i.getRoom().getName(),
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName(): null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());

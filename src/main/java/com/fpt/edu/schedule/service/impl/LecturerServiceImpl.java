@@ -13,6 +13,7 @@ import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,6 +64,7 @@ public class LecturerServiceImpl implements LecturerService {
             }
 
         }
+        lecturers.sort(Comparator.comparing(Lecturer::getEmail));
         return lecturers;
     }
 
