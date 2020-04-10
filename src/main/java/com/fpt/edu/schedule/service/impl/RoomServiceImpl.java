@@ -60,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
         Timetable timetable = timetableDetail.getTimetable();
         Set<Room> rooms1 =timetable.getTimetableDetails().stream().map(TimetableDetail::getRoom).collect(Collectors.toSet());
         Set<Room> rooms2 = timetable.getTimetableDetails().stream().filter(i->i.getSlot().getId() == timetableDetail.getSlot().getId()).map(TimetableDetail::getRoom).collect(Collectors.toSet());
-        List<Room> rooms3 = rooms1.stream().filter(i->!rooms2.contains(i)).collect(Collectors.toList());
+        List<Room> rooms3 = rooms1.stream().filter(i->!rooms2.contains(i) && i!=null).collect(Collectors.toList());
         return rooms3;
     }
 
