@@ -50,7 +50,7 @@ public class RoomServiceImpl implements RoomService {
         }
         int semester = Integer.parseInt(semesterId);
         Timetable timetable = timetableService.findBySemester(semesterService.findById(semester));
-        Set<Room> rooms = timetable.getTimetableDetails().stream().map(TimetableDetail::getRoom).collect(Collectors.toSet());
+        Set<Room> rooms = timetable.getTimetableDetails().stream().filter(i->i.getRoom()!=null).map(TimetableDetail::getRoom).collect(Collectors.toSet());
         return rooms.stream().collect(Collectors.toList());
     }
 
