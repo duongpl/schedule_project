@@ -4,6 +4,7 @@ import com.fpt.edu.schedule.common.enums.StatusReport;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,6 +18,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private StatusReport status;
+    @Type(type = "text")
     private String content;
     private Date createdDate;
     @ManyToOne
@@ -25,5 +27,6 @@ public class Report {
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
+    @Type(type = "text")
     private String replyContent;
 }
