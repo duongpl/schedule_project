@@ -1,6 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
-import com.fpt.edu.schedule.model.Report;
+import com.fpt.edu.schedule.model.Request;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.ReportService;
 import lombok.AllArgsConstructor;
@@ -18,8 +18,8 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/reports")
-public class ReportController {
+@RequestMapping("/api/v1/requests")
+public class RequestController {
     ReportService reportService;
     private JavaMailSender javaMailSender;
 
@@ -36,27 +36,27 @@ public class ReportController {
         }
     }
     @PostMapping("/filter")
-    public ResponseEntity<Report> getClassByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<Request> getClassByCriteria(@RequestBody QueryParam queryParam) {
         try {
-            List<Report> reportList =reportService.findByCriteria(queryParam);
-            return new ResponseEntity(reportList, HttpStatus.OK);
+            List<Request> requestList =reportService.findByCriteria(queryParam);
+            return new ResponseEntity(requestList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping
-    public ResponseEntity<Report> addReport(@RequestBody Report report,
-                                            @RequestHeader("GoogleId") String currentLecturerId) {
+    public ResponseEntity<Request> addReport(@RequestBody Request request,
+                                             @RequestHeader("GoogleId") String currentLecturerId) {
         try {
-            return new ResponseEntity(reportService.addReport(report,currentLecturerId), HttpStatus.OK);
+            return new ResponseEntity(reportService.addReport(request,currentLecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
-    public ResponseEntity<Report> updateReport(@RequestBody Report report) {
+    public ResponseEntity<Request> updateReport(@RequestBody Request request) {
         try {
-            return new ResponseEntity(reportService.updateReport(report), HttpStatus.OK);
+            return new ResponseEntity(reportService.updateReport(request), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

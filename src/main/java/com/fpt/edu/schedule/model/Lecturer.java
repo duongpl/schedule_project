@@ -39,7 +39,7 @@ public class Lecturer {
     private List<Expected> expectedList;
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Report> reportList ;
+    private List<Request> requestList;
     @Transient
     private boolean fillingExpected;
     @Transient

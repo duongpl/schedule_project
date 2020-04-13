@@ -13,7 +13,7 @@ import java.util.Date;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Report {
+public class Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
