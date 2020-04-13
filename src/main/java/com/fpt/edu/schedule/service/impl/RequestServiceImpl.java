@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ReportServiceImpl implements ReportService {
+public class RequestServiceImpl implements ReportService {
     RoomService roomService;
     ClassNameService classNameService;
     ClassNameRepository classNameRepository;
@@ -31,7 +31,7 @@ public class ReportServiceImpl implements ReportService {
     TimetableDetailRepository timetableDetailRepository;
     TimetableRepository timetableRepository;
     SlotService slotService;
-    ReportRepository reportRepository;
+    RequestRepository requestRepository;
     LecturerRepository lecturerRepository;
     SemesterRepository semesterRepository;
     RoomRepository roomRepository;
@@ -104,40 +104,40 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report addReport(Report report, String lecturerId) {
-        report.setSemester(semesterRepository.getAllByNowIsTrue());
-        report.setCreatedDate(new Date());
-        report.setStatus(StatusReport.PENDING);
+    public Request addReport(Request request, String lecturerId) {
+        request.setSemester(semesterRepository.getAllByNowIsTrue());
+        request.setCreatedDate(new Date());
+        request.setStatus(StatusReport.PENDING);
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
-        report.setLecturer(lecturer);
-        return reportRepository.save(report);
+        request.setLecturer(lecturer);
+        return requestRepository.save(request);
     }
 
     @Override
-    public Report updateReport(Report report) {
-        Report existedReport = reportRepository.findReportById(report.getId());
-        if (existedReport == null) {
+    public Request updateReport(Request request) {
+        Request existedRequest = requestRepository.findReportById(request.getId());
+        if (existedRequest == null) {
             throw new InvalidRequestException("Don't find this report !");
         }
-        existedReport.setStatus(report.getStatus());
-        existedReport.setReplyContent(report.getReplyContent());
+        existedRequest.setStatus(request.getStatus());
+        existedRequest.setReplyContent(request.getReplyContent());
 
-        return reportRepository.save(existedReport);
+        return requestRepository.save(existedRequest);
     }
 
     @Override
     public void removeReportById(int id) {
-        Report existedReport = reportRepository.findReportById(id);
-        if (existedReport == null) {
+        Request existedRequest = requestRepository.findReportById(id);
+        if (existedRequest == null) {
             throw new InvalidRequestException(String.format("Don't find this report reportId:%s", id));
         }
-        reportRepository.removeById(id);
+        requestRepository.removeById(id);
     }
 
     @Override
-    public List<Report> findByCriteria(QueryParam queryParam) {
+    public List<Request> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        return reportRepository.findAll(cns);
+        return requestRepository.findAll(cns);
     }
 
 

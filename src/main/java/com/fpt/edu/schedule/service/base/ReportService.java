@@ -1,6 +1,6 @@
 package com.fpt.edu.schedule.service.base;
 
-import com.fpt.edu.schedule.model.Report;
+import com.fpt.edu.schedule.model.Request;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,12 +9,12 @@ import java.util.List;
 public interface ReportService {
     void generateExcelFile(MultipartFile multipartFile, int semesterId);
 
-    Report addReport(Report report,String lecturerId);
+    Request addReport(Request request, String lecturerId);
 
-    Report updateReport(Report report);
+    Request updateReport(Request request);
 
 
     void removeReportById(int id);
 
-    List<Report> findByCriteria(QueryParam queryParam);
+    List<Request> findByCriteria(QueryParam queryParam);
 }
