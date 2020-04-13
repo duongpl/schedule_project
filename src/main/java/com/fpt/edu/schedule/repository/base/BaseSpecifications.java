@@ -28,17 +28,22 @@ public class BaseSpecifications<T> implements Specification<T> {
                 if (entry.getValue() instanceof Map) {
                     Map<String, Object> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
                     for (Map.Entry<String, Object> entry1 : mapEntry.entrySet()) {
-                        if (entry.getValue() instanceof String) {
-                            predicates.add(criteriaBuilder.like(getPath(root,entry.getKey()).get(entry.getKey()), "%" + entry.getValue() + "%"));
-                        } else {
+                        if (entry1.getValue() instanceof String) {
+                            predicates.add(criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + entry1.getValue() + "%"));
+                        } else if (entry1.getValue() instanceof Number) {
                             predicates.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), entry1.getValue()));
+                        } else if (entry1.getValue() == null){
+                            predicates.add(criteriaBuilder.isNull(getPath(root,entry.getKey()).get(entry1.getKey())));
                         }
+
                     }
                 } else {
                     if (entry.getValue() instanceof String) {
                         predicates.add(criteriaBuilder.like(root.get(entry.getKey()), "%" + entry.getValue() + "%"));
-                    } else {
+                    } else if (entry.getValue() instanceof Number) {
                         predicates.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
+                    } else if (entry.getValue() == null){
+                        predicates.add(criteriaBuilder.isNull(root.get(entry.getKey())));
                     }
                 }
             }
@@ -56,9 +61,13 @@ public class BaseSpecifications<T> implements Specification<T> {
                             break;
                         }
                         entry1.getValue().forEach(i -> {
-                            Predicate predicate = (i instanceof String) ? criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%")
-                                    : criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i);
-                            predicateList.add(predicate);
+                            if ( i instanceof String) {
+                                predicateList.add(criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%"));
+                            } else if ( i instanceof Number) {
+                                predicateList.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i));
+                            } else if (i == null){
+                                predicateList.add(criteriaBuilder.isNull(getPath(root,entry.getKey()).get(entry1.getKey())));
+                            }
                         });
                        predicate1 =  criteriaBuilder.or(predicateList.toArray(new Predicate[0]));
                        predicateList1.add(predicate1);
