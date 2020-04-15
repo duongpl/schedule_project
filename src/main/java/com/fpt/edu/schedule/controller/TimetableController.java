@@ -23,5 +23,15 @@ public class TimetableController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PostMapping("/stop")
+    public ResponseEntity<Subject> stop(@RequestParam("threadId") int threadId) {
+        try {
+            timetableService.stop(threadId);
+
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }
