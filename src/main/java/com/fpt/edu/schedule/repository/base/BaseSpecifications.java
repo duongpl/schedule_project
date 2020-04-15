@@ -33,7 +33,7 @@ public class BaseSpecifications<T> implements Specification<T> {
                         } else if (entry1.getValue() instanceof Number) {
                             predicates.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), entry1.getValue()));
                         } else if (entry1.getValue() == null){
-                            predicates.add(criteriaBuilder.isNull(getPath(root,entry.getKey()).get(entry1.getKey())));
+                            predicates.add(criteriaBuilder.isNull(getPath(root,entry.getKey())));
                         }
 
                     }
@@ -66,7 +66,7 @@ public class BaseSpecifications<T> implements Specification<T> {
                             } else if ( i instanceof Number) {
                                 predicateList.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i));
                             } else if (i == null){
-                                predicateList.add(criteriaBuilder.isNull(getPath(root,entry.getKey()).get(entry1.getKey())));
+                                predicateList.add(criteriaBuilder.isNull(getPath(root,entry.getKey())));
                             }
                         });
                        predicate1 =  criteriaBuilder.or(predicateList.toArray(new Predicate[0]));
