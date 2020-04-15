@@ -117,6 +117,9 @@ public class Model {
 //
 //    }
 
+    public Model() {
+    }
+
     public static void main(String[] args) {
         Vector<Teacher> teachers = new Vector<>();
 //        teachers.add(new Teacher("E1", "E1", 0));
@@ -176,5 +179,6 @@ public class Model {
 //        Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects);
 //        GeneticAlgorithm ga = new GeneticAlgorithm(model);
 //        ga.start();
+
     }
 }
