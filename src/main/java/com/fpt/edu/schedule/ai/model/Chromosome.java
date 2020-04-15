@@ -677,6 +677,21 @@ public class Chromosome {
         this.model = model;
     }
 
+    public  Vector<Record> getSchedule() {
+        Vector<Record> rs = new Vector<>();
+        for(int i=0 ;i < this.getModel().getTeachers().size(); i++) {
+            for(int j =0 ; j < 10; j++) {
+                int classId = this.getGenes().get(j).get(i);
+                if (classId != -1) {
+                    rs.add(new Record(this.getModel().getTeacherIdReverse(i), this.getModel().getClassIdReverse(classId),
+                            this.getModel().getSubjectIdReverse(this.getModel().getClasses().get(classId).getSubject().getId()),
+                            j));
+                }
+            }
+        }
+        return rs;
+    }
+
     public static void main(String[] args) {
         Vector<Teacher> teachers = new Vector<>();
         teachers.add(new Teacher("E1", "E1", 0));

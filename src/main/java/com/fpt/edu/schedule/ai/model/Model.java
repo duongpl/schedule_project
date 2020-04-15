@@ -7,6 +7,8 @@ import com.fpt.edu.schedule.ai.lib.SlotGroup;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.Teacher;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 public class Model {
@@ -105,7 +107,63 @@ public class Model {
         this.expectedNumberOfClass = expectedNumberOfClass;
         this.consecutiveSlotLimit = consecutiveSlotLimit;
         this.quota = quota;
+        mappingId();
     }
+
+    Map <Integer, Integer> teacherIdMapping;
+    Map <Integer, Integer> classIdMapping;
+    Map <Integer, Integer> subjectIdMapping;
+
+    Map <Integer, Integer> teacherIdMappingReverse;
+    Map <Integer, Integer> classIdMappingReverse;
+    Map <Integer, Integer> subjectIdMappingReverse;
+
+    public void mappingId() {
+        teacherIdMapping = new HashMap<>();
+        classIdMapping = new HashMap<>();
+        subjectIdMapping = new HashMap<>();
+        for(int i =0 ; i < teachers.size(); i++) {
+            teacherIdMapping.put(teachers.get(i).getId(), i);
+            teacherIdMappingReverse.put(i, teachers.get(i).getId());
+        }
+
+        for(int i = 0; i < classes.size(); i++) {
+            classIdMapping.put(classes.get(i).getId(), i);
+            classIdMappingReverse.put(i, classes.get(i).getId());
+        }
+
+        for(int i = 0; i < subjects.size(); i++) {
+            subjectIdMapping.put(subjects.get(i).getId(), i);
+            subjectIdMappingReverse.put(i, subjects.get(i).getId());
+        }
+
+
+        for(int i =0 ; i <teachers.size(); i++) {
+            teachers.get(i).setId(teacherIdMapping.get(teachers.get(i).getId()));
+        }
+
+        for(int i =0 ; i < subjects.size(); i++) {
+            subjects.get(i).setId(subjectIdMapping.get(subjects.get(i).getId()));
+        }
+
+        for(int i =0 ; i < classes.size(); i++) {
+            classes.get(i).setId(classIdMapping.get(classes.get(i).getId()));
+            classes.get(i).getSubject().setId(classIdMapping.get(classes.get(i).getSubject().getId()));
+        }
+    }
+
+    public int getTeacherIdReverse(int teacherID) {
+        return teacherIdMappingReverse.get(teacherID);
+    }
+
+    public int getClassIdReverse(int classId) {
+        return classIdMappingReverse.get(classId);
+    }
+
+    public int getSubjectIdReverse(int subjectId) {
+        return subjectIdMappingReverse.get(subjectId);
+    }
+
 //    public Model(Vector<Teacher> teachers, Vector<SlotGroup> slots, Vector<Subject> subjects, Vector<Class> classes,
 //                 double[][] registeredSlots, double[][] registeredSubjects) {
 //        this.teachers = teachers;
