@@ -6,6 +6,8 @@ import com.fpt.edu.schedule.model.Semester;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.Repository;
 
+import java.util.List;
+
 public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpecificationExecutor<Expected> {
 
     Expected save (Expected expected);
@@ -17,6 +19,8 @@ public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpe
     Expected findBySemesterAndLecturer(Semester semester, Lecturer lecturer);
 
     void deleteAllBySemester(Semester semester);
+
+    List<Expected> findAllBySemester(Semester semester);
 
 
 }
