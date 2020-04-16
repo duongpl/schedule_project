@@ -17,39 +17,29 @@ public class Model {
     private Vector<Class> classes;
     private double registeredSlots[][];
     private double registeredSubjects[][];
-    private Integer expectedNumberOfClass[];
-    private Integer consecutiveSlotLimit[];
-    private Integer quota[];
 
 
     public Model(Vector<Teacher> teachers, Vector<SlotGroup> slots, Vector<Subject> subjects, Vector<Class> classes,
-                 double[][] registeredSlots, double[][] registeredSubjects, Integer[] expectedNumberOfClass, Integer[] consecutiveSlotLimit, Integer[] quota) {
+                 double[][] registeredSlots, double[][] registeredSubjects) {
         this.teachers = teachers;
         this.slots = slots;
         this.subjects = subjects;
         this.classes = classes;
         this.registeredSlots = registeredSlots;
         this.registeredSubjects = registeredSubjects;
-        this.expectedNumberOfClass = expectedNumberOfClass;
-        this.consecutiveSlotLimit = consecutiveSlotLimit;
-        this.quota = quota;
+
         mappingId();
     }
 
     public Model(Vector<Teacher> teachers, Vector<SlotGroup> slots, Vector<Subject> subjects, Vector<Class> classes,
-                 Vector<ExpectedSlot> registeredSlots, Vector<ExpectedSubject> registeredSubjects, Vector<Integer> expectedNumberOfClass, Vector<Integer> consecutiveSlotLimit, Vector<Integer> quota) {
+                 Vector<ExpectedSlot> registeredSlots, Vector<ExpectedSubject> registeredSubjects) {
         this.teachers = teachers;
         this.slots = slots;
         this.subjects = subjects;
         this.classes = classes;
         this.registeredSlots = new double[teachers.size()][10];
         this.registeredSubjects = new double[teachers.size()][subjects.size()];
-        this.expectedNumberOfClass = new Integer[teachers.size()];
-        this.consecutiveSlotLimit = new Integer[teachers.size()];
-        this.quota = new Integer[teachers.size()];
-        expectedNumberOfClass.toArray(this.expectedNumberOfClass);
-        consecutiveSlotLimit.toArray(this.consecutiveSlotLimit);
-        quota.toArray(this.quota);
+
         mappingId();
 
 
@@ -173,7 +163,7 @@ public class Model {
         classes.add(new Class("s1", 1, 7, new Room("asdf"), 0));
         classes.add(new Class("s1", 2, 10, new Room("asdf"), 1));
         classes.add(new Class("s1", 1, 7, new Room("asdf"), 2));
-        Model model = new Model(teachers, slots, subjects, classes, registerSlot, registerSubject, new Vector<Integer>(), new Vector<Integer>(), new Vector<Integer>());
+        Model model = new Model(teachers, slots, subjects, classes, registerSlot, registerSubject);
 
     }
 }

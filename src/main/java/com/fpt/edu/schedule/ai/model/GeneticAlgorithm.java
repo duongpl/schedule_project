@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Vector;
 
 public class GeneticAlgorithm {
-    public static final int POPULATION_SIZE = 50;
+    public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
     public static final int TOURNAMENT_SIZE = 3;
     public static final int CLASS_NUMBER = 5;
@@ -30,10 +30,8 @@ public class GeneticAlgorithm {
     public void updateFitness() {
         this.population.updateFitness();
 
-        //print current generation info
 
         this.generation++;
-//            System.out.println("asdfasdf" + this.population.get);
 
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: "  + this.population.getBestIndividuals().getFitness());
@@ -41,7 +39,6 @@ public class GeneticAlgorithm {
 
         this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
                 this.population.getBestIndividuals().getNumberOfViolation());
-        this.population.getBestIndividuals().display();
         if (this.generation % 100 == 0) {
             DataWriter.writeToCsv(this.model, this.population.getBestIndividuals(), "result" + this.generation / 100 + ".csv");
         }

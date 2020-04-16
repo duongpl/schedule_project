@@ -91,7 +91,7 @@ public class Chromosome {
                 maxSlotSatisfaction += max;
             }
         }
-        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.model.getExpectedNumberOfClass()[teacherId] * max);
+        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o2
         double subjectSatisfaction = 0;
         double maxSubjectSatisfaction = 0;
@@ -106,7 +106,7 @@ public class Chromosome {
                 maxSubjectSatisfaction += max;
             }
         }
-        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.model.getExpectedNumberOfClass()[teacherId] * max);
+        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o3
         double numberOfClassSatisfaction = 0;
         int cnt = 0;
@@ -158,7 +158,7 @@ public class Chromosome {
         //o6
         int consecutiveSlot = 0;
         int overLimit = 0;
-        int lim = this.model.getConsecutiveSlotLimit()[teacherId];
+        int lim = this.model.getTeachers().get(teacherId).getConsecutiveSlotLimit();
         for (int i = 0; i < 6; i++) {
             int classId = vt.get(i);
             if (classId != -1) {
@@ -197,12 +197,12 @@ public class Chromosome {
 //        if (maxSlotSatisfaction == 0 || maxSubjectSatisfaction == 0) System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
         double F = (maxSlotSatisfaction == 0 ? 0 : 0.35 * slotSatisfaction / maxSlotSatisfaction) +
                 0.35 * (maxSubjectSatisfaction == 0 ? 0 : subjectSatisfaction / maxSubjectSatisfaction)
-                + 0.3 * (1.0 / (1.0 + Math.pow(2.0, Math.abs(cnt - this.model.getExpectedNumberOfClass()[teacherId])
+                + 0.3 * (1.0 / (1.0 + Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass())
                 + distance + 3.0 * o5 + overLimit)));
         F =
                 (maxSlotSatisfaction == 0 ? 0 : 0.15 * slotSatisfaction / maxSlotSatisfaction) +
                         0.15 * (maxSubjectSatisfaction == 0 ? 0 : subjectSatisfaction / maxSubjectSatisfaction) +
-                        0.6 * 1.0 / (Math.pow(2.0, Math.abs(cnt - this.model.getExpectedNumberOfClass()[teacherId]))) +
+                        0.6 * 1.0 / (Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass()))) +
                         0.07 * 1.0 / (1.0 + 9.0 * distance / 105.0) +
                         0.03 * 1.0 / (1.0 + o5);
 
@@ -234,7 +234,7 @@ public class Chromosome {
             total += p[i];
 
             if (p[i] > 1) System.out.println("xxxxxxxxxxxxxxxxxxx");
-            System.out.println(p[i]);
+//            System.out.println(p[i]);
         }
 
         double F = 0;
@@ -307,7 +307,7 @@ public class Chromosome {
                 }
                 row.add(Real.valueOf(expectedThisSlot * this.model.getRegisteredSlots()[teacherId][slotId]));
             }
-            row.add(Real.valueOf(Math.pow(this.model.getExpectedNumberOfClass()[teacherId], 2)));
+            row.add(Real.valueOf(Math.pow(this.model.getTeachers().get(teacherId).getExpectedNumberOfClass(), 2)));
 
             expectedMatrix.add(DenseVector.valueOf(row));
         }
@@ -348,7 +348,7 @@ public class Chromosome {
                     cnt++;
                 }
             }
-            if (cnt < this.model.getQuota()[teacherId]) rs++;
+            if (cnt < this.model.getTeachers().get(teacherId).getQuota()) rs++;
         }
         return rs;
     }
@@ -366,6 +366,7 @@ public class Chromosome {
         }
 
         this.fitness = 0.5 * this.calculateFitnessForSubGroup1(fullTimeTeachers) + 0.5 * this.calculateFitnessForSubGroup1(partTimeTeachers);
+
         this.fitness = 0.5 * (1.0 / (1.0 + this.getNumberOfViolation())) + 0.5 * this.fitness;
         this.needTobeUpdated = false;
         return fitness;
@@ -446,7 +447,7 @@ public class Chromosome {
                 if (this.getGenes().get(j).get(i) != -1) System.out.print(1 + " ");
                 else System.out.print(0 + " ");
             }
-            System.out.println(this.model.getExpectedNumberOfClass()[i] + " " + calculateSatisfaction(i));
+            System.out.println(this.model.getTeachers().get(i).getExpectedNumberOfClass() + " " + calculateSatisfaction(i));
         }
 
         for (int i = 0; i < this.model.getTeachers().size(); i++) {
@@ -456,7 +457,7 @@ public class Chromosome {
                 if (classId != -1) System.out.print(this.model.getClasses().get(classId).getRoom().getBuilding() + " ");
                 else System.out.print("- ");
             }
-            System.out.println(this.model.getExpectedNumberOfClass()[i] + " " + calculateSatisfaction(i));
+            System.out.println(this.model.getTeachers().get(i).getExpectedNumberOfClass() + " " + calculateSatisfaction(i));
         }
         System.out.println("end display!");
     }
@@ -550,7 +551,7 @@ public class Chromosome {
         Dinic dinic = new Dinic(superSink + 1, superSource, superSink);
         for (int i = 0; i < this.model.getTeachers().size(); i++) {
             if (this.model.getTeachers().get(i).getType() == Teacher.FULL_TIME) {
-                edges.add(new Graph.Edge(source, i, this.model.getQuota()[i], Dinic.INF));
+                edges.add(new Graph.Edge(source, i, this.model.getTeachers().get(i).getQuota(), Dinic.INF));
             } else {
                 edges.add(new Graph.Edge(source, i, 0, Dinic.INF));
             }
@@ -598,7 +599,7 @@ public class Chromosome {
         }
         int totalDemand = 0;
         for (int i = 0; i < this.model.getTeachers().size(); i++) {
-            totalDemand += this.model.getQuota()[i];
+            totalDemand += this.model.getTeachers().get(i).getQuota();
         }
         dinic.add(superSource1, source, this.model.getClasses().size(), Dinic.INF);
 

@@ -216,7 +216,7 @@ public class DataReader {
 
             NodeList teacherList = lst.getElementsByTagName("Row");
 
-            double[][] registeredSlots = new double[teacherList.getLength() - 1][10];
+            Vector<ExpectedSlot> registeredSlots = new Vector<>();
             Integer[] expectedNumberOfClass = new Integer[teacherList.getLength() - 1];
             Integer[] consecutiveSlotLimit = new Integer[teacherList.getLength() - 1];
             for (int i = 1; i < teacherList.getLength(); i++) {
@@ -229,7 +229,7 @@ public class DataReader {
                     teachers.add(new Teacher("asdf", teacherName, i - 1, teacherType));
                     for (int j = 1; j < 11; j++) {
                         int sat = Integer.parseInt(e.getElementsByTagName("Cell").item(j).getTextContent());
-                        registeredSlots[i - 1][j - 1] = sat;
+                        if (sat > 0) registeredSlots.add(new ExpectedSlot(i - 1, j - 1, sat));
                     }
                     int ec = Integer.parseInt(e.getElementsByTagName("Cell").item(11).getTextContent());
                     expectedNumberOfClass[i - 1] = ec;
@@ -239,34 +239,25 @@ public class DataReader {
             }
 
 
-//            for(int i = 0; i < teachers.size(); i++) {
-//                for(int j =0 ; j < 10; j++) {
-//                    System.out.print(registeredSlots[i][j] + " ");
-//                }
-//                System.out.println();
-//            }
-
             doc = buider.parse(new File(registerSubjectPath));
             lst = doc.getDocumentElement();
             teacherList = lst.getElementsByTagName("Row");
-//            Element firstRow = (Element) teacherList.item(0);
 
             Vector<Subject> subjects = new Vector<>();
 
             Element firstRowElement = (Element) teacherList.item(0);
-            for(int i = 1; i < firstRowElement.getElementsByTagName("Cell").getLength(); i++) {
+            for (int i = 1; i < firstRowElement.getElementsByTagName("Cell").getLength(); i++) {
                 String subjectName = firstRowElement.getElementsByTagName("Cell").item(i).getTextContent();
                 subjects.add(new Subject(subjectName, i - 1));
             }
-            double[][] registeredSubjects = new double[teachers.size()][subjects.size()];
+            Vector<ExpectedSubject> registeredSubjects = new Vector<>();
 
-            for(int i = 1; i < teacherList.getLength(); i++) {
+            for (int i = 1; i < teacherList.getLength(); i++) {
                 if (teacherList.item(i).getNodeType() == Node.ELEMENT_NODE) {
                     Element e = (Element) teacherList.item(i);
-                    for(int j = 0; j < subjects.size(); j++) {
+                    for (int j = 0; j < subjects.size(); j++) {
                         int sat = Integer.parseInt(e.getElementsByTagName("Cell").item(j + 1).getTextContent());
-                        registeredSubjects[i-1][j] = sat;
-//                        System.out.println(sat);
+                        if (sat > 0) registeredSubjects.add(new ExpectedSubject(i - 1, j, sat));
                     }
                 }
             }
@@ -303,7 +294,7 @@ public class DataReader {
             doc = buider.parse(new File(classPath));
             Element classList = doc.getDocumentElement();
             NodeList nodelist = classList.getElementsByTagName("Row");
-            for(int i = 1;i < nodelist.getLength(); i++) {
+            for (int i = 1; i < nodelist.getLength(); i++) {
                 Node node = nodelist.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element e = (Element) node;
@@ -313,27 +304,37 @@ public class DataReader {
                     String roomName = e.getElementsByTagName("Cell").item(3).getTextContent();
 //                    System.out.println(studentGroup + " " + subjectName + " " + slotName + " " + roomName);
                     classes.add(new Class(studentGroup, getSlotByName(slotList, slotName).getId(), getSubjectByName(subjects, subjectName).getId(),
-                            new Room(roomName, 1, roomName.split("-")[0]), i-1));
+                            new Room(roomName, 1, roomName.split("-")[0]), i - 1));
 
                 }
             }
             Random random = new Random(1);
-            Integer [] quota = new Integer[teachers.size()];
-            for(int i =0 ; i < teachers.size(); i++) {
+            Integer[] quota = new Integer[teachers.size()];
+            for (int i = 0; i < teachers.size(); i++) {
                 int cnt = 0;
-                for(int j =0 ; j <10; j++) {
-                    if (registeredSlots[i][j] > 0) cnt++;
+                for (ExpectedSlot es:registeredSlots) {
+                    if (es.getTeacherId() == i) cnt++;
                 }
                 if (teachers.get(i).getType() == Teacher.FULL_TIME) {
                     quota[i] = random.nextInt(3) + 5;
                 } else quota[i] = random.nextInt(1) + 1;
                 quota[i] = Math.min(quota[i], cnt);
             }
-//            for(Class c:classes) {
-//                System.out.println(c.getRoom().getBuilding());
+
+            for (int i = 0; i < teachers.size(); i++) {
+                teachers.get(i).setExpectedNumberOfClass(expectedNumberOfClass[i]);
+                teachers.get(i).setConsecutiveSlotLimit(consecutiveSlotLimit[i]);
+                teachers.get(i).setQuota(quota[i]);
+            }
+
+//            teachers.get(5).setId(1000);
+//            for(ExpectedSlot es:registeredSlots) {
+//                if (es.getTeacherId() == 5) es.setTeacherId(1000);
 //            }
-//            Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects);
-            Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects, expectedNumberOfClass, consecutiveSlotLimit, quota);
+//            for(ExpectedSubject es:registeredSubjects) {
+//                if (es.getTeacherId() == 5) es.setTeacherId(1000);
+//            }
+            Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects);
             return model;
         } catch (Exception e) {
             System.out.println(e.getMessage());

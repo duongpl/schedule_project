@@ -20,14 +20,9 @@ public class Train {
 
     public static void main(String[] args) {
 
-//        Model model = DataGenerator.Gendata(M, K, N);
-
         Train train = new Train();
         Model model = DataReader.getData();
 
-//        for(Subject subject:model.getSubjects()) {
-//            System.out.println(subject.getName());
-//        }
         GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
         ga.start();
     }

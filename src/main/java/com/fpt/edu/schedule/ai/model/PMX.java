@@ -45,16 +45,7 @@ public class PMX {
         return res;
     };
     public Vector<Integer> getChildren() {
-//        System.out.println(p1);
-//        System.out.println(p2);
         int sz = p1.size();
-//        System.out.println(rp1.size() + " " + rp2.size());
-//        for(int x:p1) System.out.print(x + " ");
-//        System.out.println();
-//        System.out.println("....");
-//        for(int x:p2) System.out.print(x + " ");
-//        System.out.println();
-
         Map<Integer, Integer> map = new TreeMap<>();
 
         Vector<Integer> ids = new Vector<Integer>();
@@ -72,13 +63,10 @@ public class PMX {
                 rp1.add(map.get(p1.get(i)));
             } else rp1.add(-1);
             if (p2.get(i) != -1) {
-//                if (!map.containsKey(p2.get(i))) {
-//                    System.out.println("asdfasdfasdf");
-//                }
+
                 rp2.add(map.get(p2.get(i)));
             } else rp2.add(-1);
         }
-//        System.out.println(rp1.size() + " " + rp2.size());
 
 
         int max = -1;
@@ -87,20 +75,6 @@ public class PMX {
         }
         Vector<Integer> cp1 = this.fillEmpty(rp1);
         Vector<Integer> cp2 = this.fillEmpty(rp2);
-//        for(int x:cp1) System.out.print(x + " ");
-//        System.out.println();
-//        System.out.println("....");
-//        for(int x:cp2) System.out.print(x + " ");
-//        System.out.println();
-//        System.out.println("xxxxxxxxx");
-//        int min = sz + 1;
-//        for(int i = 0 ; i < sz; i++) {
-//            min = Math.min(min, cp1.get(i));
-//        }
-//        for(int i = 0 ; i < sz; i++) {
-//            cp1.set(i, cp1.get(i) - min);
-//            cp2.set(i, cp2.get(i) - min);
-//        }
 
         Random random = new Random(this.seed);
 
@@ -134,7 +108,6 @@ public class PMX {
             if (!bag.contains(x)) {
                 int p = i;
                 while (mark[p]) {
-//                    System.out.println(p);
                     int v = cp1.get(p);
                     p = pos[v];
                 }
@@ -150,12 +123,6 @@ public class PMX {
             }
         }
 
-//        for(int i = 0; i < sz; i++) System.out.println(res.get(i));
-////        for(int i = 0; i < sz; i++) {
-////            res.set(i, res.get(i) + min);
-//        }
-
-//        for(int i = 0; i < sz; i++) System.out.println(res.get(i));
         for(int i = 0; i < sz; i++) {
             if (res.get(i) > max) {
                 res.set(i, -1);
@@ -164,10 +131,6 @@ public class PMX {
             }
         }
 
-//        System.out.println(l + " " + r);
-//        for(int i = 0; i < sz; i++) System.out.println(res.get(i));
-
-//        System.out.println("============");
         return res;
     }
 
