@@ -42,15 +42,17 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     public String autoArrange(int semesterId,String googleId) {
 
+//        Train train = new Train();
+//        Model model = DataReader.getData();
+//
+//        GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
+//        ga.start();
         Thread.currentThread().setName(googleId);
 
         try {
             for(int i=0;i<10000000;i++){
                 Thread.sleep(1000);
                 Thread.currentThread().setName(googleId);
-                if(i%10==0){
-                    hello();
-                }
                 i++;
                 System.out.println("Thread of user " + Thread.currentThread().getName()+" value i :"+i);
             }
@@ -59,9 +61,6 @@ public class TimetableServiceImpl implements TimetableService {
 
         }
         return "abc";
-    }
-    private void hello(){
-        System.out.println("hello");
     }
 
     @Override

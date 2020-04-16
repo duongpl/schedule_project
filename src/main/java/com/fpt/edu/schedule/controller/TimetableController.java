@@ -16,17 +16,15 @@ public class TimetableController {
     public ResponseEntity<Subject> autoArrange(@RequestParam("semesterId") int semesterId,
                                                         @RequestHeader("GoogleId")String hodGoogleId) {
         try {
-            timetableService.autoArrange(semesterId,hodGoogleId);
-
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(timetableService.autoArrange(semesterId,hodGoogleId),HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping("/stop")
-    public ResponseEntity<Subject> stop(@RequestParam("threadId") int threadId) {
+    public ResponseEntity<Subject> stop(@RequestParam("lecturerId") String lecturerId) {
         try {
-            timetableService.stop(threadId);
+            timetableService.stop(lecturerId);
 
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {

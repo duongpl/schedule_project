@@ -8,7 +8,7 @@ public interface TimetableService {
 
     Timetable findBySemester(Semester semester);
     
-    void autoArrange(int semesterId,String hodGoogleId);
+    String autoArrange(int semesterId,String hodGoogleId);
 
-    void stop(int threadId);
+    void stop(String googleId);
 }
