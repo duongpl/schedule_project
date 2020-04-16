@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationEvent;
 
 public class DataListener extends ApplicationEvent {
     public int data;
+
     public DataListener(Object source,int data) {
         super(source);
         this.data =data;

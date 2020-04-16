@@ -44,13 +44,11 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     public void autoArrange(int semesterId, String googleId) {
 
-        Thread.currentThread().setName(googleId);
-
         try {
             for (int i = 0; i < 10000000; i++) {
                 Thread.sleep(1000);
                 Thread.currentThread().setName(googleId);
-                if (i == 10) {
+                if (i % 10 == 0) {
                     applicationEventPublisher.publishEvent(new DataListener(this, i));
                 }
                 System.out.println("Thread of user " + Thread.currentThread().getName() + " value i :" + i);
