@@ -18,6 +18,11 @@ public class SimpleCORSFilter implements Filter {
     }
 
     @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
+    }
+
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) req;
@@ -30,6 +35,11 @@ public class SimpleCORSFilter implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
 
         chain.doFilter(req, res);
+    }
+
+    @Override
+    public void destroy() {
+
     }
 
 }
