@@ -8,6 +8,8 @@ import com.fpt.edu.schedule.repository.base.TimetableRepository;
 import com.fpt.edu.schedule.service.base.SemesterService;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,8 @@ public class TimetableServiceImpl implements TimetableService {
     SemesterService semesterService;
     TimetableRepository timetableRepository;
     ExpectedRepository expectedRepository;
-
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Timetable save(Timetable timeTable) {
@@ -37,38 +40,40 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Async
     @Override
-    public void autoArrange(int semesterId,String hodGoogleId) {
+    public String autoArrange(int semesterId,String googleId) {
 
-//        Train train = new Train();
-//        Model model = DataReader.getData();
-//
-//        GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
-//        ga.start();
+        Thread.currentThread().setName(googleId);
+
         try {
-            for(int i=0;i<100;i++){
-                Thread.sleep(2000);
+            for(int i=0;i<10000000;i++){
+                Thread.sleep(1000);
+                Thread.currentThread().setName(googleId);
+                if(i%10==0){
+                    hello();
+                }
                 i++;
-                System.out.println("My Name " + Thread.currentThread().getName()+" Id :"+Thread.currentThread().getId()+" value i :"+i);
-
+                System.out.println("Thread of user " + Thread.currentThread().getName()+" value i :"+i);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 
         }
+        return "abc";
+    }
+    private void hello(){
+        System.out.println("hello");
     }
 
     @Override
-    public void stop(int threadId) {
+    public void stop(String lecturerId) {
         Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-        System.out.println(setOfThread);
-
         for(Thread thread : setOfThread){
-            if(thread.getId()==threadId){
+            if(thread.getName().equals(lecturerId)){
                 thread.interrupt();
-                System.out.println("ThreadId "+thread.getId()+" stop");
-                System.out.println(thread.isAlive());
-                System.out.println(thread.isInterrupted());
-                System.out.println(thread.isDaemon());
+                System.out.println("Thead of user "+thread.getName()+" stop");
+
+
+               // xu ly su kien trong nay
 
             }
         }
