@@ -114,6 +114,14 @@
 			<version>4.3.8.Final</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.jscience/jscience -->
+		<dependency>
+			<groupId>org.jscience</groupId>
+			<artifactId>jscience</artifactId>
+			<version>4.3.1</version>
+		</dependency>
+
+
 
 	</dependencies>
 

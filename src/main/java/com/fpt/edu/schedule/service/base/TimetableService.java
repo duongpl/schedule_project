@@ -7,4 +7,6 @@ public interface TimetableService {
     Timetable save(Timetable timeTable);
 
     Timetable findBySemester(Semester semester);
+    
+    void autoArrange(int semesterId,String hodGoogleId);
 }

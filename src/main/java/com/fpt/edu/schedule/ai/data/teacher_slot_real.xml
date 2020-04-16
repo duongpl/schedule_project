@@ -1,0 +1,580 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Windows User</Author>
+  <LastAuthor>Windows User</LastAuthor>
+  <Created>2020-03-14T15:29:17Z</Created>
+  <LastSaved>2020-03-16T06:33:56Z</LastSaved>
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>13575</WindowHeight>
+  <WindowWidth>28665</WindowWidth>
+  <WindowTopX>0</WindowTopX>
+  <WindowTopY>0</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s63">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+   </Borders>
+   <Font ss:FontName="Arial" x:Family="Swiss" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s65">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="2"
+     ss:Color="#CCCCCC"/>
+   </Borders>
+   <Font ss:FontName="Arial" x:Family="Swiss" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s66">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Arial" x:Family="Swiss" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Sheet1">
+  <Table ss:ExpandedColumnCount="14" ss:ExpandedRowCount="30" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:AutoFitWidth="0" ss:Width="147"/>
+   <Column ss:Index="12" ss:AutoFitWidth="0" ss:Width="143.25"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">GV</Data></Cell>
+    <Cell><Data ss:Type="String">M1</Data></Cell>
+    <Cell><Data ss:Type="String">M2</Data></Cell>
+    <Cell><Data ss:Type="String">M3</Data></Cell>
+    <Cell><Data ss:Type="String">E1</Data></Cell>
+    <Cell><Data ss:Type="String">E2</Data></Cell>
+    <Cell><Data ss:Type="String">E3</Data></Cell>
+    <Cell><Data ss:Type="String">M4</Data></Cell>
+    <Cell><Data ss:Type="String">M5</Data></Cell>
+    <Cell><Data ss:Type="String">E4</Data></Cell>
+    <Cell><Data ss:Type="String">E5</Data></Cell>
+    <Cell><Data ss:Type="String">expected_number_of_class</Data></Cell>
+    <Cell><Data ss:Type="String">con_limit</Data></Cell>
+    <Cell><Data ss:Type="String">is_full_time</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">tientd17@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">chilp@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">bantq@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">chungtd6@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">binhnv2@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">huongnt7@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">vunh@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">thamnv5@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">sonnt5@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="s65"><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">anhbn@fpt.edu.vn</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">phuonglh17@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">9</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">caupd@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">9</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">thuyntb3@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">anhnh2@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">7</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">hapt27@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">anhttv20@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">khuongpd@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">10</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">1</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">bangbh@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">CuongL2@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">hungdc@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">ngaDTT22@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Sonhx@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">ThieuVV2@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Truongvx5@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">TungHT22@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">KyVK2@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">thuyntb3@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">ToanPT16@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">3</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">HaPN@fpt.edu.vn</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="Number">0</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <Print>
+    <ValidPrinterInfo/>
+    <HorizontalResolution>600</HorizontalResolution>
+    <VerticalResolution>600</VerticalResolution>
+   </Print>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>17</ActiveRow>
+     <ActiveCol>13</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>
