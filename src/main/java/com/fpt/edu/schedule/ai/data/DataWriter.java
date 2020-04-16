@@ -14,7 +14,7 @@ import java.util.Vector;
 public class DataWriter {
     public static void writeToCsv(Model model, Chromosome c, String filename) {
         try {
-            String path = "C:\\Users\\ahcl\\Documents\\NetBeansProjects\\Model1\\src\\data\\" + filename;
+            String path = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\" + filename;
             PrintWriter pr = new PrintWriter(new FileOutputStream(path));
             pr.print("teaacher_email");
             Vector<Slot> slots = SlotGroup.getSlotList(model.getSlots());

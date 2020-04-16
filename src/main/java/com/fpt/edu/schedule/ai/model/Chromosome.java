@@ -2,12 +2,14 @@ package com.fpt.edu.schedule.ai.model;
 
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.*;
+import lombok.Data;
 import org.jscience.mathematics.number.Real;
 import org.jscience.mathematics.vector.DenseMatrix;
 import org.jscience.mathematics.vector.DenseVector;
 
 import java.util.*;
 
+@Data
 public class Chromosome {
     public static final double[] W = {0.8, 0.2};
 
@@ -84,7 +86,7 @@ public class Chromosome {
         for (int i = 0; i < slots.size(); i++) max = Math.max(max, this.model.getRegisteredSlots()[teacherId][i]);
         for (int classId : vt) {
             if (classId != -1) {
-                int slotId = this.model.getClasses().get(classId).getSlot().getId();
+                int slotId = this.model.getClasses().get(classId).getSlotId();
                 slotSatisfaction += this.model.getRegisteredSlots()[teacherId][slotId];
                 maxSlotSatisfaction += max;
             }
@@ -99,7 +101,7 @@ public class Chromosome {
 
         for (int classId : vt) {
             if (classId != -1) {
-                int subjectId = this.model.getClasses().get(classId).getSubject().getId();
+                int subjectId = this.model.getClasses().get(classId).getSubjectId();
                 subjectSatisfaction += this.model.getRegisteredSubjects()[teacherId][subjectId];
                 maxSubjectSatisfaction += max;
             }
@@ -293,7 +295,7 @@ public class Chromosome {
         int[][] slotSubject = new int[10][this.model.getSubjects().size()];
 
         for (Class _class : this.model.getClasses()) {
-            slotSubject[_class.getSlot().getId()][_class.getSubject().getId()] = 1;
+            slotSubject[_class.getSlotId()][_class.getSubjectId()] = 1;
         }
         for (int i = 0; i < teachers.size(); i++) {
             int teacherId = teachers.get(i).getId();
@@ -305,7 +307,7 @@ public class Chromosome {
                 }
                 row.add(Real.valueOf(expectedThisSlot * this.model.getRegisteredSlots()[teacherId][slotId]));
             }
-            row.add(Real.valueOf( Math.pow(this.model.getExpectedNumberOfClass()[teacherId], 2)));
+            row.add(Real.valueOf(Math.pow(this.model.getExpectedNumberOfClass()[teacherId], 2)));
 
             expectedMatrix.add(DenseVector.valueOf(row));
         }
@@ -322,7 +324,7 @@ public class Chromosome {
                     row.add(Real.ZERO);
                 } else {
                     numberOfClassAssigned++;
-                    int subjectId = this.model.getClasses().get(classId).getSubject().getId();
+                    int subjectId = this.model.getClasses().get(classId).getSubjectId();
                     row.add(Real.valueOf(this.model.getRegisteredSubjects()[teacherId][subjectId] *
                             this.model.getRegisteredSlots()[teacherId][j]));
                 }
@@ -338,19 +340,18 @@ public class Chromosome {
 
     public int getNumberOfViolation() {
         int rs = 0;
-        for(Teacher teacher:this.getModel().getTeachers()) {
+        for (Teacher teacher : this.getModel().getTeachers()) {
             int teacherId = teacher.getId();
             int cnt = 0;
-            for(int j = 0; j < 10; j++) {
+            for (int j = 0; j < 10; j++) {
                 if (this.genes.get(j).get(teacherId) != -1) {
                     cnt++;
                 }
             }
-            if (cnt < this.model.getQuota()[teacherId]) rs ++;
+            if (cnt < this.model.getQuota()[teacherId]) rs++;
         }
         return rs;
     }
-
 
 
     public double calculateFitness() {
@@ -365,7 +366,7 @@ public class Chromosome {
         }
 
         this.fitness = 0.5 * this.calculateFitnessForSubGroup1(fullTimeTeachers) + 0.5 * this.calculateFitnessForSubGroup1(partTimeTeachers);
-        this.fitness = 0.5 * (1.0 /(1.0 +  this.getNumberOfViolation())) + 0.5 * this.fitness;
+        this.fitness = 0.5 * (1.0 / (1.0 + this.getNumberOfViolation())) + 0.5 * this.fitness;
         this.needTobeUpdated = false;
         return fitness;
     }
@@ -417,7 +418,7 @@ public class Chromosome {
     Vector<Integer> getClassBySlot(Vector<Class> classes, int slotId) {
         Vector<Integer> res = new Vector<>();
         for (Class c : classes) {
-            if (c.getSlot().getId() == slotId) {
+            if (c.getSlotId() == slotId) {
                 res.add(c.getId());
             }
         }
@@ -498,7 +499,7 @@ public class Chromosome {
                 if (model.getRegisteredSlots()[j][i] > 0) {
                     for (int k = 0; k < col.size(); k++) {
                         if (col.get(k) != -1) {
-                            int subjectId = model.getClasses().get(col.get(k)).getSubject().getId();
+                            int subjectId = model.getClasses().get(col.get(k)).getSubjectId();
                             if (this.model.getRegisteredSubjects()[j][subjectId] > 0) {
                                 hp.add(j, col.get(k));
                             }
@@ -511,9 +512,9 @@ public class Chromosome {
                 int teacherId = this.model.getTeachers().get(j).getId();
                 int classId = col.get(j);
                 if (classId != -1) {
-                    int subjectId = this.model.getClasses().get(classId).getSubject().getId();
+                    int subjectId = this.model.getClasses().get(classId).getSubjectId();
                     if (this.model.getRegisteredSubjects()[teacherId][subjectId] > 0 &&
-                        this.model.getRegisteredSlots()[teacherId][i] > 0) {
+                            this.model.getRegisteredSlots()[teacherId][i] > 0) {
                         hp.match(teacherId, classId);
                     }
                 }
@@ -567,7 +568,7 @@ public class Chromosome {
                 for (int k = 0; k < col.size(); k++) {
                     int classId = col.get(k);
                     if (classId != -1) {
-                        int subjectId = this.model.getClasses().get(classId).getSubject().getId();
+                        int subjectId = this.model.getClasses().get(classId).getSubjectId();
                         if (this.model.getRegisteredSubjects()[i][subjectId] > 0) {
                             edges.add(new Graph.Edge(this.model.getTeachers().size() + i * slots.size() + j,
                                     this.model.getTeachers().size() * (1 + slots.size()) + classId, 0, 1));
@@ -587,7 +588,7 @@ public class Chromosome {
             for (int i = 0; i < this.model.getTeachers().size(); i++) {
                 int classId = col.get(i);
                 if (classId != -1) {
-                    int subjectId = this.model.getClasses().get(classId).getSubject().getId();
+                    int subjectId = this.model.getClasses().get(classId).getSubjectId();
                     if (this.model.getRegisteredSubjects()[i][subjectId] > 0) {
                         dinic.match(this.model.getTeachers().size() + i * slots.size() + j,
                                 this.model.getTeachers().size() * (slots.size() + 1) + classId);
@@ -653,76 +654,18 @@ public class Chromosome {
 //        this.autoRepair();
     }
 
-    public Vector<Vector<Integer>> getGenes() {
-        return genes;
-    }
-
-    public void setGenes(Vector<Vector<Integer>> genes) {
-        this.genes = genes;
-    }
-
-    public boolean isNeedTobeUpdated() {
-        return needTobeUpdated;
-    }
-
-    public void setNeedTobeUpdated(boolean needTobeUpdated) {
-        this.needTobeUpdated = needTobeUpdated;
-    }
-
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
-    }
-
-    public  Vector<Record> getSchedule() {
+    public Vector<Record> getSchedule() {
         Vector<Record> rs = new Vector<>();
-        for(int i=0 ;i < this.getModel().getTeachers().size(); i++) {
-            for(int j =0 ; j < 10; j++) {
+        for (int i = 0; i < this.getModel().getTeachers().size(); i++) {
+            for (int j = 0; j < 10; j++) {
                 int classId = this.getGenes().get(j).get(i);
                 if (classId != -1) {
                     rs.add(new Record(this.getModel().getTeacherIdReverse(i), this.getModel().getClassIdReverse(classId),
-                            this.getModel().getSubjectIdReverse(this.getModel().getClasses().get(classId).getSubject().getId()),
+                            this.getModel().getSubjectIdReverse(this.getModel().getClasses().get(classId).getSubjectId()),
                             j));
                 }
             }
         }
         return rs;
-    }
-
-    public static void main(String[] args) {
-        Vector<Teacher> teachers = new Vector<>();
-        teachers.add(new Teacher("E1", "E1", 0));
-        teachers.add(new Teacher("E2", "E1", 1));
-        teachers.add(new Teacher("E3", "E1", 2));
-        teachers.add(new Teacher("E4", "E1", 3));
-        Vector<SlotGroup> slots = new Vector<>();
-
-        SlotGroup m246 = new SlotGroup(3);
-        m246.addSlot(new Slot("M1", 0));
-        m246.addSlot(new Slot("M2", 1));
-        m246.addSlot(new Slot("M3", 2));
-        SlotGroup e246 = new SlotGroup(3);
-        SlotGroup m35 = new SlotGroup(1);
-        SlotGroup e35 = new SlotGroup(1);
-
-        slots.add(m246);
-        Vector<Class> classes = new Vector<>();
-        Vector<Subject> subjects = new Vector<>();
-        subjects.add(new Subject("sub0", 0));
-        subjects.add(new Subject("sub1", 1));
-        classes.add(new Class("s1", m246.getSlots().get(0), subjects.get(0), new Room("asdf"), 0));
-        classes.add(new Class("s1", m246.getSlots().get(0), subjects.get(1), new Room("asdf"), 1));
-        classes.add(new Class("s1", m246.getSlots().get(0), subjects.get(0), new Room("asdf"), 2));
-        boolean[][] registeredSlots = new boolean[4][3];
-        registeredSlots[0][0] = registeredSlots[1][0] = registeredSlots[2][0] = registeredSlots[3][0] = true;
-        registeredSlots[0][1] = registeredSlots[1][1] = registeredSlots[2][1] = registeredSlots[3][1] = true;
-        registeredSlots[0][2] = registeredSlots[1][2] = registeredSlots[2][2] = registeredSlots[3][2] = true;
-
-//        boolean[][] registeredSubjects = new boolean[4][2];
-//        registeredSubjects[1][0] = registeredSubjects[2][1] = registeredSubjects[3][0] = registeredSubjects[3][1] = true;
-//        Chromosome chr = new Chromosome(new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects));
     }
 }

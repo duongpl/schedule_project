@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Record {
-    private int teacherId, classId, subjectId, slotId;
+public class ExpectedSlot {
+    private int teacherId;
+    private int slotId;
+    private double levelOfPreference;
 }

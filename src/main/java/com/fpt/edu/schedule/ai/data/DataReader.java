@@ -184,7 +184,7 @@ public class DataReader {
                 String room = datas[4];
                 int subjectId = getSubjectIdByName(subjects, subjectName);
                 if (subjectId != -1) {
-                    res.add(new Class(className, getSlotByName(slots, slotName), getSubjectByName(subjects, subjectName), new Room(room, 0, getBuilding(room)), id++));
+                    res.add(new Class(className, getSlotByName(slots, slotName).getId(), getSubjectByName(subjects, subjectName).getId(), new Room(room, 0, getBuilding(room)), id++));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -202,9 +202,9 @@ public class DataReader {
 //        teachers.add(new Teacher("E3", "E1", 2));
 //        teachers.add(new Teacher("E4", "E1", 3));
 
-        String registerSlotPath = "D:\\Project\\Model1\\src\\data\\teacher_slot_real.xml";
-        String registerSubjectPath = "D:\\Project\\Model1\\src\\data\\teacher_subject_real.xml";
-        String classPath = "D:\\Project\\Model1\\src\\data\\class_real.xml";
+        String registerSlotPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
+        String registerSubjectPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
+        String classPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
 
         try {
             File f = new File(registerSlotPath);
@@ -217,8 +217,8 @@ public class DataReader {
             NodeList teacherList = lst.getElementsByTagName("Row");
 
             double[][] registeredSlots = new double[teacherList.getLength() - 1][10];
-            int[] expectedNumberOfClass = new int[teacherList.getLength() - 1];
-            int[] consecutiveSlotLimit = new int[teacherList.getLength() - 1];
+            Integer[] expectedNumberOfClass = new Integer[teacherList.getLength() - 1];
+            Integer[] consecutiveSlotLimit = new Integer[teacherList.getLength() - 1];
             for (int i = 1; i < teacherList.getLength(); i++) {
 
                 Node node = teacherList.item(i);
@@ -312,13 +312,13 @@ public class DataReader {
                     String slotName = e.getElementsByTagName("Cell").item(2).getTextContent();
                     String roomName = e.getElementsByTagName("Cell").item(3).getTextContent();
 //                    System.out.println(studentGroup + " " + subjectName + " " + slotName + " " + roomName);
-                    classes.add(new Class(studentGroup, getSlotByName(slotList, slotName), getSubjectByName(subjects, subjectName),
+                    classes.add(new Class(studentGroup, getSlotByName(slotList, slotName).getId(), getSubjectByName(subjects, subjectName).getId(),
                             new Room(roomName, 1, roomName.split("-")[0]), i-1));
 
                 }
             }
             Random random = new Random(1);
-            int [] quota = new int[teachers.size()];
+            Integer [] quota = new Integer[teachers.size()];
             for(int i =0 ; i < teachers.size(); i++) {
                 int cnt = 0;
                 for(int j =0 ; j <10; j++) {
