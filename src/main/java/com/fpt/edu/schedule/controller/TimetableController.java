@@ -16,7 +16,8 @@ public class TimetableController {
     public ResponseEntity<Subject> autoArrange(@RequestParam("semesterId") int semesterId,
                                                         @RequestHeader("GoogleId")String hodGoogleId) {
         try {
-            return new ResponseEntity(timetableService.autoArrange(semesterId,hodGoogleId),HttpStatus.OK);
+            timetableService.autoArrange(semesterId,hodGoogleId);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

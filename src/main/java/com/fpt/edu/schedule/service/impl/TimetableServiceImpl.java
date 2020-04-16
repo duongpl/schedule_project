@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.event.DataListener;
 import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.repository.base.ExpectedRepository;
@@ -38,45 +39,39 @@ public class TimetableServiceImpl implements TimetableService {
         return timetable;
     }
 
+
     @Async
     @Override
-    public String autoArrange(int semesterId,String googleId) {
+    public void autoArrange(int semesterId, String googleId) {
 
-//        Train train = new Train();
-//        Model model = DataReader.getData();
-//
-//        GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
-//        ga.start();
         Thread.currentThread().setName(googleId);
 
         try {
-            for(int i=0;i<10000000;i++){
+            for (int i = 0; i < 10000000; i++) {
                 Thread.sleep(1000);
                 Thread.currentThread().setName(googleId);
-                i++;
-                System.out.println("Thread of user " + Thread.currentThread().getName()+" value i :"+i);
+                if (i == 10) {
+                    applicationEventPublisher.publishEvent(new DataListener(this, i));
+                }
+                System.out.println("Thread of user " + Thread.currentThread().getName() + " value i :" + i);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
 
         }
-        return "abc";
     }
 
     @Override
     public void stop(String lecturerId) {
         Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-        for(Thread thread : setOfThread){
-            if(thread.getName().equals(lecturerId)){
+        for (Thread thread : setOfThread) {
+            if (thread.getName().equals(lecturerId)) {
                 thread.interrupt();
-                System.out.println("Thead of user "+thread.getName()+" stop");
-
-
-               // xu ly su kien trong nay
-
+                System.out.println("Thead of user " + thread.getName() + " stop");
             }
         }
     }
+
 
 
 }
