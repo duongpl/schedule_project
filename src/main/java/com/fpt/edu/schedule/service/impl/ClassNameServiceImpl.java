@@ -4,6 +4,7 @@ import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.ClassNameRepository;
 import com.fpt.edu.schedule.repository.base.QueryParam;
+import com.fpt.edu.schedule.repository.base.TimetableRepository;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ClassNameServiceImpl  implements ClassNameService {
     ClassNameRepository classNameRepository;
-    TimetableService timetableService;
+    TimetableRepository timetableService;
     SemesterService semesterService;
     LecturerService lecturerService;
     @Override

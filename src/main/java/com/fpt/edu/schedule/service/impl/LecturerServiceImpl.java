@@ -9,7 +9,6 @@ import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
-import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,6 @@ public class LecturerServiceImpl implements LecturerService {
     SemesterRepository semesterRepository;
     ExpectedRepository expectedRepository;
     TimetableDetailRepository timetableDetailRepository;
-    TimetableService timetableService;
     TimetableRepository timetableRepository;
 
 
@@ -120,7 +118,7 @@ public class LecturerServiceImpl implements LecturerService {
         Lecturer lecturer = findByGoogleId(googleId);
         if(status == StatusLecturer.DEACTIVATE) {
             List<TimetableDetail> timetableDetail = timetableDetailRepository.findAllByLecturerAndTimetable(lecturer,
-                    timetableService.findBySemester(semesterRepository.getAllByNowIsTrue()));
+                    timetableRepository.findBySemester(semesterRepository.getAllByNowIsTrue()));
             // remove all timetable of this lecture
             timetableDetail.stream().forEach(i -> {
                 i.setLecturer(null);
