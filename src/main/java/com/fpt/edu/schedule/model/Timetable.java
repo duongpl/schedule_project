@@ -22,6 +22,7 @@ public class Timetable {
     Semester semester;
     boolean temp;
     @JsonIgnore
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL)
     private List<TimetableDetail> timetableDetails;

@@ -24,8 +24,6 @@ public class RequestController {
     private JavaMailSender javaMailSender;
 
 
-
-
     @PostMapping("/generate")
     public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam(name = "semesterId") int semesterId) {
         try {

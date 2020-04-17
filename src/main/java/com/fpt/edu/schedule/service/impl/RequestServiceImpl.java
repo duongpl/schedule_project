@@ -151,7 +151,7 @@ public class RequestServiceImpl implements ReportService {
             Timetable existedTimetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
 
             if (existedTimetable != null) {
-                timetableDetailRepository.deleteAllByTimetable(existedTimetable);
+                timetableDetailRepository.deleteAllByTimetable(existedTimetable.getId());
                 expectedRepository.deleteAllBySemester(semesterRepository.findById(semesterId));
                 timetableRepository.deleteById(existedTimetable.getId());
             }
