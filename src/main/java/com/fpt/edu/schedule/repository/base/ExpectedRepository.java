@@ -23,4 +23,5 @@ public interface ExpectedRepository extends Repository<Expected,Integer>, JpaSpe
     List<Expected> findAllBySemester(Semester semester);
 
 
+
 }

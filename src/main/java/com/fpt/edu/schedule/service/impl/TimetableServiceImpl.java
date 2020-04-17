@@ -78,11 +78,11 @@ public class TimetableServiceImpl implements TimetableService {
         Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
         GeneticAlgorithm ge= new GeneticAlgorithm(model,train);
-        try{
-            ge.start();
-        }catch (NullPointerException e){
-
-        }
+//        try{
+//            ge.start();
+//        }catch (NullPointerException e){
+//
+//        }
 
         start(model, train, generation, population);
     }
@@ -98,16 +98,23 @@ public class TimetableServiceImpl implements TimetableService {
         }
     }
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
-                             Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels, Vector<ExpectedSubject> expectedSubjectModel,
+                             Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
+                             Vector<ExpectedSubject> expectedSubjectModel,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots) {
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
+
         Timetable timetable = findBySemester(semester);
-        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream().filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment())).collect(Collectors.toList());
+        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
+                .filter(i -> i.getSubject().getDepartment()
+                        .equals(lecturer.getDepartment())).collect(Collectors.toList());
         List<Expected> expected = expectedRepository.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
         //teacher model
-        List<Lecturer> lecturers = lecturerRepository.findAllByDepartmentAndStatus(lecturer.getDepartment(),StatusLecturer.ACTIVATE);
+        List<Lecturer> lecturers = lecturerRepository.findAllByDepartmentAndStatus(lecturer.getDepartment(),StatusLecturer.ACTIVATE).stream()
+                .filter(i->expectedRepository.findBySemesterAndLecturer(semester,i) !=null)
+                .collect(Collectors.toList());;
+
         lecturers.forEach(i -> {
             Expected expectedEach = expectedRepository.findBySemesterAndLecturer(semester, i);
             teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
