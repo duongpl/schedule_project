@@ -18,10 +18,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -132,7 +129,36 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName(): null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+
+        Object lecturer =queryParam.getInCriteria().get("lecturer");
+        if(lecturer instanceof Map ){
+          List<String> shortName =  (List<String>)((Map) lecturer).get("shortName");
+          if(shortName.contains(null) && shortName.size()>1){
+              ArrayList arrayList = new ArrayList();
+              arrayList.add(null);
+
+              queryParam.getInCriteria().put("lecturer",arrayList);
+              BaseSpecifications cns1 = new BaseSpecifications(queryParam);
+              List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
+              timetableDetails.addAll(timetableDetails1);
+          }
+        }
+        Object room =queryParam.getInCriteria().get("room");
+        if(room instanceof Map ){
+            List<String> shortName =  (List<String>)((Map) room).get("name");
+            if(shortName.contains(null) && shortName.size()>1){
+                ArrayList arrayList = new ArrayList();
+                arrayList.add(null);
+
+                queryParam.getInCriteria().put("room",arrayList);
+                BaseSpecifications cns1 = new BaseSpecifications(queryParam);
+                List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
+                timetableDetails.addAll(timetableDetails1);
+            }
+        }
+
+
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName(): null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
