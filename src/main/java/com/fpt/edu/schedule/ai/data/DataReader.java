@@ -201,10 +201,9 @@ public class DataReader {
 //        teachers.add(new Teacher("E2", "E1", 1));
 //        teachers.add(new Teacher("E3", "E1", 2));
 //        teachers.add(new Teacher("E4", "E1", 3));
-
-        String registerSlotPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
-        String registerSubjectPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
-        String classPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
+        String registerSlotPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
+        String registerSubjectPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
+        String classPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
 
         try {
             File f = new File(registerSlotPath);
@@ -219,6 +218,8 @@ public class DataReader {
             Vector<ExpectedSlot> registeredSlots = new Vector<>();
             Integer[] expectedNumberOfClass = new Integer[teacherList.getLength() - 1];
             Integer[] consecutiveSlotLimit = new Integer[teacherList.getLength() - 1];
+
+            System.out.println(teacherList.getLength());
             for (int i = 1; i < teacherList.getLength(); i++) {
 
                 Node node = teacherList.item(i);
@@ -237,6 +238,8 @@ public class DataReader {
                     consecutiveSlotLimit[i - 1] = ccl;
                 }
             }
+
+            System.out.println(teachers.size());
 
 
             doc = buider.parse(new File(registerSubjectPath));

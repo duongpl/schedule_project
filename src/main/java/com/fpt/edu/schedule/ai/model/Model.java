@@ -36,7 +36,7 @@ public class Model {
         this.slots = slots;
         this.subjects = subjects;
         this.classes = classes;
-        this.registeredSlots = new double[teachers.size()][11];
+        this.registeredSlots = new double[teachers.size()][10];
         this.registeredSubjects = new double[teachers.size()][subjects.size()];
 
         mappingId();
@@ -44,7 +44,8 @@ public class Model {
 
         for (ExpectedSlot es : registeredSlots) {
             int teacherId = teacherIdMapping.get(es.getTeacherId());
-            this.registeredSlots[teacherId][es.getSlotId()] = es.getLevelOfPreference();
+            int slotId = slotIdMapping.get(es.getSlotId());
+            this.registeredSlots[teacherId][slotId] = es.getLevelOfPreference();
         }
 
         for (ExpectedSubject es : registeredSubjects) {
@@ -53,16 +54,28 @@ public class Model {
             this.registeredSubjects[teacherId][subjectId] = es.getLevelOfPreference();
         }
 
+//        for(int i=0 ;i < teachers.size();i ++) {
+//            System.out.print(this.teachers.get(i).getEmail() + " ");
+//            for(int j =0 ; j < 10;j ++) {
+//                System.out.print(this.registeredSlots[i][j] + " ");
+//            }
+//            System.out.println();
+//        }
+
 //
     }
 
     Map<Integer, Integer> teacherIdMapping;
     Map<Integer, Integer> classIdMapping;
     Map<Integer, Integer> subjectIdMapping;
+    Map<Integer, Integer> slotIdMapping;
+
 
     Map<Integer, Integer> teacherIdMappingReverse;
     Map<Integer, Integer> classIdMappingReverse;
     Map<Integer, Integer> subjectIdMappingReverse;
+    Map<Integer, Integer> slotIdMappingReverse;
+
 
     public void mappingId() {
         teacherIdMapping = new HashMap<>();
@@ -71,6 +84,8 @@ public class Model {
         teacherIdMappingReverse = new HashMap<>();
         classIdMappingReverse = new HashMap<>();
         subjectIdMappingReverse = new HashMap<>();
+        slotIdMapping = new HashMap<>();
+        slotIdMappingReverse = new HashMap<>();
         for (int i = 0; i < teachers.size(); i++) {
             teacherIdMapping.put(teachers.get(i).getId(), i);
             teacherIdMappingReverse.put(i, teachers.get(i).getId());
@@ -86,6 +101,12 @@ public class Model {
             subjectIdMappingReverse.put(i, subjects.get(i).getId());
         }
 
+        Vector<Slot> slots = SlotGroup.getSlotList(this.slots);
+        for(int i = 0; i < slots.size(); i++) {
+            slotIdMapping.put(slots.get(i).getId(), i);
+            slotIdMappingReverse.put(i, slots.get(i).getId());
+        }
+
 
         for (int i = 0; i < teachers.size(); i++) {
             teachers.get(i).setId(teacherIdMapping.get(teachers.get(i).getId()));
@@ -98,6 +119,15 @@ public class Model {
         for (int i = 0; i < classes.size(); i++) {
             classes.get(i).setId(classIdMapping.get(classes.get(i).getId()));
             classes.get(i).setSubjectId(subjectIdMapping.get(classes.get(i).getSubjectId()));
+            classes.get(i).setSlotId(slotIdMapping.get(classes.get(i).getSlotId()));
+
+        }
+
+        int id = 0;
+        for(SlotGroup sg:this.slots) {
+            for(Slot sl:sg.getSlots()) {
+                sl.setId(id++);
+            }
         }
     }
 
@@ -111,6 +141,10 @@ public class Model {
 
     public int getSubjectIdReverse(int subjectId) {
         return subjectIdMappingReverse.get(subjectId);
+    }
+
+    public int getSlotIdReverse(int slotId) {
+        return slotIdMappingReverse.get(slotId);
     }
 
 

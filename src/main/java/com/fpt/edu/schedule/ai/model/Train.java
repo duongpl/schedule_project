@@ -22,7 +22,6 @@ public class Train {
 
         Train train = new Train();
         Model model = DataReader.getData();
-
         GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
         ga.start();
     }
