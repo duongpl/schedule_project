@@ -20,7 +20,7 @@ public class Timetable {
     Semester semester;
     boolean temp;
     @JsonIgnore
-    @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "timetable", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<TimetableDetail> timetableDetails;
 
     public Timetable() {

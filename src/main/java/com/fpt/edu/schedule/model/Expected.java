@@ -3,6 +3,8 @@ package com.fpt.edu.schedule.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,9 +26,11 @@ public class Expected implements Cloneable {
     @ManyToOne
     @JoinColumn(name = "lecturer_id")
     private Lecturer lecturer;
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
 
     private List<ExpectedSlot> expectedSlots;
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSubject> expectedSubjects;
     @OneToOne(mappedBy = "expected", cascade = CascadeType.ALL)

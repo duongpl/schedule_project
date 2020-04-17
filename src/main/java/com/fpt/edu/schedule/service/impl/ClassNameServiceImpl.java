@@ -1,9 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.model.*;
-import com.fpt.edu.schedule.repository.base.BaseSpecifications;
-import com.fpt.edu.schedule.repository.base.ClassNameRepository;
-import com.fpt.edu.schedule.repository.base.QueryParam;
+import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,9 +16,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ClassNameServiceImpl  implements ClassNameService {
     ClassNameRepository classNameRepository;
-    TimetableService timetableService;
+    TimetableRepository timetableRepository;
     SemesterService semesterService;
-    LecturerService lecturerService;
+    LecturerRepository lecturerRepository;
     @Override
     public void addClassName(ClassName className) {
         classNameRepository.save(className);
@@ -34,8 +32,8 @@ public class ClassNameServiceImpl  implements ClassNameService {
             return classNameRepository.findAll(cns);
         }
         int semester = Integer.parseInt(semesterId);
-        Timetable timetable = timetableService.findBySemester(semesterService.findById(semester));
-        Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
+        Timetable timetable = timetableRepository.findBySemester(semesterService.findById(semester));
+        Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Set<ClassName> classes = timetable.getTimetableDetails().stream().filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()))
                 .map(TimetableDetail::getClassName).collect(Collectors.toSet());
         return classes.stream().collect(Collectors.toList());

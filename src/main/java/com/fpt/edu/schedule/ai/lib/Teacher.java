@@ -1,10 +1,8 @@
 package com.fpt.edu.schedule.ai.lib;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class Teacher {
     public final static int FULL_TIME = 1;
     public final static int PART_TIME = 0;
@@ -14,6 +12,16 @@ public class Teacher {
     private int expectedNumberOfClass;
     private int consecutiveSlotLimit;
     private int quota;
+
+    public Teacher(String email, String name, int id, int type, int expectedNumberOfClass, int consecutiveSlotLimit, int quota) {
+        this.email = email;
+        this.name = name;
+        this.id = id;
+        this.type = type;
+        this.expectedNumberOfClass = expectedNumberOfClass;
+        this.consecutiveSlotLimit = consecutiveSlotLimit;
+        this.quota = quota;
+    }
 
     public Teacher(String email, String name, int id, int type) {
         this.email = email;
