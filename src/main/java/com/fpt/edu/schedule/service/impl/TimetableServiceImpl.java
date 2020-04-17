@@ -116,8 +116,8 @@ public class TimetableServiceImpl implements TimetableService {
 
         Timetable timetable = findBySemester(semester);
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
-                .filter(i -> i.getSubject().getDepartment()
-                        .equals(lecturer.getDepartment())).collect(Collectors.toList());
+                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !Character.isAlphabetic(i.getSubject().getCode().charAt(i.getSubject().getCode().length()-1)))
+                .collect(Collectors.toList());
         List<Expected> expected = expectedRepository.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
         //teacher model
