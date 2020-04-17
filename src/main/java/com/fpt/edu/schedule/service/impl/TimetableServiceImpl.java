@@ -72,19 +72,29 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
         //convert data
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
+//        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
         int generation = 0;
+//        Population population = new Population(POPULATION_SIZE, model);
+
+
+        //run error
+        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
-        Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
         GeneticAlgorithm ge= new GeneticAlgorithm(model,train);
-//        try{
-//            ge.start();
-//        }catch (NullPointerException e){
-//
-//        }
+        try{
+            ge.start();
+        }catch (NullPointerException e){
 
-        start(model, train, generation, population);
+        }
+//        run ok
+//        Train train1 = new Train();
+//        Model model1 = DataReader.getData();
+//
+//        GeneticAlgorithm ga = new GeneticAlgorithm(model1, train1);
+//        ga.start();
+
+
     }
 
     @Override
