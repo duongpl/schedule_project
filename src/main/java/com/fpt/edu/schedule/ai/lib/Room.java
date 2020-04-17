@@ -21,7 +21,13 @@ public class Room {
 
     public Room(String name) {
         this.name = name;
+        if(name.contains("AL")){
+            this.building = "AL";
+        } else {
+            this.building = "BE";
+        }
     }
+
 
     public String getName() {
         return name;

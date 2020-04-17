@@ -1,8 +1,7 @@
 package com.fpt.edu.schedule.ai.model;
 
-import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.data.DataReader;
 import com.fpt.edu.schedule.ai.lib.Class;
+import com.fpt.edu.schedule.ai.lib.*;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -37,7 +36,7 @@ public class Model {
         this.slots = slots;
         this.subjects = subjects;
         this.classes = classes;
-        this.registeredSlots = new double[teachers.size()][10];
+        this.registeredSlots = new double[teachers.size()][11];
         this.registeredSubjects = new double[teachers.size()][subjects.size()];
 
         mappingId();

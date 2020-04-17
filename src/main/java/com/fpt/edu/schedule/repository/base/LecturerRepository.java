@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.repository.base;
 
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.model.Lecturer;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.Repository;
@@ -20,6 +21,6 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     Lecturer findById(int id);
 
-    List<Lecturer> findAllByDepartment(String department);
+    List<Lecturer> findAllByDepartmentAndStatus(String department, StatusLecturer status);
 
 }
