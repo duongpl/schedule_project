@@ -663,7 +663,7 @@ public class Chromosome {
                 if (classId != -1) {
                     rs.add(new Record(this.getModel().getTeacherIdReverse(i), this.getModel().getClassIdReverse(classId),
                             this.getModel().getSubjectIdReverse(this.getModel().getClasses().get(classId).getSubjectId()),
-                            j));
+                            this.getModel().getSlotIdReverse(this.getModel().getClasses().get(classId).getSlotId())));
                 }
             }
         }
