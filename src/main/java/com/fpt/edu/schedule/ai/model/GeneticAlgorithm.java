@@ -4,11 +4,14 @@ package com.fpt.edu.schedule.ai.model;
 import com.fpt.edu.schedule.ai.data.DataWriter;
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Collections;
 import java.util.Random;
 import java.util.Vector;
-
+@Getter
 public class GeneticAlgorithm {
     public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
@@ -16,6 +19,8 @@ public class GeneticAlgorithm {
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
 //        public static final double
+     @Autowired
+     ApplicationEventPublisher publisher;
 
     Population population;
     Model model;

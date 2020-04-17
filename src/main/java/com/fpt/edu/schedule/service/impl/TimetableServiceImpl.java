@@ -89,7 +89,10 @@ public class TimetableServiceImpl implements TimetableService {
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
         Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
-        start(model, train, generation, population);
+        GeneticAlgorithm ge= new GeneticAlgorithm(model,train);
+        ge.start();
+
+//        start(model, train, generation, population);
     }
 
     @Override
