@@ -201,9 +201,9 @@ public class DataReader {
 //        teachers.add(new Teacher("E2", "E1", 1));
 //        teachers.add(new Teacher("E3", "E1", 2));
 //        teachers.add(new Teacher("E4", "E1", 3));
-        String registerSlotPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
-        String registerSubjectPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
-        String classPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
+        String registerSlotPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
+        String registerSubjectPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
+        String classPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
 
         try {
             File f = new File(registerSlotPath);

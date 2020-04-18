@@ -3,12 +3,14 @@ package com.fpt.edu.schedule.ai.model;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.*;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 @Data
+@Component
 public class Model {
     private Vector<Teacher> teachers;
     private Vector<SlotGroup> slots;

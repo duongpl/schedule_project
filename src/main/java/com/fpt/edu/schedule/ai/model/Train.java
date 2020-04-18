@@ -1,8 +1,9 @@
 package com.fpt.edu.schedule.ai.model;
 
 
-import com.fpt.edu.schedule.ai.data.DataReader;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Train {
     public static final int M = 5; //teacher size
     public static final int K = 20; //subject size
@@ -18,12 +19,6 @@ public class Train {
 
     }
 
-    public static void main(String[] args) {
 
-        Train train = new Train();
-        Model model = DataReader.getData();
-        GeneticAlgorithm ga = new GeneticAlgorithm(model, train);
-        ga.start();
-    }
 }
 

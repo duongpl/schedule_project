@@ -1,12 +1,17 @@
 package com.fpt.edu.schedule.ai.model;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Vector;
-
+@Component
 public class Population {
     public Vector<Chromosome> getIndividuals() {
         return individuals;
+    }
+
+    public Population() {
     }
 
     public void setIndividuals(Vector<Chromosome> individuals) {

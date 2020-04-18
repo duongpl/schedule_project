@@ -112,9 +112,9 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         if (timetableDetailExisted == null) {
             throw new InvalidRequestException("Not found this timetable !");
         }
-        if (timetableDetail.getLecturerShortName() != null ) {
+        if (timetableDetail.getLecturerShortName() != null) {
             Lecturer lecturer = ("NOT_ASSIGN").equals(timetableDetail.getLecturerShortName()) ? null
-                    : lecturerService.findByShortName(getValidLecturer(timetableDetail,timetableDetailExisted));
+                    : lecturerService.findByShortName(timetableDetail.getLecturerShortName());
             timetableDetailExisted.setLecturer(lecturer);
         }
         if (timetableDetail.getRoom() != null) {
@@ -130,35 +130,44 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
 
-        Object lecturer =queryParam.getInCriteria().get("lecturer");
-        if(lecturer instanceof Map ){
-          List<String> shortName =  (List<String>)((Map) lecturer).get("shortName");
-          if(shortName.contains(null) && shortName.size()>1){
-              ArrayList arrayList = new ArrayList();
-              arrayList.add(null);
-
-              queryParam.getInCriteria().put("lecturer",arrayList);
-              BaseSpecifications cns1 = new BaseSpecifications(queryParam);
-              List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
-              timetableDetails.addAll(timetableDetails1);
-          }
-        }
-        Object room =queryParam.getInCriteria().get("room");
-        if(room instanceof Map ){
-            List<String> shortName =  (List<String>)((Map) room).get("name");
-            if(shortName.contains(null) && shortName.size()>1){
+        Object lecturer = queryParam.getInCriteria().get("lecturer");
+        if (lecturer instanceof Map) {
+            List<String> shortName = (List<String>) ((Map) lecturer).get("shortName");
+            if (shortName.contains("NOT_ASSIGN")) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(null);
+                ((Map) lecturer).replace("shortName",arrayList);
 
-                queryParam.getInCriteria().put("room",arrayList);
+                queryParam.getInCriteria().put("lecturer", lecturer);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
                 List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
-                timetableDetails.addAll(timetableDetails1);
+                if (shortName.size() != 1) {
+                    timetableDetails.addAll(timetableDetails1);
+                } else {
+                    timetableDetails = timetableDetails1;
+                }
+            }
+        }
+        Object room = queryParam.getInCriteria().get("room");
+        if (room instanceof Map) {
+            List<String> roomName = (List<String>) ((Map) room).get("name");
+            if (roomName.contains("NOT_ASSIGN")) {
+                ArrayList arrayList = new ArrayList();
+                arrayList.add(null);
+                ((Map) room).replace("name",arrayList);
+                queryParam.getInCriteria().put("room", room);
+                BaseSpecifications cns1 = new BaseSpecifications(queryParam);
+                List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
+                if (roomName.size() != 1) {
+                    timetableDetails.addAll(timetableDetails1);
+                } else {
+                    timetableDetails = timetableDetails1;
+                }
             }
         }
 
 
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName(): null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
@@ -168,21 +177,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
     private String getValidRoom(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
         TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndRoomAndTimetable(timetableDetailExisted.getSlot(),
-                roomService.getRoomByName(timetableDetail.getRoom()),timetableDetailExisted.getTimetable());
-        if(timetableDetailCheck !=null && !timetableDetailCheck.getRoom().getName().equals(timetableDetail.getRoom()) ){
+                roomService.getRoomByName(timetableDetail.getRoom()), timetableDetailExisted.getTimetable());
+        if (timetableDetailCheck != null && !timetableDetailCheck.getRoom().getName().equals(timetableDetail.getRoom())) {
             throw new InvalidRequestException(String.format("This room already have timetable Room:%s ,Slot:%s ,Subject:%s ,Department:%s",
-                    timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode(),timetableDetailCheck.getSubject().getDepartment()));
+                    timetableDetailCheck.getRoom().getName(), timetableDetailCheck.getSlot().getName(), timetableDetailCheck.getSubject().getCode(), timetableDetailCheck.getSubject().getDepartment()));
         }
         return timetableDetail.getRoom();
     }
-    private String getValidLecturer(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
-        TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndLecturerAndTimetable(timetableDetailExisted.getSlot(),
-                lecturerService.findByShortName(timetableDetail.getLecturerShortName()),timetableDetailExisted.getTimetable());
-        if(timetableDetailCheck !=null && timetableDetailCheck.getLecturer() !=null){
-            String message = String.format("This lecturer already have timetable in this slot Room:%s ,Slot:%s ,Subject:%s ,Department:%s, Lecturer:%s",
-                    timetableDetailCheck.getRoom().getName(),timetableDetailCheck.getSlot().getName(),timetableDetailCheck.getSubject().getCode(),timetableDetailCheck.getSubject().getDepartment(),timetableDetailCheck.getLecturer().getShortName());
-            throw new InvalidRequestException(message);
-        }
-        return timetableDetail.getLecturerShortName();
-    }
+
 }

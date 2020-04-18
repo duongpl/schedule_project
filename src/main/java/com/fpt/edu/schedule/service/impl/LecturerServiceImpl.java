@@ -135,7 +135,7 @@ public class LecturerServiceImpl implements LecturerService {
         Timetable timetable = timetableDetail.getTimetable();
         List<TimetableDetail> list = timetable.getTimetableDetails().stream().filter(i->
                 i.getSlot().equals(timetableDetail.getSlot())).collect(Collectors.toList());
-        List<Lecturer> lecturers = list.stream().map(TimetableDetail::getLecturer).collect(Collectors.toList());
+        List<Lecturer> lecturers = list.stream().filter(i->i.getLecturer()!=null).map(TimetableDetail::getLecturer).collect(Collectors.toList());
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository.findAll(cns).stream().filter(i->!lecturers.contains(i)).collect(Collectors.toList());
 

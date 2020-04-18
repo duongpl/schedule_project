@@ -5,13 +5,15 @@ import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.ExpectedSlot;
 import com.fpt.edu.schedule.ai.lib.ExpectedSubject;
 import com.fpt.edu.schedule.ai.lib.Room;
-import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.model.*;
+import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
+import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.Population;
+import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.event.DataListener;
+import com.fpt.edu.schedule.event.ResponseEvent;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.SemesterService;
@@ -20,6 +22,7 @@ import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -30,12 +33,15 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class TimetableServiceImpl implements TimetableService {
+public class TimetableServiceImpl implements TimetableService, ApplicationListener<ResponseEvent> {
     public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
     public static final int TOURNAMENT_SIZE = 3;
@@ -49,9 +55,11 @@ public class TimetableServiceImpl implements TimetableService {
     SubjectRepository subjectRepository;
     SlotRepository slotRepository;
     SemesterRepository semesterRepository;
+    TimetableDetailRepository timetableDetailRepository;
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
-    StartService startService;
+    @Autowired
+    GeneticAlgorithm ga;
 
     @Override
     public Timetable save(Timetable timeTable) {
@@ -80,29 +88,34 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<SlotGroup> slotGroups = new Vector<>();
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
 //        importDataFromFile();
-
-
-//        run error
-          Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
-          startService.start(model);
-
-        //run ok
-//        Train train1 = new Train();
-//        GeneticAlgorithm ga = new GeneticAlgorithm(model, train1);
-//        ga.start();
+        Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel);
+        Population population = new Population(POPULATION_SIZE, model);
+        Train train = new Train();
+        ga.setGeneration(0);
+        ga.setPopulation(population);
+        ga.setModel(model);
+        ga.setTrain(train);
+        ga.setRun(true);
+        ga.start();
 
 
     }
 
     @Override
     public void stop(String lecturerId) {
-        Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-        for (Thread thread : setOfThread) {
-            if (thread.getName().equals(lecturerId)) {
-                thread.interrupt();
-                System.out.println("Thead of user " + thread.getName() + " stop");
-            }
-        }
+       Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
+       ga.stop();
+    }
+
+
+    @Override
+    public void onApplicationEvent(ResponseEvent responseEvent) {
+        Vector<Record> records =responseEvent.getChromosome().getSchedule();
+        records.forEach(i->{
+            TimetableDetail timetableDetail =timetableDetailRepository.findById(i.getClassId());
+            timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+            timetableDetailRepository.save(timetableDetail);
+        });
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
@@ -172,87 +185,6 @@ public class TimetableServiceImpl implements TimetableService {
 
     }
 
-    public void start(Model model) {
-        Population population = new Population(POPULATION_SIZE, model);
-        Train train = new Train();
-        int generation =0;
-        while (true) {
-            updateFitness(train, generation, population);
-            population = selection1(model, population);
-            mutate(population);
-        }
-    }
-
-    public void updateFitness(Train train, int generation, Population population) {
-        population.updateFitness();
-        generation++;
-
-        System.out.println("Fitness Average: " + population.getAverageFitness());
-        System.out.println("Best fitness: " + population.getBestIndividuals().getFitness());
-        System.out.println("Generation: " + generation);
-        applicationEventPublisher.publishEvent(new DataListener(this, population.getBestIndividuals()));
-        train.notify(population.getBestIndividuals(), population.getBestIndividuals().getFitness(), population.getAverageFitness(),
-                population.getBestIndividuals().getNumberOfViolation());
-    }
-
-    public Population selection1(Model model, Population population) {
-        Population population1 = new Population(model);
-        for (int i = 0; i < population.getSize() / 2; i++) {
-            Chromosome p1 = selectParent(population);
-            Chromosome p2 = selectParent(population);
-            Chromosome c1 = this.crossover(p1, p2, model);
-            Chromosome c2 = this.crossover(p2, p1, model);
-            population1.addIndividual(c1);
-            population1.addIndividual(c2);
-        }
-        return population;
-    }
-
-    public Chromosome crossover(Chromosome c1, Chromosome c2, Model model) {
-        Vector<Slot> slots = SlotGroup.getSlotList(model.getSlots());
-        Vector<Vector<Integer>> genes = new Vector<>();
-        Random random = new Random();
-        for (Slot slot : slots) {
-            Vector<Integer> p1 = c1.getGenes().get(slot.getId());
-            Vector<Integer> p2 = c2.getGenes().get(slot.getId());
-            Vector<Integer> p3 = (new PMX(p1, p2, random.nextInt(Integer.MAX_VALUE))).getChildren();
-
-            genes.add(p3);
-        }
-
-        return new Chromosome(model, genes);
-    }
-
-    public Chromosome selectParent(Population population) {
-        Random random = new Random();
-        Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
-            int idx = random.nextInt(population.getSize());
-            candidates.add(population.getIndividuals().get(idx));
-        }
-
-        double best = candidates.get(0).getFitness();
-        Chromosome res = candidates.get(0);
-        for (Chromosome chromosome : candidates) {
-            if (chromosome.getFitness() > best) {
-                best = chromosome.getFitness();
-                res = chromosome;
-            }
-        }
-        return res;
-    }
-
-    public void mutate(Population population) {
-        Random random = new Random();
-        for (int i = 0; i < population.getSize(); i++) {
-            for (int j = 0; j < 1; j++) {
-                if (random.nextDouble() < MUTATION_RATE) {
-                    population.getIndividuals().get(i).mutate();
-                }
-            }
-            population.getIndividuals().get(i).autoRepair();
-        }
-    }
 
     private void importDataFromFile() {
         try {
@@ -359,7 +291,7 @@ public class TimetableServiceImpl implements TimetableService {
 
                     }
                     expected.setExpectedSubjects(expectedSubjects);
-                   expectedRepository.save(expected);
+                    expectedRepository.save(expected);
 
                 }
             }
@@ -369,7 +301,5 @@ public class TimetableServiceImpl implements TimetableService {
         }
 
     }
-
-
-
 }
+
