@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class RequestServiceImpl implements ReportService {
+public class RequestServiceImpl implements RequestService {
     RoomService roomService;
     ClassNameService classNameService;
     ClassNameRepository classNameRepository;

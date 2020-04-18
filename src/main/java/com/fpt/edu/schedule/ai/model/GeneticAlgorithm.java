@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.ai.model;
 
 
-import com.fpt.edu.schedule.ai.data.DataWriter;
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
 
@@ -174,11 +173,8 @@ public void selection() {
 }
 public void start() {
     while (true) {
-        System.out.println(1);
         this.updateFitness();
-        System.out.println(1);
         this.selection1();
-        System.out.println(1);
         this.mutate();
     }
 }

@@ -2,7 +2,7 @@ package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.model.Request;
 import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.service.base.ReportService;
+import com.fpt.edu.schedule.service.base.RequestService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +20,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/requests")
 public class RequestController {
-    ReportService reportService;
+    RequestService requestService;
     private JavaMailSender javaMailSender;
 
 
     @PostMapping("/generate")
     public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam(name = "semesterId") int semesterId) {
         try {
-            reportService.generateExcelFile(multipartFile,semesterId);
+            requestService.generateExcelFile(multipartFile,semesterId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -36,7 +36,7 @@ public class RequestController {
     @PostMapping("/filter")
     public ResponseEntity<Request> getClassByCriteria(@RequestBody QueryParam queryParam) {
         try {
-            List<Request> requestList =reportService.findByCriteria(queryParam);
+            List<Request> requestList = requestService.findByCriteria(queryParam);
             return new ResponseEntity(requestList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
@@ -46,7 +46,7 @@ public class RequestController {
     public ResponseEntity<Request> addReport(@RequestBody Request request,
                                              @RequestHeader("GoogleId") String currentLecturerId) {
         try {
-            return new ResponseEntity(reportService.addReport(request,currentLecturerId), HttpStatus.OK);
+            return new ResponseEntity(requestService.addReport(request,currentLecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -54,7 +54,7 @@ public class RequestController {
     @PutMapping
     public ResponseEntity<Request> updateReport(@RequestBody Request request) {
         try {
-            return new ResponseEntity(reportService.updateReport(request), HttpStatus.OK);
+            return new ResponseEntity(requestService.updateReport(request), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -62,7 +62,7 @@ public class RequestController {
     @DeleteMapping("/{reportId}")
     public ResponseEntity remove(@PathVariable("reportId") int expectedId) {
         try {
-            reportService.removeReportById(expectedId);
+            requestService.removeReportById(expectedId);
             return new ResponseEntity( HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

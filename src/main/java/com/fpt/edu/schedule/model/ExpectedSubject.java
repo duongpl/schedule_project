@@ -25,7 +25,6 @@ public class ExpectedSubject {
     private String subjectCode;
 
     public void setSubjectCode(String subjectCode) {
-        System.out.println("abc");
         this.subjectCode = subjectCode;
     }
 
