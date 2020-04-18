@@ -72,9 +72,9 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
         //convert data
-//        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
+//      convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
         int generation = 0;
-//        Population population = new Population(POPULATION_SIZE, model);
+//      Population population = new Population(POPULATION_SIZE, model);
 
 
         //run error
