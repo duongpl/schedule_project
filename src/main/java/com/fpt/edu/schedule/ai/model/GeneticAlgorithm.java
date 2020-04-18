@@ -39,9 +39,9 @@ public class GeneticAlgorithm {
 
         this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
                 this.population.getBestIndividuals().getNumberOfViolation());
-        if (this.generation % 100 == 0) {
-            DataWriter.writeToCsv(this.model, this.population.getBestIndividuals(), "result" + this.generation / 100 + ".csv");
-        }
+//        if (this.generation % 100 == 0) {
+//            DataWriter.writeToCsv(this.model, this.population.getBestIndividuals(), "result" + this.generation / 100 + ".csv");
+//        }
     }
 
 
@@ -174,8 +174,11 @@ public void selection() {
 }
 public void start() {
     while (true) {
+        System.out.println(1);
         this.updateFitness();
+        System.out.println(1);
         this.selection1();
+        System.out.println(1);
         this.mutate();
     }
 }

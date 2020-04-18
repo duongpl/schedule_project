@@ -48,4 +48,10 @@ public class Lecturer {
     public Lecturer(String email) {
         this.email = email;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Lecturer lecturer = (Lecturer) obj;
+        return id == lecturer.getId();
+    }
 }

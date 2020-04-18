@@ -131,6 +131,7 @@ public class TimetableServiceImpl implements TimetableService {
         });
         //expected model
         expected.stream().filter(i->lecturers.contains(i.getLecturer())).forEach(i -> {
+            System.out.println(i.getLecturer().getEmail());
             i.getExpectedSlots().forEach(s -> {
                 expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
             });
@@ -147,24 +148,24 @@ public class TimetableServiceImpl implements TimetableService {
 
 
         SlotGroup m246 = new SlotGroup(3);
-        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M1", 0));
-        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M2", 1));
-        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M3", 2));
+        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M1", 3));
+        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M2", 2));
+        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M3", 1));
         SlotGroup e246 = new SlotGroup(3);
 
-        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E1", 3));
-        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E2", 4));
-        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E3", 5));
+        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E1", 10));
+        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E2", 7));
+        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E3", 8));
 
         SlotGroup m35 = new SlotGroup(1);
 
-        m35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M4", 6));
-        m35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M5", 7));
+        m35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M4", 4));
+        m35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M5", 5));
 
         SlotGroup e35 = new SlotGroup(1);
 
-        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E4", 8));
-        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E5", 9));
+        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E4", 9));
+        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E5", 6));
         slots.add(m246);
         slots.add(e246);
         slots.add(m35);
