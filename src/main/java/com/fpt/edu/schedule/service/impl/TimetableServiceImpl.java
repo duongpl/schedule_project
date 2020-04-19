@@ -19,6 +19,7 @@ import com.fpt.edu.schedule.service.base.SubjectService;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
@@ -42,7 +43,7 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     public static final int TOURNAMENT_SIZE = 3;
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
-    public static Map<String, GeneticAlgorithm> map;
+    public static Map<String, GeneticAlgorithm> map = new HashMap<>();
     SemesterService semesterService;
     TimetableRepository timetableRepository;
     ExpectedRepository expectedRepository;
@@ -53,9 +54,11 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     SemesterRepository semesterRepository;
     TimetableDetailRepository timetableDetailRepository;
     @Autowired
-    ApplicationEventPublisher applicationEventPublisher;
+    private ApplicationContext applicationContext;
     @Autowired
-    GeneticAlgorithm ga;
+    ApplicationEventPublisher applicationEventPublisher;
+
+
 
     @Override
     public Timetable save(Timetable timeTable) {
@@ -71,7 +74,6 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         return timetable;
     }
 
-
     @Async
     @Override
     public void autoArrange(int semesterId, String lecturerId) {
@@ -82,29 +84,41 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         Vector<ExpectedSlot> expectedSlotModels = new Vector<>();
         Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
-//        importDataFromFile();
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
+        Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
+        Semester semester = semesterService.findById(semesterId);
+        Timetable timetable = findBySemester(semester);
+        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
+                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && i.getLecturer()!=null)
+                .collect(Collectors.toList());
+        timetableDetails.forEach(i->{
+            i.setLecturer(null);
+            timetableDetailRepository.save(i);
+        });
 
+        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups,lecturer,semester,timetable);
+//        importDataFromFile();
         Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel);
         Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
+        GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         ga.setGeneration(0);
         ga.setPopulation(population);
         ga.setModel(model);
         ga.setTrain(train);
         ga.setRun(true);
+        ga.setLecturerId(lecturerId);
+        map.put(lecturerId,ga);
         ga.start();
-
-
     }
 
     @Override
     public void stop(String lecturerId) {
-       Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-       ga.stop(lecturerId);
+        map.get(lecturerId).stop();
+        System.out.println("-------------------------Stop-----LecturerId :"+lecturerId);
+        map.remove(lecturerId);
     }
 
-
+    // xu ly khi stop
     @Override
     public void onApplicationEvent(ResponseEvent responseEvent) {
         Chromosome population =responseEvent.getPopulation();
@@ -125,11 +139,8 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
                              Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
                              Vector<ExpectedSubject> expectedSubjectModel,
-                             int semesterId, String lecturerId, Vector<SlotGroup> slots) {
-        Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
-        Semester semester = semesterService.findById(semesterId);
+                             int semesterId, String lecturerId, Vector<SlotGroup> slots,Lecturer lecturer,Semester semester,Timetable timetable) {
 
-        Timetable timetable = findBySemester(semester);
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !Character.isAlphabetic(i.getSubject().getCode().charAt(i.getSubject().getCode().length() - 1)))
                 .collect(Collectors.toList());
@@ -147,7 +158,6 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         });
         //expected model
         expected.stream().filter(i -> lecturers.contains(i.getLecturer())).forEach(i -> {
-            System.out.println(i.getLecturer().getEmail());
             i.getExpectedSlots().forEach(s -> {
                 expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
             });

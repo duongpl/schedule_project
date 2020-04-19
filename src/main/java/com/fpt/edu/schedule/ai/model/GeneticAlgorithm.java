@@ -5,16 +5,22 @@ import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
 import com.fpt.edu.schedule.common.enums.Constant;
 import com.fpt.edu.schedule.event.ResponseEvent;
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Random;
 import java.util.Vector;
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Setter
+@Getter
 public class GeneticAlgorithm {
     public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
@@ -32,17 +38,11 @@ public class GeneticAlgorithm {
     private boolean isRun = true;
     private String lecturerId;
 
-    public GeneticAlgorithm(Model model, Train train) {
-        this.generation = 0;
-        this.model = model;
-        this.train = train;
-        this.population = new Population(POPULATION_SIZE, model);
-    }
-
     public GeneticAlgorithm() {
     }
 
     public void updateFitness() {
+      System.out.println(this.lecturerId);
         this.population.updateFitness();
         this.generation++;
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
@@ -182,6 +182,7 @@ public class GeneticAlgorithm {
             this.population.getIndividuals().get(i).autoRepair();
         }
     }
+    @Async
     public void start() {
         while (true) {
             if(!this.isRun){
@@ -193,7 +194,7 @@ public class GeneticAlgorithm {
             this.mutate();
         }
     }
-    public void stop(String lecturerId){
+    public void stop(){
         this.isRun =false;
     }
 }

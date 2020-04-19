@@ -19,7 +19,6 @@ public interface TimetableDetailRepository extends Repository<TimetableDetail, I
 
     TimetableDetail findBySlotAndRoomAndTimetable(Slot slot, Room room, Timetable timetable);
 
-    TimetableDetail findBySlotAndLecturerAndTimetable(Slot slot, Lecturer lecturer, Timetable timetable);
 
     List<TimetableDetail> findAllByLecturerAndTimetable(Lecturer lecturer, Timetable timetable);
 
