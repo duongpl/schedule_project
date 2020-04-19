@@ -1,10 +1,17 @@
 package com.fpt.edu.schedule.ai.model;
 
 
+import com.fpt.edu.schedule.ai.lib.Record;
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
 import com.fpt.edu.schedule.common.enums.Constant;
+import com.fpt.edu.schedule.dto.Runs;
+import com.fpt.edu.schedule.dto.TimetableDetailDTO;
+import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.event.ResponseEvent;
+import com.fpt.edu.schedule.model.TimetableDetail;
+import com.fpt.edu.schedule.repository.base.LecturerRepository;
+import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +21,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Setter
@@ -28,6 +35,10 @@ public class GeneticAlgorithm {
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
     @Autowired
+    TimetableDetailRepository timetableDetailRepository;
+    @Autowired
+    LecturerRepository lecturerRepository;
+    @Autowired
     ApplicationEventPublisher publisher;
     @Autowired
     Population population;
@@ -37,6 +48,7 @@ public class GeneticAlgorithm {
     private Train train;
     private boolean isRun = true;
     private String lecturerId;
+    Map<Integer, Runs> genInfos = new HashMap<>();
 
     public GeneticAlgorithm() {
     }
@@ -48,8 +60,7 @@ public class GeneticAlgorithm {
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        publisher.publishEvent(new ResponseEvent(this,this.population.getBestIndividuals(), Constant.runningGa,this.generation));
-
+        handleTimetable();
         this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
                 this.population.getBestIndividuals().getNumberOfViolation());
     }
@@ -196,5 +207,22 @@ public class GeneticAlgorithm {
     }
     public void stop(){
         this.isRun =false;
+    }
+
+    public void handleTimetable(){
+        List<TimetableDetail> timetableDetails = new ArrayList<>();
+        Vector<Record> records = population.getBestIndividuals().getSchedule();
+        records.forEach(i -> {
+            TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
+            timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+            timetableDetails.add(timetableDetail);
+        });
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        Runs run = new Runs(this.population.getBestIndividuals().getFitness(),this.population.getAverageFitness(),this.population.getBestIndividuals().getNumberOfViolation(),0,this.generation,this.generation,timetableEdits);
+        genInfos.put(this.generation,run);
     }
 }

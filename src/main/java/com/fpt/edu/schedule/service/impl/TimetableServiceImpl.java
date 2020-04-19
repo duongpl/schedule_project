@@ -11,6 +11,7 @@ import com.fpt.edu.schedule.ai.model.*;
 import com.fpt.edu.schedule.common.enums.Constant;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.event.ResponseEvent;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
@@ -115,7 +116,26 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     public void stop(String lecturerId) {
         map.get(lecturerId).stop();
         System.out.println("-------------------------Stop-----LecturerId :"+lecturerId);
-        map.remove(lecturerId);
+
+    }
+
+    @Override
+    public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId,int page,int limit) {
+        QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
+        GeneticAlgorithm ge =map.get(lecturerId);
+        if(ge==null) {
+            pagedResultSet.setResults(new ArrayList<>());
+            return pagedResultSet;
+        }
+            Map<Integer, Runs> mapRuns = ge.getGenInfos();
+            List<Runs> runsList = mapRuns.values().stream().collect(Collectors.toList());
+            pagedResultSet.setTotalCount(runsList.size());
+            List<Runs> runsListComplete = runsList.stream().skip((page - 1) * limit).limit(limit).collect(Collectors.toList());
+            pagedResultSet.setResults(runsListComplete);
+            pagedResultSet.setSize(runsListComplete.size());
+            pagedResultSet.setPage(page);
+
+        return pagedResultSet;
     }
 
     // xu ly khi stop
@@ -125,12 +145,12 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         String status=responseEvent.getStatus();
 
         if(status.equals(Constant.stopGa)) {
-            Vector<Record> records = population.getSchedule();
-            records.forEach(i -> {
-                TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
-                timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
-                timetableDetailRepository.save(timetableDetail);
-            });
+//            Vector<Record> records = population.getSchedule();
+//            records.forEach(i -> {
+//                TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
+//                timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+//                timetableDetailRepository.save(timetableDetail);
+//            });
         } else {
             System.out.println(responseEvent.getGeneration());
         }

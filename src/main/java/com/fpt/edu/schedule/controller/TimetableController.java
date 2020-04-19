@@ -12,24 +12,40 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/timetables")
 public class TimetableController {
     TimetableService timetableService;
+
     @PostMapping("/auto-arrange")
     public ResponseEntity<Subject> autoArrange(@RequestParam("semesterId") int semesterId,
-                                                        @RequestHeader("GoogleId")String hodGoogleId) {
+                                               @RequestHeader("GoogleId") String hodGoogleId) {
         try {
-            timetableService.autoArrange(semesterId,hodGoogleId);
+            timetableService.autoArrange(semesterId, hodGoogleId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PostMapping("/stop")
-    public ResponseEntity<Subject> stop(@RequestParam("lecturerId") String lecturerId) {
+    public ResponseEntity<Subject> stop(@RequestHeader("GoogleId") String lecturerId) {
         try {
             timetableService.stop(lecturerId);
 
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/generations")
+    public ResponseEntity<Subject> getListGeneration(@RequestHeader("GoogleId") String hodGoogleId,
+                                                     @RequestParam("page") String page,
+                                                     @RequestParam("limit") String limit) {
+        try {
+
+            int limitParse = Integer.parseInt(limit);
+            int pageParse=Integer.parseInt(page);
+            return new ResponseEntity(timetableService.getGenerationInfo(hodGoogleId,pageParse,limitParse), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
