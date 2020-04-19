@@ -86,8 +86,9 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         Vector<ExpectedSlot> expectedSlotModels = new Vector<>();
         Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
 //        importDataFromFile();
+        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
+
         Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel);
         Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
