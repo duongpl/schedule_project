@@ -3,7 +3,8 @@ package com.fpt.edu.schedule.ai.model;
 
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
-import com.fpt.edu.schedule.event.DataEvent;
+import com.fpt.edu.schedule.common.enums.Constant;
+import com.fpt.edu.schedule.event.ResponseEvent;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +30,7 @@ public class GeneticAlgorithm {
     private int generation;
     private Train train;
     private boolean isRun = true;
+    private String lecturerId;
 
     public GeneticAlgorithm(Model model, Train train) {
         this.generation = 0;
@@ -46,7 +48,7 @@ public class GeneticAlgorithm {
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"run",this.generation));
+        publisher.publishEvent(new ResponseEvent(this,this.population.getBestIndividuals(), Constant.runningGa,this.generation));
 
         this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
                 this.population.getBestIndividuals().getNumberOfViolation());
@@ -183,7 +185,7 @@ public class GeneticAlgorithm {
     public void start() {
         while (true) {
             if(!this.isRun){
-                publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"stop",this.generation));
+                publisher.publishEvent(new ResponseEvent(this,this.population.getBestIndividuals(),Constant.stopGa,this.generation));
                 break;
             }
             this.updateFitness();
@@ -191,7 +193,7 @@ public class GeneticAlgorithm {
             this.mutate();
         }
     }
-    public void stop(){
+    public void stop(String lecturerId){
         this.isRun =false;
     }
 }

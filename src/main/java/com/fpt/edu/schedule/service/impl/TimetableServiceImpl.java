@@ -7,10 +7,8 @@ import com.fpt.edu.schedule.ai.lib.ExpectedSubject;
 import com.fpt.edu.schedule.ai.lib.Room;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
-import com.fpt.edu.schedule.ai.model.Model;
-import com.fpt.edu.schedule.ai.model.Population;
-import com.fpt.edu.schedule.ai.model.Train;
+import com.fpt.edu.schedule.ai.model.*;
+import com.fpt.edu.schedule.common.enums.Constant;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.event.ResponseEvent;
@@ -33,10 +31,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +42,7 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     public static final int TOURNAMENT_SIZE = 3;
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
+    public static Map<String, GeneticAlgorithm> map;
     SemesterService semesterService;
     TimetableRepository timetableRepository;
     ExpectedRepository expectedRepository;
@@ -105,18 +101,25 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     @Override
     public void stop(String lecturerId) {
        Set<Thread> setOfThread = Thread.getAllStackTraces().keySet();
-       ga.stop();
+       ga.stop(lecturerId);
     }
 
 
     @Override
     public void onApplicationEvent(ResponseEvent responseEvent) {
-        Vector<Record> records =responseEvent.getChromosome().getSchedule();
-        records.forEach(i->{
-            TimetableDetail timetableDetail =timetableDetailRepository.findById(i.getClassId());
-            timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
-            timetableDetailRepository.save(timetableDetail);
-        });
+        Chromosome population =responseEvent.getPopulation();
+        String status=responseEvent.getStatus();
+
+        if(status.equals(Constant.stopGa)) {
+            Vector<Record> records = population.getSchedule();
+            records.forEach(i -> {
+                TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
+                timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+                timetableDetailRepository.save(timetableDetail);
+            });
+        } else {
+            System.out.println(responseEvent.getGeneration());
+        }
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
