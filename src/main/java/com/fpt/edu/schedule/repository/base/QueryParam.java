@@ -24,6 +24,15 @@ public class QueryParam<T> {
     public static class PagedResultSet<T> {
 
         private int page;
+        private boolean running;
+
+        public boolean isRunning() {
+            return running;
+        }
+
+        public void setRunning(boolean running) {
+            this.running = running;
+        }
 
         private int size;
         private int totalCount;

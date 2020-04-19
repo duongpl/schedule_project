@@ -15,4 +15,6 @@ public interface TimetableService {
     void stop(String googleId);
 
     QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit);
+
+        
 }

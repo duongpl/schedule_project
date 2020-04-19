@@ -48,5 +48,15 @@ public class TimetableController {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PutMapping("/setDefault")
+    public ResponseEntity<Subject> setTimetableDetail(@RequestHeader("GoogleId") String hodGoogleId,
+                                                     @RequestParam("runId") int runId) {
+        try {
+
+            return new ResponseEntity( HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

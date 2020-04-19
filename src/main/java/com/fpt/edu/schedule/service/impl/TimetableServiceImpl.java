@@ -115,6 +115,7 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     @Override
     public void stop(String lecturerId) {
         map.get(lecturerId).stop();
+
         System.out.println("-------------------------Stop-----LecturerId :"+lecturerId);
 
     }
@@ -123,8 +124,10 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId,int page,int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
         GeneticAlgorithm ge =map.get(lecturerId);
+        pagedResultSet.setRunning(ge.isRun());
         if(ge==null) {
             pagedResultSet.setResults(new ArrayList<>());
+            pagedResultSet.setPage(page);
             return pagedResultSet;
         }
             Map<Integer, Runs> mapRuns = ge.getGenInfos();
