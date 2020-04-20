@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,6 @@ import java.util.List;
 @RequestMapping("/api/v1/requests")
 public class RequestController {
     RequestService requestService;
-    private JavaMailSender javaMailSender;
 
 
     @PostMapping("/generate")
@@ -76,7 +74,7 @@ public class RequestController {
 
             msg.setSubject("Logout");
             msg.setText("Ban vua logout");
-            javaMailSender.send(msg);
+
         }catch (Exception e){
             System.out.println(e.getMessage());
         }

@@ -1,25 +1,43 @@
 package com.fpt.edu.schedule.ai.model;
 
 
+import com.fpt.edu.schedule.ai.lib.Record;
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
-import com.fpt.edu.schedule.event.DataEvent;
+import com.fpt.edu.schedule.common.enums.Constant;
+import com.fpt.edu.schedule.dto.Runs;
+import com.fpt.edu.schedule.dto.TimetableDetailDTO;
+import com.fpt.edu.schedule.dto.TimetableEdit;
+import com.fpt.edu.schedule.event.ResponseEvent;
+import com.fpt.edu.schedule.model.TimetableDetail;
+import com.fpt.edu.schedule.repository.base.LecturerRepository;
+import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Component
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Setter
+@Getter
 public class GeneticAlgorithm {
     public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
     public static final int TOURNAMENT_SIZE = 3;
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
+    @Autowired
+    TimetableDetailRepository timetableDetailRepository;
+    @Autowired
+    LecturerRepository lecturerRepository;
     @Autowired
     ApplicationEventPublisher publisher;
     @Autowired
@@ -29,27 +47,25 @@ public class GeneticAlgorithm {
     private int generation;
     private Train train;
     private boolean isRun = true;
-
-    public GeneticAlgorithm(Model model, Train train) {
-        this.generation = 0;
-        this.model = model;
-        this.train = train;
-        this.population = new Population(POPULATION_SIZE, model);
-    }
+    private String lecturerId;
+    Map<Integer, Runs> genInfos = new HashMap<>();
 
     public GeneticAlgorithm() {
     }
 
     public void updateFitness() {
+        System.out.println(this.lecturerId);
         this.population.updateFitness();
         this.generation++;
+
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"run",this.generation));
-
-        this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
-                this.population.getBestIndividuals().getNumberOfViolation());
+        if (this.generation % 10 == 0 || this.generation == 1) {
+            handleTimetable();
+            this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
+                    this.population.getBestIndividuals().getNumberOfViolation());
+        }
     }
 
     public Chromosome selectParent() {
@@ -180,10 +196,13 @@ public class GeneticAlgorithm {
             this.population.getIndividuals().get(i).autoRepair();
         }
     }
+
+    @Async
     public void start() {
         while (true) {
-            if(!this.isRun){
-                publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"stop",this.generation));
+
+            if (!this.isRun) {
+                publisher.publishEvent(new ResponseEvent(this, this.population.getBestIndividuals(), Constant.stopGa, this.generation));
                 break;
             }
             this.updateFitness();
@@ -191,7 +210,25 @@ public class GeneticAlgorithm {
             this.mutate();
         }
     }
-    public void stop(){
-        this.isRun =false;
+
+    public void stop() {
+        this.isRun = false;
+    }
+
+    public void handleTimetable() {
+        List<TimetableDetail> timetableDetails = new ArrayList<>();
+        Vector<Record> records = population.getBestIndividuals().getSchedule();
+        records.forEach(i -> {
+            TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
+            timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+            timetableDetails.add(timetableDetail);
+        });
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
+        genInfos.put(this.generation, run);
     }
 }

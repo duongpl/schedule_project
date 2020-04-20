@@ -18,16 +18,20 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 @Transactional
 public class TimeTableDetailServiceImpl implements TimeTableDetailService {
-    LecturerService lecturerService;
-    TimetableDetailRepository timetableDetailRepository;
-    RoomService roomService;
+
+    private LecturerService lecturerService;
+    private TimetableDetailRepository timetableDetailRepository;
+    private RoomService roomService;
 
 
     @Override

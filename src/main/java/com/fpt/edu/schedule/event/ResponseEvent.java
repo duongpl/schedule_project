@@ -7,11 +7,15 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 @Setter
 public class ResponseEvent extends ApplicationEvent {
-    int number;
-    Chromosome chromosome;
-    public ResponseEvent(Object source,int number,Chromosome chromosome) {
+    public String status;
+    private Chromosome population;
+    int generation;
+
+    public ResponseEvent(Object source, Chromosome population, String status,int generation) {
         super(source);
-        this.number = number;
-        this.chromosome =chromosome;
+        this.population =population;
+        this.status =  status;
+        this.generation = generation;
     }
+
 }

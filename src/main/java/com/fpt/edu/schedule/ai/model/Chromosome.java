@@ -367,7 +367,7 @@ public class Chromosome {
 
         this.fitness = 0.5 * this.calculateFitnessForSubGroup1(fullTimeTeachers) + 0.5 * this.calculateFitnessForSubGroup1(partTimeTeachers);
 
-        this.fitness = 0.5 * (1.0 / (1.0 + this.getNumberOfViolation())) + 0.5 * this.fitness;
+        this.fitness = 0.7 * (1.0 / (1.0 + this.getNumberOfViolation())) + 0.3 * this.fitness;
         this.needTobeUpdated = false;
         return fitness;
     }
