@@ -2,6 +2,8 @@ package com.fpt.edu.schedule.ai.data;
 
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.*;
+import com.fpt.edu.schedule.ai.model.Cofficient;
+import com.fpt.edu.schedule.ai.model.GaParameter;
 import com.fpt.edu.schedule.ai.model.Model;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -201,9 +203,9 @@ public class DataReader {
 //        teachers.add(new Teacher("E2", "E1", 1));
 //        teachers.add(new Teacher("E3", "E1", 2));
 //        teachers.add(new Teacher("E4", "E1", 3));
-        String registerSlotPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
-        String registerSubjectPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
-        String classPath = "D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
+        String registerSlotPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml";
+        String registerSubjectPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml";
+        String classPath = "src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\class_real.xml";
 
         try {
             File f = new File(registerSlotPath);
@@ -329,15 +331,26 @@ public class DataReader {
                 teachers.get(i).setConsecutiveSlotLimit(consecutiveSlotLimit[i]);
                 teachers.get(i).setQuota(quota[i]);
             }
+            GaParameter gaParameter = new GaParameter();
+            gaParameter.setMutationRate(0.25);
+            gaParameter.setPopulationSize(150);
+            gaParameter.setTournamentSize(3);
+            gaParameter.setConvergenceCheckRange(70);
+            Cofficient coff = new Cofficient();
+            coff.setFulltimeCoff(0.5);
+            coff.setParttimeCoff(0.5);
+            coff.setHardConstraintCoff(0.7);
+            coff.setSoftConstraintCoff(0.3);
+            coff.setSlotCoff(0.15);
+            coff.setSubjectCoff(0.15);
+            coff.setNumberOfClassCoff(0.6);
+            coff.setDistanceCoff(0.07);
+            coff.setConsicutiveClassCoff(0.03);
+            coff.setSatisfactionSumCoff(0.7);
+            coff.setStdCoff(0.3);
 
-//            teachers.get(5).setId(1000);
-//            for(ExpectedSlot es:registeredSlots) {
-//                if (es.getTeacherId() == 5) es.setTeacherId(1000);
-//            }
-//            for(ExpectedSubject es:registeredSubjects) {
-//                if (es.getTeacherId() == 5) es.setTeacherId(1000);
-//            }
-            Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects);
+            gaParameter.setCofficient(coff);
+            Model model = new Model(teachers, slots, subjects, classes, registeredSlots, registeredSubjects, gaParameter);
             return model;
         } catch (Exception e) {
             System.out.println(e.getMessage());

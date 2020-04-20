@@ -3,6 +3,7 @@ package com.fpt.edu.schedule.ai.model;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.*;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,8 +19,7 @@ public class Model {
     private Vector<Class> classes;
     private double registeredSlots[][];
     private double registeredSubjects[][];
-
-
+    GaParameter gaParameter;
     public Model(Vector<Teacher> teachers, Vector<SlotGroup> slots, Vector<Subject> subjects, Vector<Class> classes,
                  double[][] registeredSlots, double[][] registeredSubjects) {
         this.teachers = teachers;
@@ -33,13 +33,14 @@ public class Model {
     }
 
     public Model(Vector<Teacher> teachers, Vector<SlotGroup> slots, Vector<Subject> subjects, Vector<Class> classes,
-                 Vector<ExpectedSlot> registeredSlots, Vector<ExpectedSubject> registeredSubjects) {
+                 Vector<ExpectedSlot> registeredSlots, Vector<ExpectedSubject> registeredSubjects, GaParameter gaParameter) {
         this.teachers = teachers;
         this.slots = slots;
         this.subjects = subjects;
         this.classes = classes;
         this.registeredSlots = new double[teachers.size()][10];
         this.registeredSubjects = new double[teachers.size()][subjects.size()];
+        this.gaParameter = gaParameter;
 
         mappingId();
 
@@ -198,7 +199,8 @@ public class Model {
         classes.add(new Class("s1", 1, 7, new Room("asdf"), 0));
         classes.add(new Class("s1", 2, 10, new Room("asdf"), 1));
         classes.add(new Class("s1", 1, 7, new Room("asdf"), 2));
-        Model model = new Model(teachers, slots, subjects, classes, registerSlot, registerSubject);
+        GaParameter gaParameter = new GaParameter();
+        Model model = new Model(teachers, slots, subjects, classes, registerSlot, registerSubject, gaParameter);
 
     }
 }

@@ -7,10 +7,7 @@ import com.fpt.edu.schedule.ai.lib.ExpectedSubject;
 import com.fpt.edu.schedule.ai.lib.Room;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
-import com.fpt.edu.schedule.ai.model.Model;
-import com.fpt.edu.schedule.ai.model.Population;
-import com.fpt.edu.schedule.ai.model.Train;
+import com.fpt.edu.schedule.ai.model.*;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
@@ -83,13 +80,17 @@ public class TimetableServiceImpl implements TimetableService {
         Timetable timetable = timetableRepository.findBySemesterAndTempTrue(semester);
 //        importDataFromFile();
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
+//        importDataFromFile();
+        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
+        //To do: lay parameter info tu fe truyen vao bien gaParameter
+        GaParameter gaParameter = new GaParameter();
+        Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel, gaParameter);
+        Population population = new Population(POPULATION_SIZE, model);
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
         Train train = new Train();
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         ga.setGeneration(0);
         ga.setModel(model);
-        ga.setTrain(train);
-        ga.setPopulation(new Population(POPULATION_SIZE,model));
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
         if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRun()) {
