@@ -27,8 +27,8 @@ public class Semester {
     @JsonIgnore
     private List<Request> requestList;
     @JsonIgnore
-    @OneToOne(mappedBy = "semester", cascade = CascadeType.ALL)
-    private Timetable timeTable;
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    private List<Timetable> timeTable;
 
     public Semester(String season, String year, boolean now) {
         this.season = season;

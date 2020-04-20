@@ -130,7 +130,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     @Override
-    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam) {
+    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam, String groupBy) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
 
@@ -140,7 +140,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             if (shortName.contains("NOT_ASSIGN")) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(null);
-                ((Map) lecturer).replace("shortName",arrayList);
+                ((Map) lecturer).replace("shortName", arrayList);
 
                 queryParam.getInCriteria().put("lecturer", lecturer);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
@@ -158,7 +158,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             if (roomName.contains("NOT_ASSIGN")) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(null);
-                ((Map) room).replace("name",arrayList);
+                ((Map) room).replace("name", arrayList);
                 queryParam.getInCriteria().put("room", room);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
                 List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
@@ -170,12 +170,16 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             }
         }
 
-
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        Map<String, List<TimetableDetailDTO>> collect;
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        if (groupBy.equals("room")) {
+            collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        } else {
+            collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+        }
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        timetableEdits.sort(groupBy.equals("room") ? Comparator.comparing(TimetableEdit::getRoom) : Comparator.comparing(TimetableEdit::getRoom).reversed());
         return timetableEdits;
     }
 

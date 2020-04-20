@@ -7,7 +7,9 @@ import com.fpt.edu.schedule.ai.lib.ExpectedSubject;
 import com.fpt.edu.schedule.ai.lib.Room;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.model.*;
+import com.fpt.edu.schedule.ai.model.GaParameter;
+import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
+import com.fpt.edu.schedule.ai.model.Model;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
@@ -18,7 +20,6 @@ import com.fpt.edu.schedule.service.base.SubjectService;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class TimetableServiceImpl implements TimetableService {
     SemesterRepository semesterRepository;
     TimetableDetailRepository timetableDetailRepository;
     @Autowired
-    private ApplicationContext applicationContext;
+    private GeneticAlgorithm ga;
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
 
@@ -80,21 +81,12 @@ public class TimetableServiceImpl implements TimetableService {
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = findBySemester(semester);
-//        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
-//                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && i.getLecturer()!=null)
-//                .collect(Collectors.toList());
-//        timetableDetails.forEach(i->{
-//            i.setLecturer(null);
-//            timetableDetailRepository.save(i);
-//        });
 
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
 //        importDataFromFile();
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GaParameter gaParameter = new GaParameter();
         Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel, gaParameter);
-        Population population = new Population(POPULATION_SIZE, model);
         ga.setGeneration(0);
         ga.setModel(model);
         ga.setRun(true);
