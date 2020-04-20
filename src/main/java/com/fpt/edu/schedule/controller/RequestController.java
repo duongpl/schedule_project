@@ -6,9 +6,6 @@ import com.fpt.edu.schedule.service.base.RequestService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,22 +64,22 @@ public class RequestController {
         }
     }
 
-    @GetMapping("/sendMail")
-    public String sendMail(@RequestParam("lecturerId") String lecturerId) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        try {
-
-            msg.setSubject("Logout");
-            msg.setText("Ban vua logout");
-
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-
-        }
-        return "redirect:/login";
-    }
+//    @GetMapping("/sendMail")
+//    public String sendMail(@RequestParam("lecturerId") String lecturerId) {
+//        SimpleMailMessage msg = new SimpleMailMessage();
+//        try {
+//
+//            msg.setSubject("Logout");
+//            msg.setText("Ban vua logout");
+//
+//        }catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth != null) {
+//
+//        }
+//        return "redirect:/login";
+//    }
 
 }
