@@ -9,6 +9,7 @@ import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
 import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.Population;
 import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
@@ -98,6 +99,7 @@ public class TimetableServiceImpl implements TimetableService {
         ga.setGeneration(0);
         ga.setModel(model);
         ga.setTrain(train);
+        ga.setPopulation(new Population(POPULATION_SIZE,model));
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
         if (map.get(lecturerId) != null && !map.get(lecturerId).isRun()) {

@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -197,7 +196,6 @@ public class GeneticAlgorithm {
         }
     }
 
-    @Async
     public void start() {
         while (true) {
 
@@ -223,11 +221,11 @@ public class GeneticAlgorithm {
             timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
             timetableDetails.add(timetableDetail);
         });
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
         genInfos.put(this.generation, run);
     }
