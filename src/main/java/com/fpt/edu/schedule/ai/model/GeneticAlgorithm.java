@@ -45,8 +45,14 @@ public class GeneticAlgorithm {
     @Autowired
     Model model;
     private int generation;
-    private Train train;
     private boolean isRun = true;
+    private double lastFitness = -1;
+    private int count = 0;
+    public GeneticAlgorithm(Model model) {
+        this.generation = 0;
+        this.model = model;
+        this.population = new Population(model.getGaParameter().getPopulationSize(), model);
+    }
     private String lecturerId;
     Map<Integer, Runs> genInfos = new HashMap<>();
 
@@ -63,16 +69,14 @@ public class GeneticAlgorithm {
         System.out.println("Generation: " + this.generation);
         if (this.generation % 10 == 0 || this.generation == 1) {
             handleTimetable();
-            this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
-                    this.population.getBestIndividuals().getNumberOfViolation());
         }
     }
 
     public Chromosome selectParent() {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
-            int idx = random.nextInt(POPULATION_SIZE);
+        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
+            int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
             candidates.add(this.population.getIndividuals().get(idx));
         }
 
@@ -89,14 +93,14 @@ public class GeneticAlgorithm {
 
     public Chromosome selectParentRandomly() {
         Random random = new Random();
-        int idx = random.nextInt(POPULATION_SIZE);
+        int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
         return this.population.getIndividuals().get(idx);
     }
 
     public Chromosome selectParent(Vector<Chromosome> individuals) {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
+        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
             int idx = random.nextInt(individuals.size());
             candidates.add(individuals.get(idx));
         }
@@ -114,13 +118,13 @@ public class GeneticAlgorithm {
 
     public void selection1() {
         Population population1 = new Population(this.model);
-        for (int i = 0; i < this.POPULATION_SIZE / 2; i++) {
+        while (population1.getSize() < this.model.getGaParameter().getPopulationSize()) {
             Chromosome p1 = selectParent();
             Chromosome p2 = selectParent();
             Chromosome c1 = this.crossover(p1, p2);
             Chromosome c2 = this.crossover(p2, p1);
             population1.addIndividual(c1);
-            population1.addIndividual(c2);
+            if (population1.getSize() < this.model.getGaParameter().getPopulationSize()) population1.addIndividual(c2);
         }
         this.population = population1;
     }
@@ -187,9 +191,9 @@ public class GeneticAlgorithm {
 
     public void mutate() {
         Random random = new Random();
-        for (int i = 0; i < POPULATION_SIZE; i++) {
+        for (int i = 0; i < this.model.getGaParameter().getPopulationSize(); i++) {
             for (int j = 0; j < 1; j++) {
-                if (random.nextDouble() < MUTATION_RATE) {
+                if (random.nextDouble() < this.model.getGaParameter().getMutationRate()) {
                     this.population.getIndividuals().get(i).mutate();
                 }
             }
@@ -197,18 +201,28 @@ public class GeneticAlgorithm {
         }
     }
 
+    boolean isConverged() {
+        double bestFitness = this.population.getBestIndividuals().getFitness();
+        if (bestFitness == lastFitness) {
+            count ++;
+        } else count = 0;
+        this.lastFitness =  bestFitness;
+        if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
+            return true;
+        }
+        return false;
+    }
+
+
     @Async
     public void start() {
-        while (true) {
+        while (this.isRun && !isConverged()) {
 
-            if (!this.isRun) {
-                publisher.publishEvent(new ResponseEvent(this, this.population.getBestIndividuals(), Constant.stopGa, this.generation));
-                break;
-            }
             this.updateFitness();
             this.selection1();
             this.mutate();
         }
+        publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"stop",this.generation));
     }
 
     public void stop() {

@@ -194,18 +194,17 @@ public class Chromosome {
         if (vt.get(9) != -1) consecutiveSlot += 2;
         else consecutiveSlot = 0;
         if (consecutiveSlot > lim) overLimit++;
-//        if (maxSlotSatisfaction == 0 || maxSubjectSatisfaction == 0) System.out.println("xxxxxxxxxxxxxxxxxxxxxx");
-        double F = (maxSlotSatisfaction == 0 ? 0 : 0.35 * slotSatisfaction / maxSlotSatisfaction) +
-                0.35 * (maxSubjectSatisfaction == 0 ? 0 : subjectSatisfaction / maxSubjectSatisfaction)
-                + 0.3 * (1.0 / (1.0 + Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass())
-                + distance + 3.0 * o5 + overLimit)));
-        F =
-                (maxSlotSatisfaction == 0 ? 0 : 0.15 * slotSatisfaction / maxSlotSatisfaction) +
-                        0.15 * (maxSubjectSatisfaction == 0 ? 0 : subjectSatisfaction / maxSubjectSatisfaction) +
-                        0.6 * 1.0 / (Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass()))) +
-                        0.07 * 1.0 / (1.0 + 9.0 * distance / 105.0) +
-                        0.03 * 1.0 / (1.0 + o5);
 
+        double slotCoff = this.model.getGaParameter().getCofficient().getSlotCoff();
+        double subjectCoff = this.model.getGaParameter().getCofficient().getSubjectCoff();
+        double numberOfClassCoff = this.model.getGaParameter().getCofficient().getNumberOfClassCoff();
+        double distanceCoff = this.model.getGaParameter().getCofficient().getDistanceCoff();
+        double consecutiveClassCoff = this.model.getGaParameter().getCofficient().getConsicutiveClassCoff();
+        double F = slotCoff * (maxSlotSatisfaction == 0 ? 0 : 1.0 * slotSatisfaction / maxSlotSatisfaction) +
+                subjectCoff * (maxSubjectSatisfaction == 0 ? 0 : 1.0 * subjectSatisfaction / maxSubjectSatisfaction) +
+                numberOfClassCoff * 1.0 / (Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass()))) +
+                distanceCoff * 1.0 / (1.0 + 9.0 * distance / 105.0) +
+                consecutiveClassCoff * 1.0 / (1.0 + o5);
         return F;
 
     }
@@ -232,9 +231,6 @@ public class Chromosome {
         for (int i = 0; i < teachers.size(); i++) {
             p[i] = calculateSatisfaction(teachers.get(i).getId());
             total += p[i];
-
-            if (p[i] > 1) System.out.println("xxxxxxxxxxxxxxxxxxx");
-//            System.out.println(p[i]);
         }
 
         double F = 0;
@@ -258,21 +254,12 @@ public class Chromosome {
         }
         double std = Math.sqrt(variance / (teachers.size() - 1));
 
-//        F1 = total - minSatisfaction * this.model.getTeachers().size();
         F1 = maxSatisfaction - minSatisfaction;
-//        this.fitness =  F / this.model.getTeachers().size() * 0.3 +
-//                0.7 * (1.0 / (1.0 + F1 / 2.0 / this.model.getTeachers().size() / (this.model.getTeachers().size() - 1)));
-//        this.fitness = F / this.model.getTeachers().size() * 0.3 +
-////                0.7 * (1.0 / (1.0 + F1 / (this.model.getTeachers().size() - 1)));
-//        double fitness = F / teachers.size() * 0.7 +
-//                0.3 * (1.0 / (1.0 + F1 * 5));
 
-        double fitness = F / teachers.size() * 0.7 +
-                0.3 * (1.0 / (1.0 + std * 5.0));
-
-//        double fitness = F / teachers.size()
-////                + 0.3 * (1.0 / (1.0 + std * 5))
-//        ;
+        double satisfactionSumCoff = this.model.getGaParameter().getCofficient().getSatisfactionSumCoff();
+        double stdCoff = this.model.getGaParameter().getCofficient().getStdCoff();
+        double fitness = F / teachers.size() * satisfactionSumCoff +
+                (1.0 / (1.0 + std * 5.0)) * stdCoff;
         return fitness;
     }
 
@@ -365,9 +352,12 @@ public class Chromosome {
             } else partTimeTeachers.add(teacher);
         }
 
-        this.fitness = 0.5 * this.calculateFitnessForSubGroup1(fullTimeTeachers) + 0.5 * this.calculateFitnessForSubGroup1(partTimeTeachers);
-
-        this.fitness = 0.7 * (1.0 / (1.0 + this.getNumberOfViolation())) + 0.3 * this.fitness;
+        double fulltimeCoff = this.model.getGaParameter().getCofficient().getFulltimeCoff();
+        double parttimeCoff = this.model.getGaParameter().getCofficient().getParttimeCoff();
+        this.fitness = fulltimeCoff * this.calculateFitnessForSubGroup1(fullTimeTeachers) + parttimeCoff * this.calculateFitnessForSubGroup1(partTimeTeachers);
+        double hardConstrainCoff = this.model.getGaParameter().getCofficient().getHardConstraintCoff();
+        double softConstrainCoff = this.model.getGaParameter().getCofficient().getSoftConstraintCoff();
+        this.fitness = hardConstrainCoff * (1.0 / (1.0 + this.getNumberOfViolation())) + softConstrainCoff * this.fitness;
         this.needTobeUpdated = false;
         return fitness;
     }
