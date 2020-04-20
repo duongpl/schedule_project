@@ -9,7 +9,6 @@ import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
 import com.fpt.edu.schedule.ai.model.Model;
-import com.fpt.edu.schedule.ai.model.Population;
 import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
@@ -39,11 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class TimetableServiceImpl implements TimetableService {
-    public static final int POPULATION_SIZE = 1000;
-    public static final double MUTATION_RATE = 0.25;
-    public static final int TOURNAMENT_SIZE = 3;
-    public static final int CLASS_NUMBER = 5;
-    public static final double IN_CLASS_RATE = 0.9;
+    public static final int POPULATION_SIZE = 150;
     public static Map<String, GeneticAlgorithm> map = new HashMap<>();
     SemesterService semesterService;
     TimetableRepository timetableRepository;
@@ -98,15 +93,16 @@ public class TimetableServiceImpl implements TimetableService {
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
 //        importDataFromFile();
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
-        Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         ga.setGeneration(0);
-        ga.setPopulation(population);
         ga.setModel(model);
         ga.setTrain(train);
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
+        if (map.get(lecturerId) != null && !map.get(lecturerId).isRun()) {
+            map.remove(lecturerId);
+        }
         if (map.get(lecturerId) != null && map.get(lecturerId).isRun()) {
             throw new InvalidRequestException("Running arrange !");
         }

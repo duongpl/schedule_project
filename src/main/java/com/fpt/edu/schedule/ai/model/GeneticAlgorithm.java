@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 public class GeneticAlgorithm {
-    public static final int POPULATION_SIZE = 1000;
+    public static final int POPULATION_SIZE = 150;
     public static final double MUTATION_RATE = 0.25;
     public static final int TOURNAMENT_SIZE = 3;
     public static final int CLASS_NUMBER = 5;
