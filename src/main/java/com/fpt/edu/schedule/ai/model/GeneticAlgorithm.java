@@ -127,50 +127,50 @@ public class GeneticAlgorithm {
         this.population = population1;
     }
 
-    public void selection() {
-        Population population1 = new Population(this.model);
-
-        this.population.sortByFitnetss();
-        Vector<Vector<Chromosome>> individualsByClass = new Vector();
-        for (int i = 0; i < CLASS_NUMBER; i++) {
-            individualsByClass.add(new Vector());
-        }
-
-
-        int classSize = POPULATION_SIZE / CLASS_NUMBER + ((POPULATION_SIZE % CLASS_NUMBER == 0) ? 0 : 1);
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            int classId = i / classSize;
-            individualsByClass.get(classId).add(this.population.getIndividuals().get(i));
-        }
-
-        for (int i = 0; i < CLASS_NUMBER; i++) {
-            Collections.shuffle(individualsByClass.get(i));
-        }
-
-
-        int inClassPairNumber = (int) (POPULATION_SIZE * IN_CLASS_RATE / CLASS_NUMBER / 2);
-        for (int i = 0; i < CLASS_NUMBER; i++) {
-            for (int j = 0; j < inClassPairNumber; j++) {
-                Chromosome p1 = selectParent(individualsByClass.get(i));
-                Chromosome p2 = selectParent(individualsByClass.get(i));
-                Chromosome c1 = this.crossover(p1, p2);
-                Chromosome c2 = this.crossover(p2, p1);
-                population1.addIndividual(c1);
-                population1.addIndividual(c2);
-            }
-        }
-
-
-        while (population1.getSize() < POPULATION_SIZE) {
-            Chromosome p1 = selectParentRandomly();
-            Chromosome p2 = selectParentRandomly();
-            Chromosome c1 = this.crossover(p1, p2);
-            Chromosome c2 = this.crossover(p2, p1);
-            population1.addIndividual(c1);
-            population1.addIndividual(c2);
-        }
-        this.population = population1;
-    }
+//    public void selection() {
+//        Population population1 = new Population(this.model);
+//
+//        this.population.sortByFitnetss();
+//        Vector<Vector<Chromosome>> individualsByClass = new Vector();
+//        for (int i = 0; i < CLASS_NUMBER; i++) {
+//            individualsByClass.add(new Vector());
+//        }
+//
+//
+//        int classSize = POPULATION_SIZE / CLASS_NUMBER + ((POPULATION_SIZE % CLASS_NUMBER == 0) ? 0 : 1);
+//        for (int i = 0; i < POPULATION_SIZE; i++) {
+//            int classId = i / classSize;
+//            individualsByClass.get(classId).add(this.population.getIndividuals().get(i));
+//        }
+//
+//        for (int i = 0; i < CLASS_NUMBER; i++) {
+//            Collections.shuffle(individualsByClass.get(i));
+//        }
+//
+//
+//        int inClassPairNumber = (int) (POPULATION_SIZE * IN_CLASS_RATE / CLASS_NUMBER / 2);
+//        for (int i = 0; i < CLASS_NUMBER; i++) {
+//            for (int j = 0; j < inClassPairNumber; j++) {
+//                Chromosome p1 = selectParent(individualsByClass.get(i));
+//                Chromosome p2 = selectParent(individualsByClass.get(i));
+//                Chromosome c1 = this.crossover(p1, p2);
+//                Chromosome c2 = this.crossover(p2, p1);
+//                population1.addIndividual(c1);
+//                population1.addIndividual(c2);
+//            }
+//        }
+//
+//
+//        while (population1.getSize() < POPULATION_SIZE) {
+//            Chromosome p1 = selectParentRandomly();
+//            Chromosome p2 = selectParentRandomly();
+//            Chromosome c1 = this.crossover(p1, p2);
+//            Chromosome c2 = this.crossover(p2, p1);
+//            population1.addIndividual(c1);
+//            population1.addIndividual(c2);
+//        }
+//        this.population = population1;
+//    }
 
     public Chromosome crossover(Chromosome c1, Chromosome c2) {
         Vector<Slot> slots = SlotGroup.getSlotList(this.model.getSlots());
@@ -234,11 +234,11 @@ public class GeneticAlgorithm {
             timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
             timetableDetails.add(timetableDetail);
         });
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
         genInfos.put(this.generation, run);
     }
