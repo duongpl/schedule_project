@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.dto;
 
+import com.fpt.edu.schedule.model.TimetableDetail;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ public class Runs {
     int generation;
     int id;
     List<TimetableEdit> timetableEdit;
+    List<TimetableDetail> timetableDetails;
 
 
 }

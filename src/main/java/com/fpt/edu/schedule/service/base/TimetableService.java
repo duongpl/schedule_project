@@ -16,5 +16,7 @@ public interface TimetableService {
 
     QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit);
 
-        
+    void setDefaultTimetable(int runId,String lecturerId,int semesterId);
+
+
 }

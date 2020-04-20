@@ -7,12 +7,13 @@ import com.fpt.edu.schedule.ai.lib.ExpectedSubject;
 import com.fpt.edu.schedule.ai.lib.Room;
 import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
-import com.fpt.edu.schedule.ai.model.*;
-import com.fpt.edu.schedule.common.enums.Constant;
+import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
+import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.Population;
+import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
-import com.fpt.edu.schedule.event.ResponseEvent;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.SemesterService;
@@ -22,7 +23,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class TimetableServiceImpl implements TimetableService, ApplicationListener<ResponseEvent> {
+public class TimetableServiceImpl implements TimetableService {
     public static final int POPULATION_SIZE = 1000;
     public static final double MUTATION_RATE = 0.25;
     public static final int TOURNAMENT_SIZE = 3;
@@ -58,7 +58,6 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
     private ApplicationContext applicationContext;
     @Autowired
     ApplicationEventPublisher applicationEventPublisher;
-
 
 
     @Override
@@ -88,17 +87,17 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = findBySemester(semester);
-        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
-                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && i.getLecturer()!=null)
-                .collect(Collectors.toList());
-        timetableDetails.forEach(i->{
-            i.setLecturer(null);
-            timetableDetailRepository.save(i);
-        });
+//        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
+//                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && i.getLecturer()!=null)
+//                .collect(Collectors.toList());
+//        timetableDetails.forEach(i->{
+//            i.setLecturer(null);
+//            timetableDetailRepository.save(i);
+//        });
 
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups,lecturer,semester,timetable);
+        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
 //        importDataFromFile();
-        Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel);
+        Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
         Population population = new Population(POPULATION_SIZE, model);
         Train train = new Train();
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
@@ -108,61 +107,59 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
         ga.setTrain(train);
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
-        map.put(lecturerId,ga);
+        if (map.get(lecturerId) != null && map.get(lecturerId).isRun()) {
+            throw new InvalidRequestException("Running arrange !");
+        }
+        map.put(lecturerId, ga);
         ga.start();
+        System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
     }
 
     @Override
     public void stop(String lecturerId) {
         map.get(lecturerId).stop();
-
-        System.out.println("-------------------------Stop-----LecturerId :"+lecturerId);
+        System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
 
     }
 
     @Override
-    public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId,int page,int limit) {
+    public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
-        GeneticAlgorithm ge =map.get(lecturerId);
-        pagedResultSet.setRunning(ge.isRun());
-        if(ge==null) {
+        GeneticAlgorithm ge = map.get(lecturerId);
+
+        pagedResultSet.setRunning(ge == null ? false : ge.isRun());
+        if (ge == null) {
             pagedResultSet.setResults(new ArrayList<>());
             pagedResultSet.setPage(page);
             return pagedResultSet;
         }
-            Map<Integer, Runs> mapRuns = ge.getGenInfos();
-            List<Runs> runsList = mapRuns.values().stream().collect(Collectors.toList());
-            pagedResultSet.setTotalCount(runsList.size());
-            List<Runs> runsListComplete = runsList.stream().skip((page - 1) * limit).limit(limit).collect(Collectors.toList());
-            pagedResultSet.setResults(runsListComplete);
-            pagedResultSet.setSize(runsListComplete.size());
-            pagedResultSet.setPage(page);
+        Map<Integer, Runs> mapRuns = ge.getGenInfos();
+        List<Runs> runsList = mapRuns.values().stream().sorted(Comparator.comparing(Runs::getGeneration)).collect(Collectors.toList());
+        pagedResultSet.setTotalCount(runsList.size());
+        List<Runs> runsListComplete = runsList.stream()
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .collect(Collectors.toList());
+        pagedResultSet.setResults(runsListComplete);
+        pagedResultSet.setSize(runsListComplete.size());
+        pagedResultSet.setPage(page);
 
         return pagedResultSet;
     }
 
-    // xu ly khi stop
     @Override
-    public void onApplicationEvent(ResponseEvent responseEvent) {
-        Chromosome population =responseEvent.getPopulation();
-        String status=responseEvent.getStatus();
-
-        if(status.equals(Constant.stopGa)) {
-//            Vector<Record> records = population.getSchedule();
-//            records.forEach(i -> {
-//                TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
-//                timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
-//                timetableDetailRepository.save(timetableDetail);
-//            });
-        } else {
-            System.out.println(responseEvent.getGeneration());
-        }
+    public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
+        Runs runs = map.get(lecturerId).getGenInfos().get(runId);
+        List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
+        Timetable timetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
+        timetable.setTimetableDetails(timetableDetails);
+        timetableRepository.save(timetable);
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
                              Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
                              Vector<ExpectedSubject> expectedSubjectModel,
-                             int semesterId, String lecturerId, Vector<SlotGroup> slots,Lecturer lecturer,Semester semester,Timetable timetable) {
+                             int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !Character.isAlphabetic(i.getSubject().getCode().charAt(i.getSubject().getCode().length() - 1)))
@@ -262,11 +259,11 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
 
                     for (int t = 0; t < slot.size(); t++) {
                         com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
-                        int levelPrefer = Integer.parseInt(e.getElementsByTagName("Cell").item(t+1).getTextContent());
+                        int levelPrefer = Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent());
                         expectedSlot.setSlotName(slot.get(t));
-                        System.out.println(slot.get(t)+" :"+levelPrefer);
+                        System.out.println(slot.get(t) + " :" + levelPrefer);
                         expectedSlot.setExpected(expected);
-                        expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t+1).getTextContent()));
+                        expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
                         System.out.println();
                         expectedSlots.add(expectedSlot);
 
@@ -319,9 +316,9 @@ public class TimetableServiceImpl implements TimetableService, ApplicationListen
                         }
                         com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
                         expectedSubject.setSubjectCode(subject.get(t));
-                        System.out.println("Subject :" + subject.get(t)+" level :"+Integer.parseInt(e.getElementsByTagName("Cell").item(t+1).getTextContent())) ;
+                        System.out.println("Subject :" + subject.get(t) + " level :" + Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
                         expectedSubject.setExpected(expected);
-                        expectedSubject.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t+1).getTextContent()));
+                        expectedSubject.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
                         System.out.println();
                         expectedSubjects.add(expectedSubject);
 

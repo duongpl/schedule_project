@@ -54,15 +54,18 @@ public class GeneticAlgorithm {
     }
 
     public void updateFitness() {
-      System.out.println(this.lecturerId);
+        System.out.println(this.lecturerId);
         this.population.updateFitness();
         this.generation++;
+
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        handleTimetable();
-        this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
-                this.population.getBestIndividuals().getNumberOfViolation());
+        if (this.generation % 10 == 0 || this.generation == 1) {
+            handleTimetable();
+            this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
+                    this.population.getBestIndividuals().getNumberOfViolation());
+        }
     }
 
     public Chromosome selectParent() {
@@ -193,11 +196,13 @@ public class GeneticAlgorithm {
             this.population.getIndividuals().get(i).autoRepair();
         }
     }
+
     @Async
     public void start() {
         while (true) {
-            if(!this.isRun){
-                publisher.publishEvent(new ResponseEvent(this,this.population.getBestIndividuals(),Constant.stopGa,this.generation));
+
+            if (!this.isRun) {
+                publisher.publishEvent(new ResponseEvent(this, this.population.getBestIndividuals(), Constant.stopGa, this.generation));
                 break;
             }
             this.updateFitness();
@@ -205,11 +210,12 @@ public class GeneticAlgorithm {
             this.mutate();
         }
     }
-    public void stop(){
-        this.isRun =false;
+
+    public void stop() {
+        this.isRun = false;
     }
 
-    public void handleTimetable(){
+    public void handleTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
         records.forEach(i -> {
@@ -222,7 +228,7 @@ public class GeneticAlgorithm {
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
-        Runs run = new Runs(this.population.getBestIndividuals().getFitness(),this.population.getAverageFitness(),this.population.getBestIndividuals().getNumberOfViolation(),0,this.generation,this.generation,timetableEdits);
-        genInfos.put(this.generation,run);
+        Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
+        genInfos.put(this.generation, run);
     }
 }

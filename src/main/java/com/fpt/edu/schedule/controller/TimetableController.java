@@ -42,18 +42,20 @@ public class TimetableController {
         try {
 
             int limitParse = Integer.parseInt(limit);
-            int pageParse=Integer.parseInt(page);
-            return new ResponseEntity(timetableService.getGenerationInfo(hodGoogleId,pageParse,limitParse), HttpStatus.OK);
+            int pageParse = Integer.parseInt(page);
+            return new ResponseEntity(timetableService.getGenerationInfo(hodGoogleId, pageParse, limitParse), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping("/setDefault")
-    public ResponseEntity<Subject> setTimetableDetail(@RequestHeader("GoogleId") String hodGoogleId,
-                                                     @RequestParam("runId") int runId) {
-        try {
 
-            return new ResponseEntity( HttpStatus.OK);
+    @PostMapping("/setDefault")
+    public ResponseEntity<Subject> setTimetableDetail(@RequestHeader("GoogleId") String hodGoogleId,
+                                                      @RequestParam("runId") int runId,
+                                                      @RequestParam("semesterId") int semesterId) {
+        try {
+            timetableService.setDefaultTimetable(runId, hodGoogleId,semesterId);
+            return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
