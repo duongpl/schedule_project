@@ -43,6 +43,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Autowired
     TimetableProcess timetableProcess;
+
     SemesterService semesterService;
     TimetableRepository timetableRepository;
     ExpectedRepository expectedRepository;
@@ -62,8 +63,8 @@ public class TimetableServiceImpl implements TimetableService {
     }
 
     @Override
-    public Timetable findBySemester(Semester semester) {
-        Timetable timetable = timetableRepository.findBySemester(semester);
+    public Timetable findBySemesterTempFalse(Semester semester) {
+        Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semester);
         if (timetable == null) {
             throw new InvalidRequestException("Don't have data for this timetable");
         }
@@ -82,9 +83,9 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<SlotGroup> slotGroups = new Vector<>();
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
-        Timetable timetable = findBySemester(semester);
+        Timetable timetable = timetableRepository.findBySemesterAndTempTrue(semester);
+        importDataFromFile();
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
-//        importDataFromFile();
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
         Train train = new Train();
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
@@ -141,8 +142,15 @@ public class TimetableServiceImpl implements TimetableService {
     public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
         Runs runs = timetableProcess.getMap().get(lecturerId).getGenInfos().get(runId);
         List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
-        Timetable timetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
-        timetable.setTimetableDetails(timetableDetails);
+        Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
+        Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
+                Collectors.toMap(x->x.getLineId(),x -> x));
+        timetableDetails.forEach(i->{
+            timetableMap.get(i.getLineId()).setLecturer(i.getLecturer());
+            timetableMap.get(i.getLineId()).setRoom(i.getRoom());
+
+        });
+        timetable.setTimetableDetails(new ArrayList(timetableMap.values()));
         timetableRepository.save(timetable);
     }
 
@@ -213,8 +221,8 @@ public class TimetableServiceImpl implements TimetableService {
     private void importDataFromFile() {
         try {
 
-            File slotFile = new File("D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml");
-            File subjectFile = new File("D:\\Project\\schedule\\Schedule_project\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml");
+            File slotFile = new File("C:\\Project\\shedule\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml");
+            File subjectFile = new File("C:\\Project\\shedule\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder buider = factory.newDocumentBuilder();
             Document doc = buider.parse(slotFile);
@@ -236,7 +244,6 @@ public class TimetableServiceImpl implements TimetableService {
                         for (int j = 1; j <= 10; j++) {
                             slot.add(e.getElementsByTagName("Cell").item(j).getTextContent());
                         }
-                        System.out.println("All slot " + slot);
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
@@ -304,10 +311,8 @@ public class TimetableServiceImpl implements TimetableService {
                         }
                         com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
                         expectedSubject.setSubjectCode(subject.get(t));
-                        System.out.println("Subject :" + subject.get(t) + " level :" + Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
                         expectedSubject.setExpected(expected);
                         expectedSubject.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
-                        System.out.println();
                         expectedSubjects.add(expectedSubject);
 
 

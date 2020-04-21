@@ -35,7 +35,7 @@ public class ClassNameServiceImpl  implements ClassNameService {
             return classNameRepository.findAll(cns);
         }
         int semester = Integer.parseInt(semesterId);
-        Timetable timetable = timetableService.findBySemester(semesterService.findById(semester));
+        Timetable timetable = timetableService.findBySemesterAndTempFalse(semesterService.findById(semester));
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
         Set<ClassName> classes = timetable.getTimetableDetails().stream().filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()))
                 .map(TimetableDetail::getClassName).collect(Collectors.toSet());

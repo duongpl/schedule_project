@@ -32,4 +32,5 @@ public class TimetableDetail {
     @ManyToOne
     @JoinColumn(name = "timetable_id")
     private Timetable timetable;
+    private int lineId;
 }

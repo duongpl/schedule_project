@@ -118,7 +118,7 @@ public class LecturerServiceImpl implements LecturerService {
         Lecturer lecturer = findByGoogleId(googleId);
         if(status == StatusLecturer.DEACTIVATE) {
             List<TimetableDetail> timetableDetail = timetableDetailRepository.findAllByLecturerAndTimetable(lecturer,
-                    timetableRepository.findBySemester(semesterRepository.getAllByNowIsTrue()));
+                    timetableRepository.findBySemesterAndTempFalse(semesterRepository.getAllByNowIsTrue()));
             // remove all timetable of this lecture
             timetableDetail.stream().forEach(i -> {
                 i.setLecturer(null);

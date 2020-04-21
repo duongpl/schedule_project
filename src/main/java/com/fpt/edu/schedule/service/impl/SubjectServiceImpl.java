@@ -37,7 +37,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public List<Subject> getAllSubjectBySemester(int semesterId,String hodGoogleId) {
-        Timetable timetable=timetableRepository.findBySemester(semesterRepository.findById(semesterId));
+        Timetable timetable=timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
 
         if(timetable == null){
             throw new InvalidRequestException("Don't have subject for this semester !");

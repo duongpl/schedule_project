@@ -8,7 +8,7 @@ import com.fpt.edu.schedule.repository.base.QueryParam;
 public interface TimetableService {
     Timetable save(Timetable timeTable);
 
-    Timetable findBySemester(Semester semester);
+    Timetable findBySemesterTempFalse(Semester semester);
     
     void autoArrange(int semesterId,String hodGoogleId);
 

@@ -148,20 +148,32 @@ public class RequestServiceImpl implements RequestService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
-            Timetable existedTimetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
+            List<Timetable> existedTimetable = timetableRepository.findAllBySemester(semesterRepository.findById(semesterId));
 
-            if (existedTimetable != null) {
-                timetableDetailRepository.deleteAllByTimetable(existedTimetable.getId());
+            if (existedTimetable.size()>0) {
+
+                existedTimetable.forEach(i->{
+                    timetableDetailRepository.deleteAllByTimetable(i.getId());
+                    timetableRepository.deleteById(i.getId());
+                });
                 expectedRepository.deleteAllBySemester(semesterRepository.findById(semesterId));
-                timetableRepository.deleteById(existedTimetable.getId());
             }
             Timetable timeTable = new Timetable();
+            Timetable timeTableTemp = new Timetable();
+            timeTableTemp.setTemp(true);
+            int line = 0;
+            int lineTemp =0;
             while (rowIterator.hasNext()) {
                 int column = 0;
+
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
                 TimetableDetail timetableDetail = new TimetableDetail();
+                TimetableDetail timetableDetailTemp = new TimetableDetail();
                 timeTable.setSemester(semesterRepository.findById(semesterId));
+                timeTableTemp.setSemester(semesterRepository.findById(semesterId));
+                line++;
+                lineTemp++;
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -172,21 +184,35 @@ public class RequestServiceImpl implements RequestService {
                     switch (column) {
                         case 1:
                             timetableDetail.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
+                            timetableDetailTemp.setClassName(classNameRepository.findByName(cell.getStringCellValue().trim()));
+
                             break;
                         case 2:
                             timetableDetail.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
+                            timetableDetailTemp.setSubject(subjectService.getSubjectByCode(cell.getStringCellValue().trim()));
+
                             break;
                         case 3:
                             timetableDetail.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
+                            timetableDetailTemp.setSlot(slotService.getSlotByName(cell.getStringCellValue().trim()));
+
                             break;
                         case 5:
                             timetableDetail.setRoom(roomService.getRoomByName(cell.getStringCellValue().trim()));
+                            timetableDetailTemp.setRoom(roomService.getRoomByName(cell.getStringCellValue().trim()));
                             break;
                     }
                     timetableDetail.setTimetable(timeTable);
+                    timetableDetail.setLineId(line);
                     timeTable.getTimetableDetails().add(timetableDetail);
+
+
+                    timetableDetailTemp.setTimetable(timeTableTemp);
+                    timetableDetailTemp.setLineId(lineTemp);
+                    timeTableTemp.getTimetableDetails().add(timetableDetailTemp);
                 }
             }
+            timetableRepository.save(timeTableTemp);
             timetableRepository.save(timeTable);
         } catch (Exception e) {
             e.printStackTrace();

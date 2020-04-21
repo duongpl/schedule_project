@@ -4,11 +4,9 @@ package com.fpt.edu.schedule.ai.model;
 import com.fpt.edu.schedule.ai.lib.Record;
 import com.fpt.edu.schedule.ai.lib.Slot;
 import com.fpt.edu.schedule.ai.lib.SlotGroup;
-import com.fpt.edu.schedule.common.enums.Constant;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
-import com.fpt.edu.schedule.event.ResponseEvent;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.LecturerRepository;
 import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
@@ -200,7 +198,7 @@ public class GeneticAlgorithm {
         while (true) {
 
             if (!this.isRun) {
-                publisher.publishEvent(new ResponseEvent(this, this.population.getBestIndividuals(), Constant.stopGa, this.generation));
+
                 break;
             }
             this.updateFitness();

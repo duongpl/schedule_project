@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Runs {
     double bestFitness;
-    double avgfitness;
+    double avgFitness;
     double numberOfViolation;
     double std;
     int generation;
