@@ -13,6 +13,7 @@ import com.fpt.edu.schedule.ai.model.Population;
 import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.dto.TimetableProcess;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
@@ -22,7 +23,6 @@ import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -40,7 +40,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TimetableServiceImpl implements TimetableService {
     public static final int POPULATION_SIZE = 150;
-    public static Map<String, GeneticAlgorithm> map = new HashMap<>();
+
+    @Autowired
+    TimetableProcess timetableProcess;
     SemesterService semesterService;
     TimetableRepository timetableRepository;
     ExpectedRepository expectedRepository;
@@ -52,8 +54,6 @@ public class TimetableServiceImpl implements TimetableService {
     TimetableDetailRepository timetableDetailRepository;
     @Autowired
     private ApplicationContext applicationContext;
-    @Autowired
-    ApplicationEventPublisher applicationEventPublisher;
 
 
     @Override
@@ -83,14 +83,6 @@ public class TimetableServiceImpl implements TimetableService {
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = findBySemester(semester);
-//        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
-//                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && i.getLecturer()!=null)
-//                .collect(Collectors.toList());
-//        timetableDetails.forEach(i->{
-//            i.setLecturer(null);
-//            timetableDetailRepository.save(i);
-//        });
-
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
 //        importDataFromFile();
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
@@ -102,20 +94,20 @@ public class TimetableServiceImpl implements TimetableService {
         ga.setPopulation(new Population(POPULATION_SIZE,model));
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
-        if (map.get(lecturerId) != null && !map.get(lecturerId).isRun()) {
-            map.remove(lecturerId);
+        if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRun()) {
+            timetableProcess.getMap().remove(lecturerId);
         }
-        if (map.get(lecturerId) != null && map.get(lecturerId).isRun()) {
+        if (timetableProcess.getMap().get(lecturerId) != null && timetableProcess.getMap().get(lecturerId).isRun()) {
             throw new InvalidRequestException("Running arrange !");
         }
-        map.put(lecturerId, ga);
+        timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
         System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
     }
 
     @Override
     public void stop(String lecturerId) {
-        map.get(lecturerId).stop();
+        timetableProcess.getMap().get(lecturerId).stop();
         System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
 
     }
@@ -123,7 +115,7 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
-        GeneticAlgorithm ge = map.get(lecturerId);
+        GeneticAlgorithm ge = timetableProcess.getMap().get(lecturerId);
 
         pagedResultSet.setRunning(ge == null ? false : ge.isRun());
         if (ge == null) {
@@ -147,7 +139,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Override
     public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
-        Runs runs = map.get(lecturerId).getGenInfos().get(runId);
+        Runs runs = timetableProcess.getMap().get(lecturerId).getGenInfos().get(runId);
         List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
         Timetable timetable = timetableRepository.findBySemester(semesterRepository.findById(semesterId));
         timetable.setTimetableDetails(timetableDetails);
@@ -264,8 +256,6 @@ public class TimetableServiceImpl implements TimetableService {
                         expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
                         System.out.println();
                         expectedSlots.add(expectedSlot);
-
-
                     }
                     expected.setSemester(semesterRepository.getAllByNowIsTrue());
                     expected.setLecturer(lecturer);
