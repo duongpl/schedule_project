@@ -1,6 +1,5 @@
 package com.fpt.edu.schedule;
 
-import com.fpt.edu.schedule.ai.model.GeneticAlgorithm;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -29,14 +28,6 @@ public class SheduleApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println(applicationContext.getDisplayName());
-		System.out.println(applicationContext.getId());
 
-		GeneticAlgorithm myBean = applicationContext.getBean(GeneticAlgorithm.class);
-		myBean.setGeneration(10);
-		System.out.println(myBean.getGeneration());
-		GeneticAlgorithm myBean1 = applicationContext.getBean(GeneticAlgorithm.class);
-		myBean1.setGeneration(20);
-		System.out.println(myBean1.getGeneration());
 	}
 }

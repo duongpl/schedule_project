@@ -130,7 +130,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     @Override
-    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam) {
+    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
 
@@ -169,24 +169,22 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 }
             }
         }
-
-
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        Map<String, List<TimetableDetailDTO>> collect;
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(),
+                i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
+                i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+        if(groupBy.equals("room")) {
+            collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
+            List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+            timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+            return timetableEdits;
+        }
+        collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
         List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         return timetableEdits;
     }
 
-    private String getValidRoom(TimetableDetailDTO timetableDetail, TimetableDetail timetableDetailExisted) {
-        TimetableDetail timetableDetailCheck = timetableDetailRepository.findBySlotAndRoomAndTimetable(timetableDetailExisted.getSlot(),
-                roomService.getRoomByName(timetableDetail.getRoom()), timetableDetailExisted.getTimetable());
-        if (timetableDetailCheck != null && !timetableDetailCheck.getRoom().getName().equals(timetableDetail.getRoom())) {
-            throw new InvalidRequestException(String.format("This room already have timetable Room:%s ,Slot:%s ,Subject:%s ,Department:%s",
-                    timetableDetailCheck.getRoom().getName(), timetableDetailCheck.getSlot().getName(), timetableDetailCheck.getSubject().getCode(), timetableDetailCheck.getSubject().getDepartment()));
-        }
-        return timetableDetail.getRoom();
-    }
 
 }

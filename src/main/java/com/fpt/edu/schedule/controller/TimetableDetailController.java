@@ -39,10 +39,11 @@ public class TimetableDetailController {
         }
     }
     @PostMapping("/filter/forEdit")
-    public ResponseEntity getTimetableForEdit(@RequestBody QueryParam queryParam) {
+    public ResponseEntity getTimetableForEdit(@RequestBody QueryParam queryParam,
+                                              @RequestParam("groupBy") String groupBy) {
         try {
 
-            List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam);
+            List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam,groupBy);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

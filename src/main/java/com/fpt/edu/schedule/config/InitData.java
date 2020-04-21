@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.config;
 
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Role;
 import com.fpt.edu.schedule.model.Semester;
@@ -37,6 +38,7 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             lecturer.setDepartment("CF");
             lecturer.setShortName("admin");
             lecturer.setEmail("dsst.dummy@gmail.com");
+            lecturer.setStatus(StatusLecturer.ACTIVATE);
             lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
             lecturerRepository.save(lecturer);
         }
