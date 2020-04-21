@@ -6,7 +6,6 @@ import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 
 public interface TimetableService {
-    Timetable save(Timetable timeTable);
 
     Timetable findBySemesterTempFalse(Semester semester);
     

@@ -13,8 +13,8 @@ import com.fpt.edu.schedule.ai.model.Population;
 import com.fpt.edu.schedule.ai.model.Train;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
-import com.fpt.edu.schedule.dto.TimetableProcess;
 import com.fpt.edu.schedule.dto.Runs;
+import com.fpt.edu.schedule.dto.TimetableProcess;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.SemesterService;
@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,10 +58,6 @@ public class TimetableServiceImpl implements TimetableService {
     private ApplicationContext applicationContext;
 
 
-    @Override
-    public Timetable save(Timetable timeTable) {
-        return null;
-    }
 
     @Override
     public Timetable findBySemesterTempFalse(Semester semester) {
@@ -84,7 +81,7 @@ public class TimetableServiceImpl implements TimetableService {
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = timetableRepository.findBySemesterAndTempTrue(semester);
-        importDataFromFile();
+//        importDataFromFile();
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
         Train train = new Train();
@@ -168,8 +165,6 @@ public class TimetableServiceImpl implements TimetableService {
         List<Lecturer> lecturers = lecturerRepository.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
                 .filter(i -> expectedRepository.findBySemesterAndLecturer(semester, i) != null)
                 .collect(Collectors.toList());
-        ;
-
         lecturers.forEach(i -> {
             Expected expectedEach = expectedRepository.findBySemesterAndLecturer(semester, i);
             teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
@@ -183,14 +178,16 @@ public class TimetableServiceImpl implements TimetableService {
                 expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepository.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
             });
         });
+        //class model
         timetableDetails.forEach(i -> {
             classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId()));
         });
+        //subject model
         subjects.forEach(i -> {
             subjectModels.add(new Subject(i.getCode(), i.getId()));
         });
 
-
+        //slot model
         SlotGroup m246 = new SlotGroup(3);
         m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M1", 3));
         m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M2", 2));
@@ -221,8 +218,8 @@ public class TimetableServiceImpl implements TimetableService {
     private void importDataFromFile() {
         try {
 
-            File slotFile = new File("C:\\Project\\shedule\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_slot_real.xml");
-            File subjectFile = new File("C:\\Project\\shedule\\src\\main\\java\\com\\fpt\\edu\\schedule\\ai\\data\\teacher_subject_real.xml");
+            File slotFile = ResourceUtils.getFile("classpath:data/teacher_slot_real.xml");
+            File subjectFile = ResourceUtils.getFile("classpath:data/teacher_subject_real.xml");
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder buider = factory.newDocumentBuilder();
             Document doc = buider.parse(slotFile);
