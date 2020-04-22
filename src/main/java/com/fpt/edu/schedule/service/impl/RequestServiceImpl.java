@@ -12,6 +12,8 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,7 +106,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request addReport(Request request, String lecturerId) {
+    public Request addRequest(Request request, String lecturerId) {
         request.setSemester(semesterRepository.getAllByNowIsTrue());
         request.setCreatedDate(new Date());
         request.setStatus(StatusReport.PENDING);
@@ -114,7 +116,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request updateReport(Request request) {
+    public Request updateRequest(Request request) {
         Request existedRequest = requestRepository.findReportById(request.getId());
         if (existedRequest == null) {
             throw new InvalidRequestException("Don't find this report !");
@@ -126,7 +128,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void removeReportById(int id) {
+    public void removeRequestById(int id) {
         Request existedRequest = requestRepository.findReportById(id);
         if (existedRequest == null) {
             throw new InvalidRequestException(String.format("Don't find this report reportId:%s", id));
@@ -135,9 +137,20 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> findByCriteria(QueryParam queryParam) {
+    public QueryParam.PagedResultSet<Request> findByCriteria(QueryParam queryParam) {
+        QueryParam.PagedResultSet page = new QueryParam.PagedResultSet();
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        return requestRepository.findAll(cns);
+        page.setTotalCount((int)requestRepository.count(cns));
+        if(queryParam.getPage() < 1){
+            queryParam.setPage(1);
+            queryParam.setLimit(1000);
+        }
+        Page<Lecturer> lecturers = (Page<Lecturer>)requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()));
+        page.setPage(queryParam.getPage());
+        page.setLimit(queryParam.getLimit());
+        page.setSize(lecturers.getContent().size());
+        page.setResults(lecturers.getContent());
+        return page;
     }
 
 

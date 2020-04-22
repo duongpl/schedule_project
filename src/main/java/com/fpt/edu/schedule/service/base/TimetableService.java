@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.service.base;
 
+import com.fpt.edu.schedule.ai.model.GaParameter;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.model.Timetable;
@@ -9,7 +10,7 @@ public interface TimetableService {
 
     Timetable findBySemesterTempFalse(Semester semester);
     
-    void autoArrange(int semesterId,String hodGoogleId);
+    void autoArrange(int semesterId, String hodGoogleId, GaParameter gaParameter);
 
     void stop(String googleId);
 

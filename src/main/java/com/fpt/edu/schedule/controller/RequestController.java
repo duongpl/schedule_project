@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 
 @AllArgsConstructor
 @RestController
@@ -29,27 +27,26 @@ public class RequestController {
         }
     }
     @PostMapping("/filter")
-    public ResponseEntity<Request> getClassByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<Request> getRequestByCriteria(@RequestBody QueryParam queryParam) {
         try {
-            List<Request> requestList = requestService.findByCriteria(queryParam);
-            return new ResponseEntity(requestList, HttpStatus.OK);
+            return new ResponseEntity(requestService.findByCriteria(queryParam), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PostMapping
-    public ResponseEntity<Request> addReport(@RequestBody Request request,
+    public ResponseEntity<Request> addRequest(@RequestBody Request request,
                                              @RequestHeader("GoogleId") String currentLecturerId) {
         try {
-            return new ResponseEntity(requestService.addReport(request,currentLecturerId), HttpStatus.OK);
+            return new ResponseEntity(requestService.addRequest(request,currentLecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping
-    public ResponseEntity<Request> updateReport(@RequestBody Request request) {
+    public ResponseEntity<Request> updateRequest(@RequestBody Request request) {
         try {
-            return new ResponseEntity(requestService.updateReport(request), HttpStatus.OK);
+            return new ResponseEntity(requestService.updateRequest(request), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -57,7 +54,7 @@ public class RequestController {
     @DeleteMapping("/{reportId}")
     public ResponseEntity remove(@PathVariable("reportId") int expectedId) {
         try {
-            requestService.removeReportById(expectedId);
+            requestService.removeRequestById(expectedId);
             return new ResponseEntity( HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

@@ -10,6 +10,8 @@ import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,8 +26,6 @@ public class LecturerServiceImpl implements LecturerService {
     ExpectedRepository expectedRepository;
     TimetableDetailRepository timetableDetailRepository;
     TimetableRepository timetableRepository;
-
-
 
 
 
@@ -50,9 +50,19 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
-    public List<Lecturer> findByCriteria(QueryParam queryParam) {
+    public QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam) {
+        QueryParam.PagedResultSet page = new QueryParam.PagedResultSet();
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<Lecturer> lecturers = lecturerRepository.findAll(cns);
+        page.setTotalCount((int)lecturerRepository.count(cns));
+        if(queryParam.getPage() < 1){
+            queryParam.setPage(1);
+            queryParam.setLimit(1000);
+        }
+        Page<Lecturer> lecturers = (Page<Lecturer>)lecturerRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()));
+        page.setPage(queryParam.getPage());
+        page.setLimit(queryParam.getLimit());
+        page.setSize(lecturers.getContent().size());
+        page.setResults(lecturers.getContent());
         for (Lecturer u : lecturers) {
             if (expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
                    lecturerRepository.findById(u.getId())) != null) {
@@ -63,7 +73,7 @@ public class LecturerServiceImpl implements LecturerService {
             }
 
         }
-        return lecturers;
+        return page;
     }
 
     @Override

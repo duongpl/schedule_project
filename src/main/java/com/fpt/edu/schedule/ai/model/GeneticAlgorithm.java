@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -64,8 +65,8 @@ public class GeneticAlgorithm {
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        if (this.generation % 10 == 0 || this.generation == 1) {
-            handleTimetable();
+        if (this.generation % 20 == 0 || this.generation == 1) {
+            generateTimetable();
         }
     }
 
@@ -205,6 +206,7 @@ public class GeneticAlgorithm {
         } else count = 0;
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
+            generateTimetable();
             return true;
         }
         return false;
@@ -215,22 +217,17 @@ public class GeneticAlgorithm {
     public void start() {
         while (this.isRun && !isConverged()) {
 
-            if (!this.isRun) {
-
-                break;
-            }
             this.updateFitness();
             this.selection1();
             this.mutate();
         }
-        publisher.publishEvent(new DataEvent(this,this.population.getBestIndividuals(),"stop",this.generation));
     }
 
     public void stop() {
         this.isRun = false;
     }
 
-    public void handleTimetable() {
+    public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
         records.forEach(i -> {

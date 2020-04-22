@@ -67,7 +67,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Async
     @Override
-    public void autoArrange(int semesterId, String lecturerId) {
+    public void autoArrange(int semesterId, String lecturerId,GaParameter gaParameter) {
 
         Vector<Teacher> teacherModels = new Vector<>();
         Vector<Subject> subjectModels = new Vector<>();
@@ -78,27 +78,14 @@ public class TimetableServiceImpl implements TimetableService {
         Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = timetableRepository.findBySemesterAndTempTrue(semester);
-//        importDataFromFile();
+        checkGaParameter(gaParameter);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
-//        importDataFromFile();
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
-        GaParameter gaParameter = new GaParameter();
+        GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel, gaParameter);
         Population population = new Population(POPULATION_SIZE, model);
-        Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel);
-        Train train = new Train();
-        GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
-        ga.setGeneration(0);
-        ga.setModel(model);
-        ga.setRun(true);
-        ga.setLecturerId(lecturerId);
-        if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRun()) {
-            timetableProcess.getMap().remove(lecturerId);
-        }
-        if (timetableProcess.getMap().get(lecturerId) != null && timetableProcess.getMap().get(lecturerId).isRun()) {
-            throw new InvalidRequestException("Running arrange !");
-        }
+        setAttributeForGa(ga,population,model,lecturerId);
+        checkExistedGa(lecturerId);
         timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
         System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
@@ -108,7 +95,6 @@ public class TimetableServiceImpl implements TimetableService {
     public void stop(String lecturerId) {
         timetableProcess.getMap().get(lecturerId).stop();
         System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
-
     }
 
     @Override
@@ -142,8 +128,8 @@ public class TimetableServiceImpl implements TimetableService {
         List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
         Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
         Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
-                Collectors.toMap(x->x.getLineId(),x -> x));
-        timetableDetails.forEach(i->{
+                Collectors.toMap(x -> x.getLineId(), x -> x));
+        timetableDetails.forEach(i -> {
             timetableMap.get(i.getLineId()).setLecturer(i.getLecturer());
             timetableMap.get(i.getLineId()).setRoom(i.getRoom());
 
@@ -151,7 +137,37 @@ public class TimetableServiceImpl implements TimetableService {
         timetable.setTimetableDetails(new ArrayList(timetableMap.values()));
         timetableRepository.save(timetable);
     }
+    private void checkExistedGa(String lecturerId){
+        if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRun()) {
+            timetableProcess.getMap().remove(lecturerId);
+        }
+        if (timetableProcess.getMap().get(lecturerId) != null && timetableProcess.getMap().get(lecturerId).isRun()) {
+            throw new InvalidRequestException("Running arrange !");
+        }
+    }
+    private void setAttributeForGa(GeneticAlgorithm ga,Population population,Model model,String lecturerId){
+        ga.setPopulation(population);
+        ga.setGeneration(0);
+        ga.setModel(model);
+        ga.setRun(true);
+        ga.setLecturerId(lecturerId);
+    }
+    private void checkGaParameter(GaParameter gaParam){
+        Cofficient cofficient =gaParam.getCofficient();
+        if(cofficient.getSlotCoff()+cofficient.getSubjectCoff()+cofficient.getNumberOfClassCoff()+cofficient.getDistanceCoff()!=1){
+            throw new InvalidRequestException("Sum of slotCoff,subjectCoff,numberOfClassCoff,distanceCoff must be equal 1!");
+        }
+        if(cofficient.getStdCoff()+cofficient.getSatisfactionSumCoff() != 1){
+            throw new InvalidRequestException("Sum of stdCoff,satisfactionSum must be equal 1!");
+        }
+        if(cofficient.getFulltimeCoff()+cofficient.getParttimeCoff() != 1){
+            throw new InvalidRequestException("Sum of fullTimeCoff,PartimeCoff must be equal 1!");
+        }
+        if(cofficient.getHardConstraintCoff()+cofficient.getSoftConstraintCoff() !=1){
+            throw new InvalidRequestException("Sum of hardCoff,SoftCoff must be equal 1!");
+        }
 
+    }
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
                              Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
                              Vector<ExpectedSubject> expectedSubjectModel,

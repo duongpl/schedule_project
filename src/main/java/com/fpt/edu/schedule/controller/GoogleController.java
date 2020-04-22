@@ -27,7 +27,7 @@ public class GoogleController {
 
 
     @GetMapping("login")
-    public Lecturer getAccessToken(@RequestParam("accessToken") String accessToken, HttpServletRequest request) throws ClientProtocolException, IOException {
+    public Lecturer getLecturerAccessToken(@RequestParam("accessToken") String accessToken, HttpServletRequest request) throws ClientProtocolException, IOException {
 
         GooglePojo googlePojo = googleUtils.getUserInfo(accessToken);
 //        if (!googlePojo.getHd().equalsIgnoreCase("fpt.edu.vn")) {

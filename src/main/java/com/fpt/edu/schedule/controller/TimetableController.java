@@ -1,11 +1,15 @@
 package com.fpt.edu.schedule.controller;
 
+import com.fpt.edu.schedule.ai.model.GaParameter;
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Subject;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @AllArgsConstructor
 @RestController
@@ -15,11 +19,12 @@ public class TimetableController {
 
     @PostMapping("/auto-arrange")
     public ResponseEntity<Subject> autoArrange(@RequestParam("semesterId") int semesterId,
-                                               @RequestHeader("GoogleId") String hodGoogleId) {
+                                               @RequestHeader("GoogleId") String hodGoogleId,
+                                               @Valid @RequestBody GaParameter gaParameter) {
         try {
-            timetableService.autoArrange(semesterId, hodGoogleId);
+            timetableService.autoArrange(semesterId, hodGoogleId, gaParameter);
             return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (InvalidRequestException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -54,7 +59,7 @@ public class TimetableController {
                                                       @RequestParam("runId") int runId,
                                                       @RequestParam("semesterId") int semesterId) {
         try {
-            timetableService.setDefaultTimetable(runId, hodGoogleId,semesterId);
+            timetableService.setDefaultTimetable(runId, hodGoogleId, semesterId);
             return new ResponseEntity(HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
