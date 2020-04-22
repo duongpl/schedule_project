@@ -207,6 +207,7 @@ public class GeneticAlgorithm {
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
             generateTimetable();
+            this.isRun =false;
             return true;
         }
         return false;
