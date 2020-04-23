@@ -108,12 +108,12 @@ public class TimetableServiceImpl implements TimetableService {
             pagedResultSet.setPage(page);
             return pagedResultSet;
         }
-        Map<Integer, Runs> mapRuns = ge.getGenInfos();
-        List<Runs> runsList = mapRuns.values().stream().sorted(Comparator.comparing(Runs::getGeneration)).collect(Collectors.toList());
+        Queue runsList = ge.getGenInfos();
         pagedResultSet.setTotalCount(runsList.size());
-        List<Runs> runsListComplete = runsList.stream()
+        List<Runs> runsListComplete = (List<Runs>) runsList.stream()
                 .skip((page - 1) * limit)
                 .limit(limit)
+                .sorted(Comparator.comparingInt(Runs::getId))
                 .collect(Collectors.toList());
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
@@ -124,7 +124,13 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Override
     public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
-        Runs runs = timetableProcess.getMap().get(lecturerId).getGenInfos().get(runId);
+        Queue<Runs> q = timetableProcess.getMap().get(lecturerId).getGenInfos();
+
+        List<Runs> runsQueue = new ArrayList<>(timetableProcess.getMap().get(lecturerId).getGenInfos());
+        Runs runs = runsQueue.stream()
+                .filter(i->i.getId() == runId)
+                .findAny()
+                .orElse(null);
         List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
         Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
         Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
@@ -173,7 +179,8 @@ public class TimetableServiceImpl implements TimetableService {
                              Vector<ExpectedSubject> expectedSubjectModel,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
-        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails().stream()
+        List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
+                .stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !Character.isAlphabetic(i.getSubject().getCode().charAt(i.getSubject().getCode().length() - 1)))
                 .collect(Collectors.toList());
         List<Expected> expected = expectedRepository.findAllBySemester(semester);
@@ -187,7 +194,9 @@ public class TimetableServiceImpl implements TimetableService {
             teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
         });
         //expected model
-        expected.stream().filter(i -> lecturers.contains(i.getLecturer())).forEach(i -> {
+        expected.stream()
+                .filter(i -> lecturers.contains(i.getLecturer()))
+                .forEach(i -> {
             i.getExpectedSlots().forEach(s -> {
                 expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
             });

@@ -40,7 +40,7 @@ public class Semester {
     private boolean hasData;
 
     public boolean isHasData() {
-        if(this.timeTable != null){
+        if(this.timeTable.size() >0 ){
            return true;
         }
         return false;

@@ -58,7 +58,8 @@ public class LecturerServiceImpl implements LecturerService {
             queryParam.setPage(1);
             queryParam.setLimit(1000);
         }
-        Page<Lecturer> lecturers = (Page<Lecturer>)lecturerRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()));
+        Page<Lecturer> lecturers = lecturerRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1
+                , queryParam.getLimit()));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(lecturers.getContent().size());
@@ -71,7 +72,6 @@ public class LecturerServiceImpl implements LecturerService {
             if (u.getRole().getRoleName().equals(Role.ROLE_ADMIN.getName())) {
                 u.setHeadOfDepartment(true);
             }
-
         }
         return page;
     }

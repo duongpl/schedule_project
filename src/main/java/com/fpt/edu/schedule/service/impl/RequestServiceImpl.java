@@ -14,6 +14,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -145,7 +146,8 @@ public class RequestServiceImpl implements RequestService {
             queryParam.setPage(1);
             queryParam.setLimit(1000);
         }
-        Page<Lecturer> lecturers = (Page<Lecturer>)requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()));
+        Page<Lecturer> lecturers = (Page<Lecturer>)requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()
+                , Sort.by(queryParam.getSortField()).ascending()));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(lecturers.getContent().size());

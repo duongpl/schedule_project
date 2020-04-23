@@ -7,7 +7,7 @@ import javax.validation.constraints.Min;
 
 @Data
 public class GaParameter {
-    @Min(value = 150)
+    @Min(value = 50)
     private int populationSize;
     @Max(value =1)
     private double mutationRate;
