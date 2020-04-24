@@ -147,7 +147,7 @@ public class RequestServiceImpl implements RequestService {
             queryParam.setLimit(1000);
         }
         Page<Lecturer> lecturers = (Page<Lecturer>)requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()
-                , Sort.by(queryParam.getSortField()).ascending()));
+                , Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC,queryParam.getSortField())));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(lecturers.getContent().size());

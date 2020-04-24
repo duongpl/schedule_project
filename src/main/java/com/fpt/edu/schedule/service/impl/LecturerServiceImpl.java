@@ -12,6 +12,7 @@ import com.fpt.edu.schedule.service.base.LecturerService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class LecturerServiceImpl implements LecturerService {
             queryParam.setLimit(1000);
         }
         Page<Lecturer> lecturers = lecturerRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1
-                , queryParam.getLimit()));
+                , queryParam.getLimit(), queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC) );
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(lecturers.getContent().size());
