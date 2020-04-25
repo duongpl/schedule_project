@@ -214,7 +214,8 @@ public class GeneticAlgorithm {
         } else count = 0;
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
-
+            generateTimetable();
+            this.isRun =false;
             return true;
         }
         return false;
@@ -223,7 +224,8 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
-        while (this.isRun ) {
+        while (this.isRun && !isConverged()) {
+
             this.updateFitness();
             this.selection1();
             this.mutate();
