@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 
+import com.fpt.edu.schedule.common.constant.MessageResponse;
 import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
@@ -37,7 +38,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer addLecture(Lecturer lecturer, String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
         if (lecturerRepository.findByEmail(lecturer.getEmail()) != null) {
-            throw new InvalidRequestException(String.format("Already have this lecturer %s ", lecturer.getEmail()));
+            throw new InvalidRequestException(String.format(MessageResponse.msgAlreadyHaveEmail, lecturer.getEmail()));
         }
         Lecturer hod = findByGoogleId(hodGoogleId);
         newLecturer.setStatus(StatusLecturer.ACTIVATE);

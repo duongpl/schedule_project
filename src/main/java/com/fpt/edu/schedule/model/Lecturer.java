@@ -34,7 +34,8 @@ public class Lecturer {
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
-
+    @OneToMany(mappedBy = "lecturer", orphanRemoval=true)
+    private List<TimetableDetail> timetableDetails;
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Expected> expectedList;
