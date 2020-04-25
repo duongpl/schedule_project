@@ -3,11 +3,13 @@ package com.fpt.edu.schedule.repository.base;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.model.Lecturer;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
 
-public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpecificationExecutor<Lecturer> {
+public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpecificationExecutor<Lecturer>
+        ,PagingAndSortingRepository<Lecturer, String> {
 
     Lecturer save(Lecturer lecturer);
 

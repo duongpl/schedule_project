@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -42,14 +43,27 @@ public class GeneticAlgorithm {
     @Autowired
     Model model;
     private int generation;
-    private Train train;
     private boolean isRun = true;
+    private double lastFitness = -1;
+    private int count = 0;
     private String lecturerId;
-    Map<Integer, Runs> genInfos = new HashMap<>();
+    Queue genInfos =  new PriorityQueue();
+
+
+
+    public GeneticAlgorithm(Model model) {
+        this.generation = 0;
+        this.model = model;
+        this.population = new Population(model.getGaParameter().getPopulationSize(), model);
+    }
+    ;
 
     public GeneticAlgorithm() {
+
     }
 
+
+    @Async
     public void updateFitness() {
         System.out.println(this.lecturerId);
         this.population.updateFitness();
@@ -58,18 +72,17 @@ public class GeneticAlgorithm {
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
-        if (this.generation % 10 == 0 || this.generation == 1) {
-            handleTimetable();
-            this.train.notify(this.population.getBestIndividuals(), this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(),
-                    this.population.getBestIndividuals().getNumberOfViolation());
+
+        if (this.generation % 10  == 0 || this.generation == 1) {
+            generateTimetable();
         }
     }
 
     public Chromosome selectParent() {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
-            int idx = random.nextInt(POPULATION_SIZE);
+        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
+            int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
             candidates.add(this.population.getIndividuals().get(idx));
         }
 
@@ -86,14 +99,14 @@ public class GeneticAlgorithm {
 
     public Chromosome selectParentRandomly() {
         Random random = new Random();
-        int idx = random.nextInt(POPULATION_SIZE);
+        int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
         return this.population.getIndividuals().get(idx);
     }
 
     public Chromosome selectParent(Vector<Chromosome> individuals) {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
+        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
             int idx = random.nextInt(individuals.size());
             candidates.add(individuals.get(idx));
         }
@@ -111,13 +124,13 @@ public class GeneticAlgorithm {
 
     public void selection1() {
         Population population1 = new Population(this.model);
-        for (int i = 0; i < this.POPULATION_SIZE / 2; i++) {
+        while (population1.getSize() < this.model.getGaParameter().getPopulationSize()) {
             Chromosome p1 = selectParent();
             Chromosome p2 = selectParent();
             Chromosome c1 = this.crossover(p1, p2);
             Chromosome c2 = this.crossover(p2, p1);
             population1.addIndividual(c1);
-            population1.addIndividual(c2);
+            if (population1.getSize() < this.model.getGaParameter().getPopulationSize()) population1.addIndividual(c2);
         }
         this.population = population1;
     }
@@ -184,9 +197,9 @@ public class GeneticAlgorithm {
 
     public void mutate() {
         Random random = new Random();
-        for (int i = 0; i < POPULATION_SIZE; i++) {
+        for (int i = 0; i < this.model.getGaParameter().getPopulationSize(); i++) {
             for (int j = 0; j < 1; j++) {
-                if (random.nextDouble() < MUTATION_RATE) {
+                if (random.nextDouble() < this.model.getGaParameter().getMutationRate()) {
                     this.population.getIndividuals().get(i).mutate();
                 }
             }
@@ -194,13 +207,23 @@ public class GeneticAlgorithm {
         }
     }
 
+    boolean isConverged() {
+        double bestFitness = this.population.getBestIndividuals().getFitness();
+        if (bestFitness == lastFitness) {
+            count ++;
+        } else count = 0;
+        this.lastFitness =  bestFitness;
+        if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
+
+            return true;
+        }
+        return false;
+    }
+
+
+    @Async
     public void start() {
-        while (true) {
-
-            if (!this.isRun) {
-
-                break;
-            }
+        while (this.isRun ) {
             this.updateFitness();
             this.selection1();
             this.mutate();
@@ -210,8 +233,7 @@ public class GeneticAlgorithm {
     public void stop() {
         this.isRun = false;
     }
-
-    public void handleTimetable() {
+    public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
         records.forEach(i -> {
@@ -219,12 +241,24 @@ public class GeneticAlgorithm {
             timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
             timetableDetails.add(timetableDetail);
         });
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream()
+                .distinct()
+                .map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
-        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
-        List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+        Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS
+                .stream()
+                .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+        List<TimetableEdit> timetableEdits = collect
+                .entrySet()
+                .stream().map(i -> new TimetableEdit(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
-        genInfos.put(this.generation, run);
+        if (genInfos.size() > 29) {
+            genInfos.poll();
+        }
+        System.out.println(genInfos.size());
+        genInfos.add(run);
+
     }
 }

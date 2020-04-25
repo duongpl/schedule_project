@@ -20,6 +20,7 @@ public class Lecturer {
     private int id;
     private String googleId;
     private String fullName;
+    @Column(unique = true)
     private String shortName;
     private String email;
     private String phone;

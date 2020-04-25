@@ -54,7 +54,7 @@ public class LecturerController {
     public ResponseEntity<Lecturer> getLecturerByCriteria(@RequestBody QueryParam queryParam) {
         try {
 
-            List<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam);
+            QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam);
             return new ResponseEntity(lecturerList, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

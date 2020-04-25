@@ -20,7 +20,6 @@ public class BaseSpecifications<T> implements Specification<T> {
         Map<String, Object> criteria = queryParam.getCriteria();
         Map<String, Object> inCriteria = queryParam.getInCriteria();
         ObjectMapper oMapper = new ObjectMapper();
-        String sortField = queryParam.getSortField();
         List<Predicate> predicates = new ArrayList();
 
         if (criteria != null) {
@@ -87,9 +86,6 @@ public class BaseSpecifications<T> implements Specification<T> {
             }
 
             predicates.add(criteriaBuilder.and(predicateList1.toArray(new Predicate[0])));
-        }
-        if (sortField != null && sortField.length() > 0) {
-            query.orderBy(queryParam.isAscending() ? criteriaBuilder.asc(getPath(root, sortField)) : criteriaBuilder.desc(getPath(root, sortField)));
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }

@@ -25,6 +25,18 @@ public class QueryParam<T> {
 
         private int page;
         private boolean running;
+        private int limit;
+        private int size;
+        private int totalCount;
+        private List<T> results;
+
+        public int getLimit() {
+            return limit;
+        }
+
+        public void setLimit(int limit) {
+            this.limit = limit;
+        }
 
         public boolean isRunning() {
             return running;
@@ -34,9 +46,6 @@ public class QueryParam<T> {
             this.running = running;
         }
 
-        private int size;
-        private int totalCount;
-        private List<T> results;
 
         public int getPage() {
             return page;
