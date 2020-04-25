@@ -68,7 +68,6 @@ public class TimetableServiceImpl implements TimetableService {
     @Async
     @Override
     public void autoArrange(int semesterId, String lecturerId,GaParameter gaParameter) {
-
         Vector<Teacher> teacherModels = new Vector<>();
         Vector<Subject> subjectModels = new Vector<>();
         Vector<com.fpt.edu.schedule.ai.lib.Class> classModels = new Vector<>();
@@ -96,7 +95,6 @@ public class TimetableServiceImpl implements TimetableService {
         timetableProcess.getMap().get(lecturerId).stop();
         System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
     }
-
     @Override
     public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
@@ -118,7 +116,7 @@ public class TimetableServiceImpl implements TimetableService {
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
         pagedResultSet.setPage(page);
-
+        System.out.println("size-map-------------"  +timetableProcess.getMap().size());
         return pagedResultSet;
     }
 

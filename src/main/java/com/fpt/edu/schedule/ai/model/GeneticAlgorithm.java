@@ -62,6 +62,8 @@ public class GeneticAlgorithm {
 
     }
 
+
+    @Async
     public void updateFitness() {
         System.out.println(this.lecturerId);
         this.population.updateFitness();
@@ -212,8 +214,7 @@ public class GeneticAlgorithm {
         } else count = 0;
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
-            generateTimetable();
-            this.isRun =false;
+
             return true;
         }
         return false;
@@ -222,8 +223,7 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
-        while (this.isRun && !isConverged()) {
-
+        while (this.isRun ) {
             this.updateFitness();
             this.selection1();
             this.mutate();
@@ -233,7 +233,6 @@ public class GeneticAlgorithm {
     public void stop() {
         this.isRun = false;
     }
-   @Async
     public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
