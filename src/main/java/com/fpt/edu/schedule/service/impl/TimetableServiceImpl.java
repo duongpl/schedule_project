@@ -109,9 +109,9 @@ public class TimetableServiceImpl implements TimetableService {
         Queue runsList = ge.getGenInfos();
         pagedResultSet.setTotalCount(runsList.size());
         List<Runs> runsListComplete = (List<Runs>) runsList.stream()
+                .sorted(Comparator.comparingInt(Runs::getId))
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .sorted(Comparator.comparingInt(Runs::getId))
                 .collect(Collectors.toList());
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
