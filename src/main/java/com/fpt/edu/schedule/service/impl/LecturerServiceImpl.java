@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,8 +50,13 @@ public class LecturerServiceImpl implements LecturerService {
         return lecturerRepository.save(newLecturer);
     }
 
+    @Transactional
     @Override
     public void remove(int id) {
+        Lecturer lec = lecturerRepository.findById(id);
+        if(lec.isLogin()){
+            timetableDetailRepository.deleteByLecturer(id);
+        }
         lecturerRepository.removeById(id);
     }
 

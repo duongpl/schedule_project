@@ -167,7 +167,7 @@ public class RequestServiceImpl implements RequestService {
 
             if (existedTimetable.size()>0) {
 
-                existedTimetable.forEach(i->{
+                existedTimetable.stream().forEach(i->{
                     timetableDetailRepository.deleteAllByTimetable(i.getId());
                     timetableRepository.deleteById(i.getId());
                 });

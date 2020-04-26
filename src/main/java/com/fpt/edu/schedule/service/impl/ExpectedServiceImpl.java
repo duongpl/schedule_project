@@ -46,20 +46,32 @@ public class ExpectedServiceImpl implements ExpectedService {
         Lecturer lecturer = lecturerService.findByGoogleId(expected.getLecturer().getGoogleId());
 
         //get all subject and slot request
-        List<String> slotRequests = expected.getExpectedSlots().stream().map(ExpectedSlot::getSlotName).collect(Collectors.toList());
-        List<String> subjectRequests = expected.getExpectedSubjects().stream().map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
+        List<String> slotRequests = expected.getExpectedSlots().stream()
+                .map(ExpectedSlot::getSlotName)
+                .collect(Collectors.toList());
+        List<String> subjectRequests = expected.getExpectedSubjects().stream()
+                .map(ExpectedSubject::getSubjectCode)
+                .collect(Collectors.toList());
         List<Subject> subjects = subjectService.getAllSubjectBySemester(expected.getSemester().getId(), lecturer.getGoogleId());
-        List<Subject> subjectsNotContainInRequest = subjects.stream().filter(i -> !subjectRequests.contains(i.getCode())).collect(Collectors.toList());
-        List<String> slotNotContainInRequest = SLOT_LIST.stream().filter(o -> !slotRequests.contains(o)).collect(Collectors.toList());
-        subjectsNotContainInRequest.forEach(i -> expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode())));
-        slotNotContainInRequest.forEach(i -> expected.getExpectedSlots().add(new ExpectedSlot(i)));
+        List<Subject> subjectsNotContainInRequest = subjects.stream()
+                .filter(i -> !subjectRequests.contains(i.getCode()))
+                .collect(Collectors.toList());
+        List<String> slotNotContainInRequest = SLOT_LIST.stream()
+                .filter(o -> !slotRequests.contains(o))
+                .collect(Collectors.toList());
+        subjectsNotContainInRequest.stream()
+                .forEach(i -> expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode())));
+        slotNotContainInRequest.stream()
+                .forEach(i -> expected.getExpectedSlots().add(new ExpectedSlot(i)));
         expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
 
         //assign parent of each child
-        expected.getExpectedSlots().stream().forEach(i -> i.setExpected(expected));
-        expected.getExpectedSubjects().stream().forEach(i -> i.setExpected(expected));
+        expected.getExpectedSlots().stream()
+                .forEach(i -> i.setExpected(expected));
+        expected.getExpectedSubjects().stream()
+                .forEach(i -> i.setExpected(expected));
         return expectedRepository.save(expected);
     }
 
@@ -75,10 +87,10 @@ public class ExpectedServiceImpl implements ExpectedService {
             existedExpected.getExpectedNote().setExpected(existedExpected);
         }
         if (expected.getExpectedSlots() != null) {
-            expected.getExpectedSlots().forEach(i -> expectedSlotService.update(i));
+            expected.getExpectedSlots().stream().forEach(i -> expectedSlotService.update(i));
         }
         if (expected.getExpectedSubjects() != null) {
-            expected.getExpectedSubjects().forEach(i -> expectedSubjectService.update(i));
+            expected.getExpectedSubjects().stream().forEach(i -> expectedSubjectService.update(i));
         }
         existedExpected.setUpdatedDate(new Date());
         return expectedRepository.save(existedExpected);
@@ -106,8 +118,12 @@ public class ExpectedServiceImpl implements ExpectedService {
         if (expected == null) {
             Expected newExpected = new Expected();
             List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId,lecturerId);
-            List<ExpectedSubject> expectedSubjectList = subjects.stream().map(i -> new ExpectedSubject(i.getCode())).collect(Collectors.toList());
-            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream().map(i -> new ExpectedSlot(i)).collect(Collectors.toList());
+            List<ExpectedSubject> expectedSubjectList = subjects.stream()
+                    .map(i -> new ExpectedSubject(i.getCode()))
+                    .collect(Collectors.toList());
+            List<ExpectedSlot> expectedSlot = SLOT_LIST.stream()
+                    .map(i -> new ExpectedSlot(i))
+                    .collect(Collectors.toList());
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.findByGoogleId(lecturerId));
@@ -133,15 +149,16 @@ public class ExpectedServiceImpl implements ExpectedService {
         ExpectedNote expectedNote = expected.getExpectedNote();
         newExpected.setLecturer(expected.getLecturer());
         //convert data
-        List<ExpectedSubject> expectedSubjects = expected.getExpectedSubjects().stream().map(i -> new ExpectedSubject(i.getSubjectCode(), i.getLevelOfPrefer(), newExpected))
+        List<ExpectedSubject> expectedSubjects = expected.getExpectedSubjects().stream()
+                .map(i -> new ExpectedSubject(i.getSubjectCode(), i.getLevelOfPrefer(), newExpected))
                 .collect(Collectors.toList());
-        List<ExpectedSlot> expectedSlots = expected.getExpectedSlots().stream().map(i -> new ExpectedSlot(i.getSlotName(), i.getLevelOfPrefer(), newExpected))
+        List<ExpectedSlot> expectedSlots = expected.getExpectedSlots().stream()
+                .map(i -> new ExpectedSlot(i.getSlotName(), i.getLevelOfPrefer(), newExpected))
                 .collect(Collectors.toList());
 
         newExpected.setExpectedSubjects(expectedSubjects);
         newExpected.setExpectedSlots(expectedSlots);
         newExpected.setExpectedNote(new ExpectedNote(expectedNote.getExpectedNumOfClass(), expectedNote.getMaxConsecutiveSlot(), expectedNote.getNote(), newExpected));
-
         newExpected.setUpdatedDate(new Date());
         newExpected.setCreatedDate(new Date());
         newExpected.setSemester(semesterRepository.getAllByNowIsTrue());

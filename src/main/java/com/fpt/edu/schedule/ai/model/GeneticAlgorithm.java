@@ -47,6 +47,7 @@ public class GeneticAlgorithm {
     private double lastFitness = -1;
     private int count = 0;
     private String lecturerId;
+    private int stepGen;
     Queue genInfos =  new PriorityQueue();
 
 
@@ -73,7 +74,7 @@ public class GeneticAlgorithm {
         System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
         System.out.println("Generation: " + this.generation);
 
-        if (this.generation % 10  == 0 || this.generation == 1) {
+        if (this.generation % this.stepGen  == 0 || this.generation == 1) {
             generateTimetable();
         }
     }
@@ -215,7 +216,7 @@ public class GeneticAlgorithm {
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
             generateTimetable();
-            this.isRun =false;
+
             return true;
         }
         return false;
@@ -224,7 +225,7 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
-        while (this.isRun && !isConverged()) {
+        while (this.isRun) {
 
             this.updateFitness();
             this.selection1();
@@ -238,7 +239,7 @@ public class GeneticAlgorithm {
     public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
-        records.forEach(i -> {
+        records.stream().forEach(i -> {
             TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
             timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
             timetableDetails.add(timetableDetail);
@@ -246,16 +247,16 @@ public class GeneticAlgorithm {
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream()
                 .distinct()
                 .map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN", i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(),i.getLineId())).collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS
                 .stream()
                 .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
         List<TimetableEdit> timetableEdits = collect
-                .entrySet()
-                .stream().map(i -> new TimetableEdit(i.getKey(), i.getValue()))
+                .entrySet().stream()
+                .map(i -> new TimetableEdit(i.getKey(), i.getValue()))
                 .collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
-        Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits, timetableDetails);
+        Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits);
         if (genInfos.size() > 29) {
             genInfos.poll();
         }

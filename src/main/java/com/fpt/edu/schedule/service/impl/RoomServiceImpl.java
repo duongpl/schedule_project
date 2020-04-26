@@ -50,7 +50,11 @@ public class RoomServiceImpl implements RoomService {
         }
         int semester = Integer.parseInt(semesterId);
         Timetable timetable = timetableService.findBySemesterTempFalse(semesterService.findById(semester));
-        Set<Room> rooms = timetable.getTimetableDetails().stream().filter(i->i.getRoom()!=null).map(TimetableDetail::getRoom).collect(Collectors.toSet());
+        Set<Room> rooms = timetable.getTimetableDetails()
+                .stream()
+                .filter(i->i.getRoom()!=null)
+                .map(TimetableDetail::getRoom)
+                .collect(Collectors.toSet());
         return rooms.stream().collect(Collectors.toList());
     }
 
@@ -58,9 +62,19 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> getRoomForUpdate(int timetableDetailId) {
         TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
         Timetable timetable = timetableDetail.getTimetable();
-        Set<Room> rooms1 =timetable.getTimetableDetails().stream().map(TimetableDetail::getRoom).collect(Collectors.toSet());
-        Set<Room> rooms2 = timetable.getTimetableDetails().stream().filter(i->i.getSlot().getId() == timetableDetail.getSlot().getId()).map(TimetableDetail::getRoom).collect(Collectors.toSet());
-        List<Room> rooms3 = rooms1.stream().filter(i->!rooms2.contains(i) && i!=null).collect(Collectors.toList());
+        Set<Room> rooms1 =timetable.getTimetableDetails()
+                .stream()
+                .map(TimetableDetail::getRoom)
+                .collect(Collectors.toSet());
+        Set<Room> rooms2 = timetable.getTimetableDetails()
+                .stream()
+                .filter(i->i.getSlot().getId() == timetableDetail.getSlot().getId())
+                .map(TimetableDetail::getRoom)
+                .collect(Collectors.toSet());
+        List<Room> rooms3 = rooms1
+                .stream()
+                .filter(i->!rooms2.contains(i) && i!=null)
+                .collect(Collectors.toList());
         return rooms3;
     }
 

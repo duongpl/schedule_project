@@ -41,7 +41,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : null,
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
-        timetableDetailDTOS.forEach(i -> {
+        timetableDetailDTOS.stream().forEach(i -> {
 
             // convert
             switch (i.getSlot()) {
