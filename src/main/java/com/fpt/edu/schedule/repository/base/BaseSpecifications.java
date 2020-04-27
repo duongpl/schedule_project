@@ -76,7 +76,7 @@ public class BaseSpecifications<T> implements Specification<T> {
                     if (array.size() == 0) {
                         break;
                     }
-                    array.forEach(i -> {
+                    array.stream().forEach(i -> {
 
                         Predicate predicate = (i instanceof String) ? criteriaBuilder.like(root.get(entry.getKey()), "%" + i + "%")
                                 : criteriaBuilder.equal(root.get(entry.getKey()), i);

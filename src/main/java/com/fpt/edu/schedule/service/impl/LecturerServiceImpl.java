@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 
+import com.fpt.edu.schedule.common.constant.MessageResponse;
 import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +39,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer addLecture(Lecturer lecturer, String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
         if (lecturerRepository.findByEmail(lecturer.getEmail()) != null) {
-            throw new InvalidRequestException(String.format("Already have this lecturer %s ", lecturer.getEmail()));
+            throw new InvalidRequestException(String.format(MessageResponse.msgAlreadyHaveEmail, lecturer.getEmail()));
         }
         Lecturer hod = findByGoogleId(hodGoogleId);
         newLecturer.setStatus(StatusLecturer.ACTIVATE);
@@ -48,8 +50,13 @@ public class LecturerServiceImpl implements LecturerService {
         return lecturerRepository.save(newLecturer);
     }
 
+    @Transactional
     @Override
     public void remove(int id) {
+        Lecturer lec = lecturerRepository.findById(id);
+        if(lec.isLogin()){
+            timetableDetailRepository.deleteByLecturer(id);
+        }
         lecturerRepository.removeById(id);
     }
 

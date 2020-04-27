@@ -1,7 +1,5 @@
 package com.fpt.edu.schedule.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fpt.edu.schedule.model.TimetableDetail;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,8 +17,6 @@ public class Runs implements Comparable<Runs>  {
     int generation;
     int id;
     List<TimetableEdit> timetableEdit;
-    @JsonIgnore
-    List<TimetableDetail> timetableDetails;
 
 
     @Override

@@ -41,7 +41,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : null,
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
-        timetableDetailDTOS.forEach(i -> {
+        timetableDetailDTOS.stream().forEach(i -> {
 
             // convert
             switch (i.getSlot()) {
@@ -100,7 +100,11 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             }
         });
         Map<Integer, List<TimetableDetailDTO>> collect = timetableDetailDTOSnew.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlotNumber));
-        List<TimetableView> timetableViews = collect.entrySet().stream().map(i -> new TimetableView(i.getKey(), i.getValue())).collect(Collectors.toList());
+        List<TimetableView> timetableViews = collect
+                .entrySet()
+                .stream()
+                .map(i -> new TimetableView(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
         return timetableViews;
     }
 

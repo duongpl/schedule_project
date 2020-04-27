@@ -17,7 +17,10 @@ public interface TimetableDetailRepository extends Repository<TimetableDetail, I
 
     TimetableDetail findById(int id);
 
-    TimetableDetail findBySlotAndRoomAndTimetable(Slot slot, Room room, Timetable timetable);
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM timetabledetail\n" +
+            "    WHERE lecturer_id =?1  ", nativeQuery = true)
+    void deleteByLecturer(int lecturerId);
 
 
     List<TimetableDetail> findAllByLecturerAndTimetable(Lecturer lecturer, Timetable timetable);

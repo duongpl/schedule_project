@@ -11,6 +11,7 @@ import com.fpt.edu.schedule.ai.model.*;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
+import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableProcess;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
@@ -50,6 +51,7 @@ public class TimetableServiceImpl implements TimetableService {
     SubjectRepository subjectRepository;
     SlotRepository slotRepository;
     SemesterRepository semesterRepository;
+    RoomRepository roomRepository;
     TimetableDetailRepository timetableDetailRepository;
     @Autowired
     private ApplicationContext applicationContext;
@@ -83,8 +85,9 @@ public class TimetableServiceImpl implements TimetableService {
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel, gaParameter);
         Population population = new Population(POPULATION_SIZE, model);
-        setAttributeForGa(ga,population,model,lecturerId);
+        setAttributeForGa(ga,population,model,lecturerId,gaParameter.getStepGeneration());
         checkExistedGa(lecturerId);
+
         timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
         System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
@@ -109,9 +112,9 @@ public class TimetableServiceImpl implements TimetableService {
         Queue runsList = ge.getGenInfos();
         pagedResultSet.setTotalCount(runsList.size());
         List<Runs> runsListComplete = (List<Runs>) runsList.stream()
+                .sorted(Comparator.comparingInt(Runs::getId))
                 .skip((page - 1) * limit)
                 .limit(limit)
-                .sorted(Comparator.comparingInt(Runs::getId))
                 .collect(Collectors.toList());
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
@@ -123,19 +126,17 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
         Queue<Runs> q = timetableProcess.getMap().get(lecturerId).getGenInfos();
-
-        List<Runs> runsQueue = new ArrayList<>(timetableProcess.getMap().get(lecturerId).getGenInfos());
-        Runs runs = runsQueue.stream()
+        Runs runs = q.stream()
                 .filter(i->i.getId() == runId)
                 .findAny()
                 .orElse(null);
-        List<TimetableDetail> timetableDetails = runs.getTimetableDetails();
+        List<TimetableDetailDTO> timetableDetails = runs.getTimetableEdit().stream().map(i->i.getTimetable()).flatMap(List::stream).collect(Collectors.toList());
         Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
         Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
                 Collectors.toMap(x -> x.getLineId(), x -> x));
-        timetableDetails.forEach(i -> {
-            timetableMap.get(i.getLineId()).setLecturer(i.getLecturer());
-            timetableMap.get(i.getLineId()).setRoom(i.getRoom());
+        timetableDetails.stream().forEach(i -> {
+            timetableMap.get(i.getLineId()).setLecturer(lecturerRepository.findByShortName(i.getLecturerShortName()));
+            timetableMap.get(i.getLineId()).setRoom(roomRepository.findByName(i.getRoom()));
 
         });
         timetable.setTimetableDetails(new ArrayList(timetableMap.values()));
@@ -149,10 +150,11 @@ public class TimetableServiceImpl implements TimetableService {
             throw new InvalidRequestException("Running arrange !");
         }
     }
-    private void setAttributeForGa(GeneticAlgorithm ga,Population population,Model model,String lecturerId){
+    private void setAttributeForGa(GeneticAlgorithm ga,Population population,Model model,String lecturerId,int step){
         ga.setPopulation(population);
         ga.setGeneration(0);
         ga.setModel(model);
+        ga.setStepGen(step);
         ga.setRun(true);
         ga.setLecturerId(lecturerId);
     }
@@ -203,11 +205,11 @@ public class TimetableServiceImpl implements TimetableService {
             });
         });
         //class model
-        timetableDetails.forEach(i -> {
+        timetableDetails.stream().forEach(i -> {
             classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId()));
         });
         //subject model
-        subjects.forEach(i -> {
+        subjects.stream().forEach(i -> {
             subjectModels.add(new Subject(i.getCode(), i.getId()));
         });
 

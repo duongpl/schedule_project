@@ -146,12 +146,12 @@ public class RequestServiceImpl implements RequestService {
             queryParam.setPage(1);
             queryParam.setLimit(1000);
         }
-        Page<Lecturer> lecturers = (Page<Lecturer>)requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()
+        Page<Lecturer> requests = requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()
                 , Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC,queryParam.getSortField())));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
-        page.setSize(lecturers.getContent().size());
-        page.setResults(lecturers.getContent());
+        page.setSize(requests.getContent().size());
+        page.setResults(requests.getContent());
         return page;
     }
 
@@ -167,7 +167,7 @@ public class RequestServiceImpl implements RequestService {
 
             if (existedTimetable.size()>0) {
 
-                existedTimetable.forEach(i->{
+                existedTimetable.stream().forEach(i->{
                     timetableDetailRepository.deleteAllByTimetable(i.getId());
                     timetableRepository.deleteById(i.getId());
                 });

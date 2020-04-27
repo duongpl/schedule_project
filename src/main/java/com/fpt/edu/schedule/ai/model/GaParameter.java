@@ -13,6 +13,8 @@ public class GaParameter {
     private double mutationRate;
     @Min(value = 1)
     private double tournamentSize;
+    @Min(value = 1)
+    private int stepGeneration;
     private Cofficient cofficient;
     private int convergenceCheckRange;
 }
