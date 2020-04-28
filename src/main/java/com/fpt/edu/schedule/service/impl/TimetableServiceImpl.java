@@ -103,7 +103,7 @@ public class TimetableServiceImpl implements TimetableService {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
         GeneticAlgorithm ge = timetableProcess.getMap().get(lecturerId);
 
-        pagedResultSet.setRunning(ge == null ? false : ge.isRun());
+        pagedResultSet.setRunning(ge == null ? false : ge.isRunning());
         if (ge == null) {
             pagedResultSet.setResults(new ArrayList<>());
             pagedResultSet.setPage(page);
@@ -143,10 +143,10 @@ public class TimetableServiceImpl implements TimetableService {
         timetableRepository.save(timetable);
     }
     private void checkExistedGa(String lecturerId){
-        if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRun()) {
+        if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRunning()) {
             timetableProcess.getMap().remove(lecturerId);
         }
-        if (timetableProcess.getMap().get(lecturerId) != null && timetableProcess.getMap().get(lecturerId).isRun()) {
+        if (timetableProcess.getMap().get(lecturerId) != null && timetableProcess.getMap().get(lecturerId).isRunning()) {
             throw new InvalidRequestException("Running arrange !");
         }
     }
@@ -155,7 +155,7 @@ public class TimetableServiceImpl implements TimetableService {
         ga.setGeneration(0);
         ga.setModel(model);
         ga.setStepGen(step);
-        ga.setRun(true);
+        ga.setRunning(true);
         ga.setLecturerId(lecturerId);
     }
     private void checkGaParameter(GaParameter gaParam){

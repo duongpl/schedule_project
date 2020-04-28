@@ -1,5 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
+import com.fpt.edu.schedule.common.constant.Config;
+import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusReport;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.*;
@@ -12,9 +14,13 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +47,9 @@ public class RequestServiceImpl implements RequestService {
     LecturerService lecturerService;
     DepartmentRepository departmentRepository;
     ExpectedRepository expectedRepository;
+    RoleService roleService;
+    @Autowired
+    private JavaMailSender javaMailSender;
 
     @Transactional
     @Override
@@ -105,26 +114,34 @@ public class RequestServiceImpl implements RequestService {
             throw new InvalidRequestException(e.getMessage());
         }
     }
-
+    @Async
     @Override
     public Request addRequest(Request request, String lecturerId) {
+
         request.setSemester(semesterRepository.getAllByNowIsTrue());
         request.setCreatedDate(new Date());
         request.setStatus(StatusReport.PENDING);
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
+        Lecturer hod = lecturerRepository.findAllByDepartmentAndRole(lecturer.getDepartment(),roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
         request.setLecturer(lecturer);
+        String title = "[DSST SYSTEM] New Request";
+        String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to response !",lecturer.getEmail(),request.getContent(),Config.domainWebsite);
+        sendEmail(content,hod.getEmail(),title);
         return requestRepository.save(request);
     }
-
     @Override
-    public Request updateRequest(Request request) {
+    public Request updateRequest(Request request,String lecturerId) {
+        Lecturer hod = lecturerService.findByGoogleId(lecturerId);
         Request existedRequest = requestRepository.findReportById(request.getId());
         if (existedRequest == null) {
             throw new InvalidRequestException("Don't find this report !");
         }
         existedRequest.setStatus(request.getStatus());
         existedRequest.setReplyContent(request.getReplyContent());
-
+        String content = String.format("Lecturer: %s response your request: %s\nReply: %s\nStatus: %s\n\nPlease visit %s to response !"
+                ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
+        String title = "[DSST SYSTEM] Response Request";
+        sendEmail(content,existedRequest.getLecturer().getEmail(),title);
         return requestRepository.save(existedRequest);
     }
 
@@ -168,7 +185,7 @@ public class RequestServiceImpl implements RequestService {
             if (existedTimetable.size()>0) {
 
                 existedTimetable.stream().forEach(i->{
-                    timetableDetailRepository.deleteAllByTimetable(i.getId());
+//                    timetableDetailRepository.deleteAllByTimetable(i.getId());
                     timetableRepository.deleteById(i.getId());
                 });
                 expectedRepository.deleteAllBySemester(semesterRepository.findById(semesterId));
@@ -232,5 +249,14 @@ public class RequestServiceImpl implements RequestService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendEmail(String content,String receiveEmail,String subject) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(receiveEmail);
+        msg.setSubject(subject);
+        msg.setText(content);
+        javaMailSender.send(msg);
+
     }
 }

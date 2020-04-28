@@ -137,7 +137,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
-
+        // check not_assign
         Object lecturer = queryParam.getInCriteria().get("lecturer");
         if (lecturer instanceof Map) {
             List<String> shortName = (List<String>) ((Map) lecturer).get("shortName");
@@ -156,6 +156,8 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 }
             }
         }
+
+        // check not_assign
         Object room = queryParam.getInCriteria().get("room");
         if (room instanceof Map) {
             List<String> roomName = (List<String>) ((Map) room).get("name");
@@ -177,16 +179,26 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(),
                 i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
                 i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode()))
+                .collect(Collectors.toList());
         if(groupBy.equals("room")) {
             collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
-            List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-            timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom));
+            List<TimetableEdit> timetableEdits = collect
+                    .entrySet()
+                    .stream()
+                    .map(i -> new TimetableEdit(i.getKey(), i.getValue()))
+                    .collect(Collectors.toList());
+            timetableEdits
+                    .sort(Comparator.comparing(TimetableEdit::getRoom));
             return timetableEdits;
         }
         collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
-        List<TimetableEdit> timetableEdits = collect.entrySet().stream().map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
-        timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
+        List<TimetableEdit> timetableEdits = collect
+                .entrySet()
+                .stream()
+                .map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+        timetableEdits
+                .sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         return timetableEdits;
     }
 

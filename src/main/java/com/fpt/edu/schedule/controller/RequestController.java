@@ -44,9 +44,10 @@ public class RequestController {
         }
     }
     @PutMapping
-    public ResponseEntity<Request> updateRequest(@RequestBody Request request) {
+    public ResponseEntity<Request> updateRequest(@RequestBody Request request,
+                                                 @RequestHeader("GoogleId")String lecturerId) {
         try {
-            return new ResponseEntity(requestService.updateRequest(request), HttpStatus.OK);
+            return new ResponseEntity(requestService.updateRequest(request,lecturerId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }

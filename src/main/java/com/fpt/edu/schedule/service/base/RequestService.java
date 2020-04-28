@@ -9,7 +9,7 @@ public interface RequestService {
 
     Request addRequest(Request request, String lecturerId);
 
-    Request updateRequest(Request request);
+    Request updateRequest(Request request,String lecturerId);
 
     void removeRequestById(int id);
 

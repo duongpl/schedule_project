@@ -95,7 +95,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer findByGoogleId(String id) {
         Lecturer lecturer = lecturerRepository.findByGoogleId(id);
         if (lecturer == null) {
-            throw new InvalidRequestException("Don't find this lecturer");
+            throw new InvalidRequestException("Don't find this lecturer: "+lecturer.getEmail());
         }
         return lecturer;
     }
@@ -104,7 +104,11 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer updateLecturerName(Lecturer lecturer) {
         Lecturer existedUser = lecturerRepository.findById(lecturer.getId());
         if (existedUser == null) {
-            throw new InvalidRequestException("Don't find this user !");
+            throw new InvalidRequestException("Don't find this user!");
+        }
+        Lecturer checkDupShortName=lecturerRepository.findByShortName(lecturer.getShortName());
+        if(checkDupShortName!=null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())){
+            throw new InvalidRequestException("Already have this short name:"+checkDupShortName.getShortName()+"!");
         }
         existedUser.setFullName(lecturer.getFullName() != null ? lecturer.getFullName() : existedUser.getFullName());
         existedUser.setDepartment(lecturer.getDepartment() != null ? lecturer.getDepartment() : existedUser.getDepartment());
@@ -160,14 +164,32 @@ public class LecturerServiceImpl implements LecturerService {
     public List<Lecturer> findForUpdate(int timetableDetailId, QueryParam queryParam) {
         TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
         Timetable timetable = timetableDetail.getTimetable();
-        List<TimetableDetail> list = timetable.getTimetableDetails().stream().filter(i ->
-                i.getSlot().equals(timetableDetail.getSlot())).collect(Collectors.toList());
-        List<Lecturer> lecturers = list.stream().filter(i -> i.getLecturer() != null).map(TimetableDetail::getLecturer).collect(Collectors.toList());
+        List<TimetableDetail> list = timetable
+                .getTimetableDetails()
+                .stream()
+                .filter(i ->
+                i.getSlot().equals(timetableDetail.getSlot()))
+                .collect(Collectors.toList());
+        List<Lecturer> lecturers = list
+                .stream()
+                .filter(i -> i.getLecturer() != null)
+                .map(TimetableDetail::getLecturer)
+                .collect(Collectors.toList());
+        if (isOnlineTimetableDetail(timetableDetail)){
+            return lecturers;
+        }
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository.findAll(cns).stream().filter(i -> !lecturers.contains(i)).collect(Collectors.toList());
+        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository
+                .findAll(cns)
+                .stream()
+                .filter(i -> !lecturers.contains(i))
+                .collect(Collectors.toList());
 
         return lecturer;
     }
-
-
+    boolean isOnlineTimetableDetail(TimetableDetail timetableDetail){
+        return Character
+                .isAlphabetic(timetableDetail.getSubject().getCode()
+                        .charAt(timetableDetail.getSubject().getCode().length() - 1));
+    }
 }
