@@ -95,7 +95,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer findByGoogleId(String id) {
         Lecturer lecturer = lecturerRepository.findByGoogleId(id);
         if (lecturer == null) {
-            throw new InvalidRequestException("Don't find this lecturer");
+            throw new InvalidRequestException("Don't find this lecturer: "+lecturer.getEmail());
         }
         return lecturer;
     }
@@ -164,14 +164,32 @@ public class LecturerServiceImpl implements LecturerService {
     public List<Lecturer> findForUpdate(int timetableDetailId, QueryParam queryParam) {
         TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
         Timetable timetable = timetableDetail.getTimetable();
-        List<TimetableDetail> list = timetable.getTimetableDetails().stream().filter(i ->
-                i.getSlot().equals(timetableDetail.getSlot())).collect(Collectors.toList());
-        List<Lecturer> lecturers = list.stream().filter(i -> i.getLecturer() != null).map(TimetableDetail::getLecturer).collect(Collectors.toList());
+        List<TimetableDetail> list = timetable
+                .getTimetableDetails()
+                .stream()
+                .filter(i ->
+                i.getSlot().equals(timetableDetail.getSlot()))
+                .collect(Collectors.toList());
+        List<Lecturer> lecturers = list
+                .stream()
+                .filter(i -> i.getLecturer() != null)
+                .map(TimetableDetail::getLecturer)
+                .collect(Collectors.toList());
+        if (isOnlineTimetableDetail(timetableDetail)){
+            return lecturers;
+        }
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository.findAll(cns).stream().filter(i -> !lecturers.contains(i)).collect(Collectors.toList());
+        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepository
+                .findAll(cns)
+                .stream()
+                .filter(i -> !lecturers.contains(i))
+                .collect(Collectors.toList());
 
         return lecturer;
     }
-
-
+    boolean isOnlineTimetableDetail(TimetableDetail timetableDetail){
+        return Character
+                .isAlphabetic(timetableDetail.getSubject().getCode()
+                        .charAt(timetableDetail.getSubject().getCode().length() - 1));
+    }
 }
