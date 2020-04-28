@@ -100,7 +100,11 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             }
         });
         Map<Integer, List<TimetableDetailDTO>> collect = timetableDetailDTOSnew.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getSlotNumber));
-        List<TimetableView> timetableViews = collect.entrySet().stream().map(i -> new TimetableView(i.getKey(), i.getValue())).collect(Collectors.toList());
+        List<TimetableView> timetableViews = collect
+                .entrySet()
+                .stream()
+                .map(i -> new TimetableView(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
         return timetableViews;
     }
 
