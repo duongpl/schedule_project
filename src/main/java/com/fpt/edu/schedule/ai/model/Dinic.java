@@ -31,7 +31,6 @@ public class Dinic {
     public void match(int u, int v) {
         this.matx[u] = v;
         this.prioritizedNodes.add(u);
-//        System.out.println(u + " " + v);
     }
 
     public void add(int u, int v, int c) {
@@ -91,12 +90,10 @@ public class Dinic {
     }
     public int argument(int u, int mx) {
         if (u == t) return mx;
-//        System.out.println( "asdf " + u + " " + matx[u]);
         if (matx[u] != -1) {
             int v = matx[u];
             if (lv[v] == lv[u] + 1 && cap[u][v] > flow[u][v]) {
                 int tmp = argument(v, Math.min(mx, cap[u][v] - flow[u][v]));
-//                System.out.println(u + " " + v + " " + tmp + " " + (cap[u][v] - flow[u][v]));
                 if (tmp != 0) {
                     flow[u][v] += tmp;
                     flow[v][u] -= tmp;
@@ -133,7 +130,8 @@ public class Dinic {
     }
 
 
-    int maxflow() {
+    public int maxflow() {
+        if (s == t) return -1;
         this.reset();
         int flow = 0;
         while (bfs()) {
@@ -146,36 +144,6 @@ public class Dinic {
             }
         }
         return flow;
-    }
-
-    public static void main(String[] args) {
-        int n, m, s, t;
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            String str = br.readLine();
-            String[] ss = str.split("\\s+");
-            System.out.println(ss[0]);
-            n = Integer.parseInt(ss[0]);
-            m = Integer.parseInt(ss[1]);
-            s = Integer.parseInt(ss[2]);
-            t = Integer.parseInt(ss[3]);
-            s--;t--;
-            Dinic dinic = new Dinic(n, s, t);
-            for (int i = 0; i < m; i++) {
-                str = br.readLine();
-                int u, v, c;
-                ss = str.split("\\s+");
-                u = Integer.parseInt(ss[0]);
-                v = Integer.parseInt(ss[1]);
-                u--; v--;
-                c = Integer.parseInt(ss[2]);
-                dinic.add(u, v, c);
-                dinic.add(v, u, c);
-            }
-            System.out.println(dinic.maxflow());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
 

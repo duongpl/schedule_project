@@ -24,23 +24,24 @@ public class HopcroftKarp {
         Arrays.fill(matx, -1);
         Arrays.fill(maty, -1);
     }
-    void add(int x, int y) {
+
+    public void add(int x, int y) {
         adj[E] = y;
         nxt[E] = lst[x];
         lst[x] = E++;
     }
 
-    void match(int x,int y) {
+    public void match(int x, int y) {
         this.matx[x] = y;
         this.maty[y] = x;
     }
-    int bfs() {
+
+    public int bfs() {
         int qh = 0, qe = 0;
         for (int x = 0; x < nx; x++) {
             if (matx[x] != -1) {
                 lev[x] = 0;
-            }
-            else {
+            } else {
                 lev[x] = 1;
                 que[qe++] = x;
             }
@@ -52,8 +53,7 @@ public class HopcroftKarp {
                 int y = adj[e];
                 if (maty[y] == -1) {
                     res = 1;
-                }
-                else if (lev[maty[y]] == 0) {
+                } else if (lev[maty[y]] == 0) {
                     lev[maty[y]] = lev[x] + 1;
                     que[qe++] = maty[y];
                 }
@@ -61,7 +61,8 @@ public class HopcroftKarp {
         }
         return res;
     }
-    int dfs(int x) {
+
+    public int dfs(int x) {
         for (int e = ptr[x]; e != -1; e = nxt[e]) {
             int y = adj[e];
             if (maty[y] == -1) {
@@ -80,7 +81,8 @@ public class HopcroftKarp {
         }
         return 0;
     }
-    int maxmat() {
+
+    public int maxmat() {
         while (bfs() != 0) {
             for (int x = 0; x < nx; x++) {
                 ptr[x] = lst[x];
@@ -108,10 +110,10 @@ public class HopcroftKarp {
         hp.add(3, 3);
         hp.add(0, 1);
         hp.add(1, 0);
-        hp.match(0 , 0);
+        hp.match(0, 0);
 
         System.out.println(hp.maxmat());
-        for(int i = 0 ; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             System.out.println(hp.matx[i]);
         }
     }

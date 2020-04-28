@@ -14,9 +14,6 @@ public class Population {
     public Population() {
     }
 
-    public void setIndividuals(Vector<Chromosome> individuals) {
-        this.individuals = individuals;
-    }
 
     private Vector<Chromosome> individuals;
     private int size;

@@ -234,7 +234,7 @@ public class TimetableServiceImpl implements TimetableService {
                 });
         //class model
         timetableDetails.stream().forEach(i -> {
-            classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId()));
+            classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId(), Class.OK));
         });
         //subject model
         // exclude online subject
