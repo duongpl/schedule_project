@@ -42,8 +42,9 @@ public class GeneticAlgorithm {
     Population population;
     @Autowired
     Model model;
+    public final int RESULT_RANGE = 29;
     private int generation;
-    private boolean isRun = true;
+    private boolean isRunning = true;
     private double lastFitness = -1;
     private int count = 0;
     private String lecturerId;
@@ -216,7 +217,7 @@ public class GeneticAlgorithm {
         this.lastFitness =  bestFitness;
         if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
             generateTimetable();
-
+            this.isRunning =false;
             return true;
         }
         return false;
@@ -225,8 +226,7 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
-        while (this.isRun) {
-
+        while (this.isRunning && !isConverged()) {
             this.updateFitness();
             this.selection1();
             this.mutate();
@@ -234,7 +234,7 @@ public class GeneticAlgorithm {
     }
 
     public void stop() {
-        this.isRun = false;
+        this.isRunning = false;
     }
     public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
@@ -257,7 +257,7 @@ public class GeneticAlgorithm {
                 .collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits);
-        if (genInfos.size() > 29) {
+        if (genInfos.size() > RESULT_RANGE) {
             genInfos.poll();
         }
         System.out.println(genInfos.size());

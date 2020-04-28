@@ -37,7 +37,7 @@ public class LecturerController {
         try {
             return new ResponseEntity(lecturerService.addLecture(lecturer, hodGoogleId), HttpStatus.OK);
         } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -50,6 +50,9 @@ public class LecturerController {
         try {
             lecturerService.remove(lecturerId);
             return new ResponseEntity(HttpStatus.OK);
+
+        } catch (InvalidRequestException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -62,6 +65,8 @@ public class LecturerController {
 
             QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam);
             return new ResponseEntity(lecturerList, HttpStatus.OK);
+        } catch (InvalidRequestException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -71,6 +76,8 @@ public class LecturerController {
     public ResponseEntity<Lecturer> updateLecturer(@RequestBody Lecturer lecturer) {
         try {
             return new ResponseEntity(lecturerService.updateLecturerName(lecturer), HttpStatus.OK);
+        } catch (InvalidRequestException e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

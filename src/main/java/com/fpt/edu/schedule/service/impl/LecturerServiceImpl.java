@@ -104,7 +104,11 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer updateLecturerName(Lecturer lecturer) {
         Lecturer existedUser = lecturerRepository.findById(lecturer.getId());
         if (existedUser == null) {
-            throw new InvalidRequestException("Don't find this user !");
+            throw new InvalidRequestException("Don't find this user!");
+        }
+        Lecturer checkDupShortName=lecturerRepository.findByShortName(lecturer.getShortName());
+        if(checkDupShortName!=null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())){
+            throw new InvalidRequestException("Already have this short name:"+checkDupShortName.getShortName()+"!");
         }
         existedUser.setFullName(lecturer.getFullName() != null ? lecturer.getFullName() : existedUser.getFullName());
         existedUser.setDepartment(lecturer.getDepartment() != null ? lecturer.getDepartment() : existedUser.getDepartment());
