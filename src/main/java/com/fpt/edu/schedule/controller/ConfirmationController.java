@@ -32,4 +32,13 @@ public class ConfirmationController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping()
+    public ResponseEntity getByLecturerAndSemester(@RequestParam("semesterId") int semesterId,
+                                                   @RequestHeader("GoogleId") String lecturerId) {
+        try {
+            return new ResponseEntity(confirmationService.getByLecturerAndSemester(lecturerId,semesterId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

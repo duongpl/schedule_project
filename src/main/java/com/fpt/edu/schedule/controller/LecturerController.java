@@ -60,10 +60,11 @@ public class LecturerController {
 
     //Test
     @PostMapping("/filter")
-    public ResponseEntity<Lecturer> getLecturerByCriteria(@RequestBody QueryParam queryParam) {
+    public ResponseEntity<Lecturer> getLecturerByCriteria(@RequestBody QueryParam queryParam,
+                                                          @RequestParam(value = "semesterId",defaultValue = "0") int semesterId) {
         try {
 
-            QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam);
+            QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam,semesterId);
             return new ResponseEntity(lecturerList, HttpStatus.OK);
         } catch (InvalidRequestException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);

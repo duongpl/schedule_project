@@ -60,4 +60,14 @@ public class TimetableDetailController {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @PutMapping("swap/lecturer")
+    public ResponseEntity swapLecturerTimetable(@RequestBody List<Integer> ids) {
+        try {
+
+          timeTableDetailService.swapTwoTimetableDetail(ids);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

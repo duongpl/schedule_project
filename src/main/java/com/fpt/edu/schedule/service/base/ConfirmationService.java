@@ -9,4 +9,6 @@ public interface ConfirmationService {
 
     Confirmation update(Confirmation confirmation);
 
+    Confirmation getByLecturerAndSemester(String lecturerId,int semesterId);
+
 }

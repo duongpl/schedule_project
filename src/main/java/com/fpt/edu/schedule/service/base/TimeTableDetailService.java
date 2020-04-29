@@ -16,4 +16,7 @@ public interface TimeTableDetailService {
     TimetableDetail updateTimetableDetail(TimetableDetailDTO timetableDetail);
 
     List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy,int semesterId);
+
+    void swapTwoTimetableDetail(List<Integer> ids) ;
+
 }

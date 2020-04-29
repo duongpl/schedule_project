@@ -114,7 +114,7 @@ public class RequestServiceImpl implements RequestService {
             throw new InvalidRequestException(e.getMessage());
         }
     }
-    @Async
+
     @Override
     public Request addRequest(Request request, String lecturerId) {
 
@@ -250,8 +250,8 @@ public class RequestServiceImpl implements RequestService {
             e.printStackTrace();
         }
     }
-
-    private void sendEmail(String content,String receiveEmail,String subject) {
+    @Async
+    void sendEmail(String content,String receiveEmail,String subject) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setTo(receiveEmail);
         msg.setSubject(subject);

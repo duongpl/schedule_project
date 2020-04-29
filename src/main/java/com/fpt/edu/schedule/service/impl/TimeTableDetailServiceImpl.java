@@ -14,10 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +23,7 @@ import java.util.stream.Collectors;
 public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
     private LecturerService lecturerService;
-    private TimetableDetailRepository timetableDetailRepository;
+    private TimetableDetailRepository timetableDetailRepo;
     private RoomService roomService;
     private ConfirmationRepository confirmationRepository;
     private SemesterRepository semesterRepository;
@@ -34,7 +31,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
     @Override
     public List<TimetableView> getTimetableForView(QueryParam queryParam) {
-        List<TimetableDetail> timetableDetails = findByCriteria(queryParam,1) ;
+        List<TimetableDetail> timetableDetails = findByCriteria(queryParam, 1);
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : null,
                 i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
@@ -106,9 +103,9 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     @Override
-    public List<TimetableDetail> findByCriteria(QueryParam queryParam,int semesterId) {
+    public List<TimetableDetail> findByCriteria(QueryParam queryParam, int semesterId) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
+        List<TimetableDetail> timetableDetails = timetableDetailRepo.findAll(cns);
         Semester semester = semesterRepository.findById(semesterId);
         timetableDetails.stream().forEach(i -> {
             Confirmation con = confirmationRepository.findBySemesterAndLecturer(semester, i.getLecturer());
@@ -116,12 +113,13 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 i.setTimetableStatus(con.getStatus());
             }
         });
-        return timetableDetailRepository.findAll(cns);
+        return timetableDetailRepo.findAll(cns);
     }
 
     @Override
     public TimetableDetail updateTimetableDetail(TimetableDetailDTO timetableDetail) {
-        TimetableDetail timetableDetailExisted = timetableDetailRepository.findById(timetableDetail.getId());
+        TimetableDetail timetableDetailExisted = timetableDetailRepo.findById(timetableDetail.getId());
+        Semester semester = timetableDetailExisted.getTimetable().getSemester();
         if (timetableDetailExisted == null) {
             throw new InvalidRequestException("Not found this timetable !");
         }
@@ -129,19 +127,20 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             Lecturer lecturer = ("NOT_ASSIGN").equals(timetableDetail.getLecturerShortName()) ? null
                     : lecturerService.findByShortName(timetableDetail.getLecturerShortName());
             timetableDetailExisted.setLecturer(lecturer);
+
         }
         if (timetableDetail.getRoom() != null) {
             Room room = ("NOT_ASSIGN").equals(timetableDetail.getRoom()) ? null
                     : roomService.getRoomByName(timetableDetail.getRoom());
             timetableDetailExisted.setRoom(room);
         }
-        return timetableDetailRepository.save(timetableDetailExisted);
+        return timetableDetailRepo.save(timetableDetailExisted);
     }
 
     @Override
     public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam, String groupBy, int semesterId) {
 
-        List<TimetableDetail> timetableDetails = findByCriteria(queryParam,semesterId);
+        List<TimetableDetail> timetableDetails = findByCriteria(queryParam, semesterId);
 
 
         // check not_assign
@@ -155,7 +154,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
                 queryParam.getInCriteria().put("lecturer", lecturer);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
-                List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
+                List<TimetableDetail> timetableDetails1 = timetableDetailRepo.findAll(cns1);
                 if (shortName.size() != 1) {
                     timetableDetails.addAll(timetableDetails1);
                 } else {
@@ -174,7 +173,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 ((Map) room).replace("name", arrayList);
                 queryParam.getInCriteria().put("room", room);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
-                List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
+                List<TimetableDetail> timetableDetails1 = timetableDetailRepo.findAll(cns1);
                 if (roomName.size() != 1) {
                     timetableDetails.addAll(timetableDetails1);
                 } else {
@@ -211,5 +210,35 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         return timetableEdits;
     }
 
+    @Override
+    public void swapTwoTimetableDetail(List<Integer> ids) {
+        if (ids.size() != 2) {
+            throw new InvalidRequestException("Don't select more than 2 items !");
+        }
+        TimetableDetail timetableDetail2 = timetableDetailRepo.findById(ids.get(1));
+        TimetableDetail timetableDetail1 = timetableDetailRepo.findById(ids.get(0));
+        TimetableDetailWrap t1 = new TimetableDetailWrap(timetableDetail1);
+        TimetableDetailWrap t2 = new TimetableDetailWrap(timetableDetail2);
+        swapLecturer(t1, t2);
+        timetableDetailRepo.save(t1.detail);
+        timetableDetailRepo.save(t2.detail);
+    }
+
+    public static void swapLecturer(TimetableDetailWrap cw1,
+                                    TimetableDetailWrap cw2) {
+        Lecturer temp = cw1.detail.getLecturer();
+        cw1.detail.setLecturer(cw2.detail.getLecturer());
+        cw2.detail.setLecturer(temp);
+    }
+
+    // wrap class for swap
+    class TimetableDetailWrap {
+        TimetableDetail detail;
+
+        // Constructor
+        TimetableDetailWrap(TimetableDetail detail) {
+            this.detail = detail;
+        }
+    }
 
 }

@@ -12,7 +12,7 @@ public interface LecturerService {
 
     void remove(int id);
 
-    QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam);
+    QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam,int semesterId);
 
     Lecturer findByGoogleId(String id);
 

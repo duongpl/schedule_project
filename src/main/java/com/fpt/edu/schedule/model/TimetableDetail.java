@@ -6,9 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-
-@Getter
 @Setter
+@Getter
 @Entity
 @NoArgsConstructor
 public class TimetableDetail {
@@ -36,4 +35,16 @@ public class TimetableDetail {
     private int lineId;
     @Transient
     TimetableStatus timetableStatus = TimetableStatus.DRAFT;
+
+    public TimetableDetail(int id,Subject subject, Slot slot, Room room, Lecturer lecturer, ClassName className, Timetable timetable, int lineId) {
+        this.subject = subject;
+        this.slot = slot;
+        this.room = room;
+        this.lecturer = lecturer;
+        this.className = className;
+        this.timetable = timetable;
+        this.lineId = lineId;
+        this.id =id;
+
+    }
 }

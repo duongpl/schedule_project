@@ -21,9 +21,9 @@ import java.util.List;
 public class ConfirmationServiceImpl implements ConfirmationService {
     TimetableRepository timetableRepository;
     SemesterRepository semesterRepository;
-
     LecturerService lecturerService;
     ConfirmationRepository confirmationRepository;
+
     @Override
     public List<Confirmation> save(List<Integer> lecturerIds, int semesterId) {
         Semester semester = semesterRepository.findById(semesterId);
@@ -44,9 +44,18 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     @Override
     public Confirmation update(Confirmation confirmation) {
         Confirmation existed = confirmationRepository.findById(confirmation.getId());
-        existed.setStatus(confirmation.getStatus());
+        if(confirmation.getStatus() != null) {
+            existed.setStatus(confirmation.getStatus());
+        }
+        existed.setReason(confirmation.getReason());
 
         return confirmationRepository.save(existed);
+    }
+
+    @Override
+    public Confirmation getByLecturerAndSemester(String lecturerId, int semesterId) {
+        return confirmationRepository
+                .findBySemesterAndLecturer(semesterRepository.findById(semesterId),lecturerService.findByGoogleId(lecturerId));
     }
 
 
