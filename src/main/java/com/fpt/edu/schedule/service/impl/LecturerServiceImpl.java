@@ -145,6 +145,15 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
+    public Lecturer findById(int id) {
+        Lecturer lecturer = lecturerRepository.findById(id);
+        if (lecturer == null) {
+            throw new InvalidRequestException(String.format("Not found lecturerId:%d",id));
+        }
+        return lecturer;
+    }
+
+    @Override
     public Lecturer changeStatus(StatusLecturer status, String googleId) {
         Lecturer lecturer = findByGoogleId(googleId);
         if (status == StatusLecturer.DEACTIVATE) {

@@ -5,12 +5,8 @@ import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.dto.TimetableView;
-import com.fpt.edu.schedule.model.Lecturer;
-import com.fpt.edu.schedule.model.Room;
-import com.fpt.edu.schedule.model.TimetableDetail;
-import com.fpt.edu.schedule.repository.base.BaseSpecifications;
-import com.fpt.edu.schedule.repository.base.QueryParam;
-import com.fpt.edu.schedule.repository.base.TimetableDetailRepository;
+import com.fpt.edu.schedule.model.*;
+import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.LecturerService;
 import com.fpt.edu.schedule.service.base.RoomService;
 import com.fpt.edu.schedule.service.base.TimeTableDetailService;
@@ -32,14 +28,15 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private LecturerService lecturerService;
     private TimetableDetailRepository timetableDetailRepository;
     private RoomService roomService;
+    private ConfirmationRepository confirmationRepository;
+    private SemesterRepository semesterRepository;
 
 
     @Override
     public List<TimetableView> getTimetableForView(QueryParam queryParam) {
-        BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
+        List<TimetableDetail> timetableDetails = findByCriteria(queryParam,1) ;
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : null,
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode())).collect(Collectors.toList());
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
         timetableDetailDTOS.stream().forEach(i -> {
 
@@ -109,8 +106,16 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     @Override
-    public List<TimetableDetail> findByCriteria(QueryParam queryParam) {
+    public List<TimetableDetail> findByCriteria(QueryParam queryParam,int semesterId) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
+        List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
+        Semester semester = semesterRepository.findById(semesterId);
+        timetableDetails.stream().forEach(i -> {
+            Confirmation con = confirmationRepository.findBySemesterAndLecturer(semester, i.getLecturer());
+            if (con != null) {
+                i.setTimetableStatus(con.getStatus());
+            }
+        });
         return timetableDetailRepository.findAll(cns);
     }
 
@@ -134,9 +139,11 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     }
 
     @Override
-    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy) {
-        BaseSpecifications cns = new BaseSpecifications(queryParam);
-        List<TimetableDetail> timetableDetails = timetableDetailRepository.findAll(cns);
+    public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam, String groupBy, int semesterId) {
+
+        List<TimetableDetail> timetableDetails = findByCriteria(queryParam,semesterId);
+
+
         // check not_assign
         Object lecturer = queryParam.getInCriteria().get("lecturer");
         if (lecturer instanceof Map) {
@@ -144,7 +151,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             if (shortName.contains("NOT_ASSIGN")) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(null);
-                ((Map) lecturer).replace("shortName",arrayList);
+                ((Map) lecturer).replace("shortName", arrayList);
 
                 queryParam.getInCriteria().put("lecturer", lecturer);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
@@ -164,7 +171,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             if (roomName.contains("NOT_ASSIGN")) {
                 ArrayList arrayList = new ArrayList();
                 arrayList.add(null);
-                ((Map) room).replace("name",arrayList);
+                ((Map) room).replace("name", arrayList);
                 queryParam.getInCriteria().put("room", room);
                 BaseSpecifications cns1 = new BaseSpecifications(queryParam);
                 List<TimetableDetail> timetableDetails1 = timetableDetailRepository.findAll(cns1);
@@ -176,12 +183,14 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
             }
         }
         Map<String, List<TimetableDetailDTO>> collect;
-        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().distinct().map(i -> new TimetableDetailDTO(i.getId(),
-                i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
-                i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode()))
+        List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream()
+                .distinct()
+                .map(i -> new TimetableDetailDTO(i.getId(),
+                        i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
+                        i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+                        i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus()))
                 .collect(Collectors.toList());
-        if(groupBy.equals("room")) {
+        if (groupBy.equals("room")) {
             collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
             List<TimetableEdit> timetableEdits = collect
                     .entrySet()

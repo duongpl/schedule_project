@@ -11,9 +11,9 @@ import java.util.List;
 public interface TimeTableDetailService {
     List<TimetableView> getTimetableForView(QueryParam queryParam);
 
-    List<TimetableDetail> findByCriteria(QueryParam queryParam);
+    List<TimetableDetail> findByCriteria(QueryParam queryParam,int semesterId);
 
     TimetableDetail updateTimetableDetail(TimetableDetailDTO timetableDetail);
 
-    List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy);
+    List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy,int semesterId);
 }

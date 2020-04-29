@@ -22,6 +22,8 @@ public interface LecturerService {
 
     Lecturer findByShortName(String shortName);
 
+    Lecturer findById(int id);
+
     Lecturer changeStatus(StatusLecturer status,String googleId);
 
     List<Lecturer> findForUpdate(int timetableDetailId,QueryParam queryParam);

@@ -23,7 +23,7 @@ public class TimetableDetailController {
     @PostMapping("/filter")
     public ResponseEntity<ClassName> getScheduleByCriteria(@RequestBody QueryParam queryParam) {
         try {
-            List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam);
+            List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam,1);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -40,10 +40,11 @@ public class TimetableDetailController {
     }
     @PostMapping("/filter/forEdit")
     public ResponseEntity getTimetableForEdit(@RequestBody QueryParam queryParam,
-                                              @RequestParam("groupBy") String groupBy) {
+                                              @RequestParam("groupBy") String groupBy,
+                                              @RequestParam("semesterId") int semesterId) {
         try {
 
-            List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam,groupBy);
+            List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam,groupBy,semesterId);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

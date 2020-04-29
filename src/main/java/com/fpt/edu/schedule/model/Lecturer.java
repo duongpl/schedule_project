@@ -49,7 +49,9 @@ public class Lecturer {
     public Lecturer(String email) {
         this.email = email;
     }
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
+    private List<Confirmation> confirmations;
     @Override
     public boolean equals(Object obj) {
         Lecturer lecturer = (Lecturer) obj;

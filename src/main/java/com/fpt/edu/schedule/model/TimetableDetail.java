@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.model;
 
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,4 +34,6 @@ public class TimetableDetail {
     @JoinColumn(name = "timetable_id")
     private Timetable timetable;
     private int lineId;
+    @Transient
+    TimetableStatus timetableStatus = TimetableStatus.DRAFT;
 }
