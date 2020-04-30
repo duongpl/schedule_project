@@ -35,6 +35,8 @@ public class TimetableDetail {
     private int lineId;
     @Transient
     TimetableStatus timetableStatus = TimetableStatus.DRAFT;
+    @Transient
+    String reason ;
 
     public TimetableDetail(int id,Subject subject, Slot slot, Room room, Lecturer lecturer, ClassName className, Timetable timetable, int lineId) {
         this.subject = subject;

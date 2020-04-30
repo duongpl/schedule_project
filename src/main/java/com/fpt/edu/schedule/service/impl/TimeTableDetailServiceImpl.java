@@ -25,15 +25,16 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private LecturerService lecturerService;
     private TimetableDetailRepository timetableDetailRepo;
     private RoomService roomService;
-    private ConfirmationRepository confirmationRepository;
+    private ConfirmationRepository confirmationRepo;
     private SemesterRepository semesterRepository;
-
+    final static List<Integer> slotNumbers = Arrays.asList(1,2,3,4,5,6);
 
     @Override
     public List<TimetableView> getTimetableForView(QueryParam queryParam) {
+
         List<TimetableDetail> timetableDetails = findByCriteria(queryParam, 1);
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream().map(i -> new TimetableDetailDTO(i.getId(), i.getLecturer() != null ? i.getLecturer().getShortName() : null, i.getRoom() != null ? i.getRoom().getName() : null,
-                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus())).collect(Collectors.toList());
+                i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus(),i.getReason())).collect(Collectors.toList());
         List<TimetableDetailDTO> timetableDetailDTOSnew = new ArrayList<>();
         timetableDetailDTOS.stream().forEach(i -> {
 
@@ -99,6 +100,13 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 .stream()
                 .map(i -> new TimetableView(i.getKey(), i.getValue()))
                 .collect(Collectors.toList());
+        slotNumbers.stream().forEach(i->{
+            if(!collect.keySet().contains(i)){
+                timetableViews.add(new TimetableView(i,new ArrayList<>()));
+            }
+        });
+        timetableViews
+                .sort(Comparator.comparing(TimetableView::getSlotNumber));
         return timetableViews;
     }
 
@@ -108,9 +116,10 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         List<TimetableDetail> timetableDetails = timetableDetailRepo.findAll(cns);
         Semester semester = semesterRepository.findById(semesterId);
         timetableDetails.stream().forEach(i -> {
-            Confirmation con = confirmationRepository.findBySemesterAndLecturer(semester, i.getLecturer());
+            Confirmation con = confirmationRepo.findBySemesterAndLecturer(semester, i.getLecturer());
             if (con != null) {
                 i.setTimetableStatus(con.getStatus());
+                i.setReason(con.getReason());
             }
         });
         return timetableDetailRepo.findAll(cns);
@@ -120,6 +129,14 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     public TimetableDetail updateTimetableDetail(TimetableDetailDTO timetableDetail) {
         TimetableDetail timetableDetailExisted = timetableDetailRepo.findById(timetableDetail.getId());
         Semester semester = timetableDetailExisted.getTimetable().getSemester();
+        Confirmation con = confirmationRepo.findBySemesterAndLecturer(semester,timetableDetailExisted.getLecturer());
+        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester,lecturerService.findByShortName(timetableDetail.getLecturerShortName()));
+        if(con!=null){
+            confirmationRepo.deleteById(con.getId());
+        }
+        if(con1!=null && !timetableDetail.getLecturerShortName().equalsIgnoreCase(timetableDetailExisted.getLecturer().getShortName())){
+            confirmationRepo.deleteById(con1.getId());
+        }
         if (timetableDetailExisted == null) {
             throw new InvalidRequestException("Not found this timetable !");
         }
@@ -187,7 +204,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 .map(i -> new TimetableDetailDTO(i.getId(),
                         i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
                         i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
-                        i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus()))
+                        i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus(),i.getReason()))
                 .collect(Collectors.toList());
         if (groupBy.equals("room")) {
             collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getRoom));
