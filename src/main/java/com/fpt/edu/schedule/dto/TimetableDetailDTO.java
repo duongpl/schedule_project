@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.dto;
 
 import com.fpt.edu.schedule.common.enums.Day;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,14 +21,18 @@ public class TimetableDetailDTO {
     private int slotNumber;
     private Day day;
     private int lineId;
+    TimetableStatus timetableStatus;
+    String reason;
 
-    public TimetableDetailDTO(int id, String lecturerShortName, String room, String className, String slot, String subjectCode) {
+    public TimetableDetailDTO(int id, String lecturerShortName, String room, String className, String slot, String subjectCode,TimetableStatus status,String reason) {
         this.id = id;
         this.lecturerShortName = lecturerShortName;
         this.room = room;
         this.className = className;
         this.slot = slot;
         this.subjectCode = subjectCode;
+        this.timetableStatus = status;
+        this.reason =reason;
     }
 
     public TimetableDetailDTO(int id, String lecturerShortName, String room, String className, String slot, String subjectCode, int slotNumber, Day day) {

@@ -4,8 +4,10 @@ package com.fpt.edu.schedule.service.impl;
 import com.fpt.edu.schedule.common.constant.MessageResponse;
 import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.TimetableProcess;
+import com.fpt.edu.schedule.model.Confirmation;
 import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.model.TimetableDetail;
@@ -31,6 +33,7 @@ public class LecturerServiceImpl implements LecturerService {
     ExpectedRepository expectedRepository;
     TimetableDetailRepository timetableDetailRepository;
     TimetableRepository timetableRepository;
+    ConfirmationRepository confirmationRepository;
 
     @Autowired
     TimetableProcess timetableProcess;
@@ -54,14 +57,14 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public void remove(int id) {
         Lecturer lec = lecturerRepository.findById(id);
-        if(lec.isLogin()){
+        if (lec.isLogin()) {
             timetableDetailRepository.deleteByLecturer(id);
         }
         lecturerRepository.removeById(id);
     }
 
     @Override
-    public QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam) {
+    public QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam, int semesterId) {
         QueryParam.PagedResultSet page = new QueryParam.PagedResultSet();
         BaseSpecifications cns = new BaseSpecifications(queryParam);
         page.setTotalCount((int) lecturerRepository.count(cns));
@@ -75,11 +78,19 @@ public class LecturerServiceImpl implements LecturerService {
             lecturers = lecturerRepository.findAll(cns, PageRequest.of(queryParam.getPage() - 1
                     , queryParam.getLimit(), Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, queryParam.getSortField())));
         }
+        if (semesterId != 0) {
+            System.out.println("ok");
+        }
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(lecturers.getContent().size());
         page.setResults(lecturers.getContent());
+
         for (Lecturer u : lecturers) {
+            if (semesterId != 0 ){
+                Confirmation con = confirmationRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),u);
+                u.setTimetableStatus(con !=null ? con.getStatus() : TimetableStatus.DRAFT);
+            }
             if (expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
                     lecturerRepository.findById(u.getId())) != null) {
                 u.setFillingExpected(true);
@@ -95,7 +106,7 @@ public class LecturerServiceImpl implements LecturerService {
     public Lecturer findByGoogleId(String id) {
         Lecturer lecturer = lecturerRepository.findByGoogleId(id);
         if (lecturer == null) {
-            throw new InvalidRequestException("Don't find this lecturer: "+lecturer.getEmail());
+            throw new InvalidRequestException("Don't find this lecturer: " + lecturer.getEmail());
         }
         return lecturer;
     }
@@ -106,9 +117,9 @@ public class LecturerServiceImpl implements LecturerService {
         if (existedUser == null) {
             throw new InvalidRequestException("Don't find this user!");
         }
-        Lecturer checkDupShortName=lecturerRepository.findByShortName(lecturer.getShortName());
-        if(checkDupShortName!=null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())){
-            throw new InvalidRequestException("Already have this short name:"+checkDupShortName.getShortName()+"!");
+        Lecturer checkDupShortName = lecturerRepository.findByShortName(lecturer.getShortName());
+        if (checkDupShortName != null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())) {
+            throw new InvalidRequestException("Already have this short name:" + checkDupShortName.getShortName() + "!");
         }
         existedUser.setFullName(lecturer.getFullName() != null ? lecturer.getFullName() : existedUser.getFullName());
         existedUser.setDepartment(lecturer.getDepartment() != null ? lecturer.getDepartment() : existedUser.getDepartment());
@@ -145,6 +156,15 @@ public class LecturerServiceImpl implements LecturerService {
     }
 
     @Override
+    public Lecturer findById(int id) {
+        Lecturer lecturer = lecturerRepository.findById(id);
+        if (lecturer == null) {
+            throw new InvalidRequestException(String.format("Not found lecturerId:%d", id));
+        }
+        return lecturer;
+    }
+
+    @Override
     public Lecturer changeStatus(StatusLecturer status, String googleId) {
         Lecturer lecturer = findByGoogleId(googleId);
         if (status == StatusLecturer.DEACTIVATE) {
@@ -168,14 +188,14 @@ public class LecturerServiceImpl implements LecturerService {
                 .getTimetableDetails()
                 .stream()
                 .filter(i ->
-                i.getSlot().equals(timetableDetail.getSlot()))
+                        i.getSlot().equals(timetableDetail.getSlot()))
                 .collect(Collectors.toList());
         List<Lecturer> lecturers = list
                 .stream()
                 .filter(i -> i.getLecturer() != null)
                 .map(TimetableDetail::getLecturer)
                 .collect(Collectors.toList());
-        if (isOnlineTimetableDetail(timetableDetail)){
+        if (isOnlineTimetableDetail(timetableDetail)) {
             return lecturers;
         }
         BaseSpecifications cns = new BaseSpecifications(queryParam);
@@ -187,7 +207,8 @@ public class LecturerServiceImpl implements LecturerService {
 
         return lecturer;
     }
-    boolean isOnlineTimetableDetail(TimetableDetail timetableDetail){
+
+    boolean isOnlineTimetableDetail(TimetableDetail timetableDetail) {
         return Character
                 .isAlphabetic(timetableDetail.getSubject().getCode()
                         .charAt(timetableDetail.getSubject().getCode().length() - 1));

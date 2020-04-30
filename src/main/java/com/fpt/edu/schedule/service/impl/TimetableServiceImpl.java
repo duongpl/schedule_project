@@ -52,10 +52,10 @@ public class TimetableServiceImpl implements TimetableService {
     SlotRepository slotRepository;
     SemesterRepository semesterRepository;
     RoomRepository roomRepository;
-    TimetableDetailRepository timetableDetailRepository;
+    TimetableDetailRepository timetableDetailRepo;
+    ConfirmationRepository confirmationRepo;
     @Autowired
     private ApplicationContext applicationContext;
-
 
 
     @Override
@@ -69,7 +69,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Async
     @Override
-    public void autoArrange(int semesterId, String lecturerId,GaParameter gaParameter) {
+    public void autoArrange(int semesterId, String lecturerId, GaParameter gaParameter) {
         Vector<Teacher> teacherModels = new Vector<>();
         Vector<Subject> subjectModels = new Vector<>();
         Vector<com.fpt.edu.schedule.ai.lib.Class> classModels = new Vector<>();
@@ -83,9 +83,9 @@ public class TimetableServiceImpl implements TimetableService {
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
-        Model model = new Model(teacherModels,slotGroups,subjectModels,classModels,expectedSlotModels,expectedSubjectModel, gaParameter);
+        Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, gaParameter);
         Population population = new Population(POPULATION_SIZE, model);
-        setAttributeForGa(ga,population,model,lecturerId,gaParameter.getStepGeneration());
+        setAttributeForGa(ga, population, model, lecturerId, gaParameter.getStepGeneration());
         checkExistedGa(lecturerId);
 
         timetableProcess.getMap().put(lecturerId, ga);
@@ -98,6 +98,7 @@ public class TimetableServiceImpl implements TimetableService {
         timetableProcess.getMap().get(lecturerId).stop();
         System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
     }
+
     @Override
     public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
@@ -119,7 +120,7 @@ public class TimetableServiceImpl implements TimetableService {
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
         pagedResultSet.setPage(page);
-        System.out.println("size-map-------------"  +timetableProcess.getMap().size());
+        System.out.println("size-map-------------" + timetableProcess.getMap().size());
         return pagedResultSet;
     }
 
@@ -127,10 +128,10 @@ public class TimetableServiceImpl implements TimetableService {
     public void setDefaultTimetable(int runId, String lecturerId, int semesterId) {
         Queue<Runs> q = timetableProcess.getMap().get(lecturerId).getGenInfos();
         Runs runs = q.stream()
-                .filter(i->i.getId() == runId)
+                .filter(i -> i.getId() == runId)
                 .findAny()
                 .orElse(null);
-        List<TimetableDetailDTO> timetableDetails = runs.getTimetableEdit().stream().map(i->i.getTimetable()).flatMap(List::stream).collect(Collectors.toList());
+        List<TimetableDetailDTO> timetableDetails = runs.getTimetableEdit().stream().map(i -> i.getTimetable()).flatMap(List::stream).collect(Collectors.toList());
         Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
         Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
                 Collectors.toMap(x -> x.getLineId(), x -> x));
@@ -142,7 +143,8 @@ public class TimetableServiceImpl implements TimetableService {
         timetable.setTimetableDetails(new ArrayList(timetableMap.values()));
         timetableRepository.save(timetable);
     }
-    private void checkExistedGa(String lecturerId){
+
+    private void checkExistedGa(String lecturerId) {
         if (timetableProcess.getMap().get(lecturerId) != null && !timetableProcess.getMap().get(lecturerId).isRunning()) {
             timetableProcess.getMap().remove(lecturerId);
         }
@@ -150,7 +152,8 @@ public class TimetableServiceImpl implements TimetableService {
             throw new InvalidRequestException("Running arrange !");
         }
     }
-    private void setAttributeForGa(GeneticAlgorithm ga,Population population,Model model,String lecturerId,int step){
+
+    private void setAttributeForGa(GeneticAlgorithm ga, Population population, Model model, String lecturerId, int step) {
         ga.setPopulation(population);
         ga.setGeneration(0);
         ga.setModel(model);
@@ -158,36 +161,57 @@ public class TimetableServiceImpl implements TimetableService {
         ga.setRunning(true);
         ga.setLecturerId(lecturerId);
     }
-    private void checkGaParameter(GaParameter gaParam){
-        Cofficient cofficient =gaParam.getCofficient();
-        if(cofficient.getSlotCoff()+cofficient.getSubjectCoff()+cofficient.getNumberOfClassCoff()+cofficient.getDistanceCoff()!=1){
+
+    private void checkGaParameter(GaParameter gaParam) {
+        Cofficient cofficient = gaParam.getCofficient();
+        if (cofficient.getSlotCoff() + cofficient.getSubjectCoff() + cofficient.getNumberOfClassCoff() + cofficient.getDistanceCoff() != 1) {
             throw new InvalidRequestException("Sum of slotCoff,subjectCoff,numberOfClassCoff,distanceCoff must be equal 1!");
         }
-        if(cofficient.getStdCoff()+cofficient.getSatisfactionSumCoff() != 1){
+        if (cofficient.getStdCoff() + cofficient.getSatisfactionSumCoff() != 1) {
             throw new InvalidRequestException("Sum of stdCoff,satisfactionSum must be equal 1!");
         }
-        if(cofficient.getFulltimeCoff()+cofficient.getParttimeCoff() != 1){
+        if (cofficient.getFulltimeCoff() + cofficient.getParttimeCoff() != 1) {
             throw new InvalidRequestException("Sum of fullTimeCoff,PartimeCoff must be equal 1!");
         }
-        if(cofficient.getHardConstraintCoff()+cofficient.getSoftConstraintCoff() !=1){
+        if (cofficient.getHardConstraintCoff() + cofficient.getSoftConstraintCoff() != 1) {
             throw new InvalidRequestException("Sum of hardCoff,SoftCoff must be equal 1!");
         }
 
     }
+
+    private boolean isDraft(Lecturer lecturer, Semester semester) {
+        Confirmation confirmation = confirmationRepo.findBySemesterAndLecturer(semester, lecturer);
+        if (confirmation != null) {
+            return false;
+        }
+        return true;
+    }
+    private boolean isOnlineTimetable(TimetableDetail time){
+        return Character.isAlphabetic(time.getSubject().getCode().charAt(time.getSubject().getCode().length() - 1));
+    }
+
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
                              Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
                              Vector<ExpectedSubject> expectedSubjectModel,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
+        List<Lecturer> lecturersPublic = confirmationRepo.findAllBySemester(semester).stream().map(Confirmation::getLecturer).collect(Collectors.toList());
+        List<Integer> lineIdPublic = timetableRepository.findBySemesterAndTempFalse(semester)
+                .getTimetableDetails()
+                .stream()
+                .filter(i->lecturersPublic.contains(i.getLecturer()))
+                .map(TimetableDetail::getLineId)
+                .collect(Collectors.toList());
+     ;
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
                 .stream()
-                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !Character.isAlphabetic(i.getSubject().getCode().charAt(i.getSubject().getCode().length() - 1)))
+                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineTimetable(i) && !lineIdPublic.contains(i.getLineId()))
                 .collect(Collectors.toList());
         List<Expected> expected = expectedRepository.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
         //teacher model
         List<Lecturer> lecturers = lecturerRepository.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
-                .filter(i -> expectedRepository.findBySemesterAndLecturer(semester, i) != null)
+                .filter(i -> expectedRepository.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
                 .collect(Collectors.toList());
         lecturers.forEach(i -> {
             Expected expectedEach = expectedRepository.findBySemesterAndLecturer(semester, i);
@@ -197,13 +221,13 @@ public class TimetableServiceImpl implements TimetableService {
         expected.stream()
                 .filter(i -> lecturers.contains(i.getLecturer()))
                 .forEach(i -> {
-            i.getExpectedSlots().forEach(s -> {
-                expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
-            });
-            i.getExpectedSubjects().forEach(s -> {
-                expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepository.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
-            });
-        });
+                    i.getExpectedSlots().forEach(s -> {
+                        expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
+                    });
+                    i.getExpectedSubjects().forEach(s -> {
+                        expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepository.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
+                    });
+                });
         //class model
         timetableDetails.stream().forEach(i -> {
             classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId()));

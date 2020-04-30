@@ -2,6 +2,7 @@ package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,10 +50,15 @@ public class Lecturer {
     public Lecturer(String email) {
         this.email = email;
     }
-
+    @JsonIgnore
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
+    private List<Confirmation> confirmations;
+    @Transient
+    TimetableStatus timetableStatus = TimetableStatus.DRAFT;
     @Override
     public boolean equals(Object obj) {
         Lecturer lecturer = (Lecturer) obj;
         return id == lecturer.getId();
     }
+
 }

@@ -12,7 +12,7 @@ public interface LecturerService {
 
     void remove(int id);
 
-    QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam);
+    QueryParam.PagedResultSet<Lecturer> findByCriteria(QueryParam queryParam,int semesterId);
 
     Lecturer findByGoogleId(String id);
 
@@ -21,6 +21,8 @@ public interface LecturerService {
     Lecturer transferRole(String hodGoogleId,String lecturerGoogleId);
 
     Lecturer findByShortName(String shortName);
+
+    Lecturer findById(int id);
 
     Lecturer changeStatus(StatusLecturer status,String googleId);
 
