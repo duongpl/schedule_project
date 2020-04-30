@@ -27,6 +27,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private RoomService roomService;
     private ConfirmationRepository confirmationRepo;
     private SemesterRepository semesterRepository;
+    private LecturerRepository lecturerRepo;
     final static List<Integer> slotNumbers = Arrays.asList(1,2,3,4,5,6);
 
     @Override
@@ -130,11 +131,11 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         TimetableDetail timetableDetailExisted = timetableDetailRepo.findById(timetableDetail.getId());
         Semester semester = timetableDetailExisted.getTimetable().getSemester();
         Confirmation con = confirmationRepo.findBySemesterAndLecturer(semester,timetableDetailExisted.getLecturer());
-        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester,lecturerService.findByShortName(timetableDetail.getLecturerShortName()));
+        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester,lecturerRepo.findByShortName(timetableDetail.getLecturerShortName()));
         if(con!=null){
             confirmationRepo.deleteById(con.getId());
         }
-        if(con1!=null && !timetableDetail.getLecturerShortName().equalsIgnoreCase(timetableDetailExisted.getLecturer().getShortName())){
+        if(con1!=null && !isSame(timetableDetail,timetableDetailExisted)){
             confirmationRepo.deleteById(con1.getId());
         }
         if (timetableDetailExisted == null) {
@@ -153,7 +154,15 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         }
         return timetableDetailRepo.save(timetableDetailExisted);
     }
-
+    private boolean isSame(TimetableDetailDTO t1,TimetableDetail t2){
+        if(t2.getLecturer() == null){
+            return false;
+        }
+        if(t1.getLecturerShortName().equalsIgnoreCase(t2.getLecturer().getShortName())) {
+            return true;
+        }
+        return false;
+    }
     @Override
     public List<TimetableEdit> getTimetableForEdit(QueryParam queryParam, String groupBy, int semesterId) {
 
