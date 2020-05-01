@@ -20,24 +20,24 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class SubjectServiceImpl implements SubjectService {
-    SubjectRepository subjectRepository;
-    TimetableRepository timetableRepository;
-    SemesterRepository semesterRepository;
+    SubjectRepository subjectRepo;
+    TimetableRepository timetableRepo;
+    SemesterRepository semesterRepo;
     LecturerService lecturerService;
 
     @Override
     public void addSubject(Subject subject) {
-        subjectRepository.save(subject);
+        subjectRepo.save(subject);
     }
 
     @Override
     public Subject getSubjectByCode(String code) {
-        return subjectRepository.findByCode(code);
+        return subjectRepo.findByCode(code);
     }
 
     @Override
     public List<Subject> getAllSubjectBySemester(int semesterId,String hodGoogleId) {
-        Timetable timetable=timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
+        Timetable timetable=timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(semesterId));
 
         if(timetable == null){
             throw new InvalidRequestException("Don't have subject for this semester !");

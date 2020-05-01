@@ -18,7 +18,7 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
 
     private RoleService roleService;
     private SemesterService semesterService;
-    private LecturerRepository lecturerRepository;
+    private LecturerRepository lecturerRepo;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -33,14 +33,14 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             semesterService.save(new Semester("summer","2020",true));
             semesterService.save(new Semester("spring","2020",false));
         }
-        if(lecturerRepository.findByEmail("dsst.dummy@gmail.com") == null){
+        if(lecturerRepo.findByEmail("dsst.dummy@gmail.com") == null){
             Lecturer lecturer = new Lecturer();
             lecturer.setDepartment("CF");
             lecturer.setShortName("admin");
             lecturer.setEmail("dsst.dummy@gmail.com");
             lecturer.setStatus(StatusLecturer.ACTIVATE);
             lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
-            lecturerRepository.save(lecturer);
+            lecturerRepo.save(lecturer);
         }
     }
 }

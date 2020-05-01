@@ -19,23 +19,23 @@ import java.util.List;
 @Transactional
 @AllArgsConstructor
 public class ConfirmationServiceImpl implements ConfirmationService {
-    TimetableRepository timetableRepository;
-    SemesterRepository semesterRepository;
+    TimetableRepository timetableRepo;
+    SemesterRepository semesterRepo;
     LecturerService lecturerService;
-    ConfirmationRepository confirmationRepository;
+    ConfirmationRepository confirmationRe;
 
     @Override
     public List<Confirmation> save(List<Integer> lecturerIds, int semesterId) {
-        Semester semester = semesterRepository.findById(semesterId);
+        Semester semester = semesterRepo.findById(semesterId);
         lecturerIds.stream().forEach(i->{
             Lecturer lecture = lecturerService.findById(i);
             // find exist confirmation
-            Confirmation con = confirmationRepository.findBySemesterAndLecturer(semester,lecture);
+            Confirmation con = confirmationRe.findBySemesterAndLecturer(semester,lecture);
             if(con == null) {
-                confirmationRepository.save(new Confirmation(TimetableStatus.PUBLIC, lecturerService.findById(i), semesterRepository.findById(semesterId)));
+                confirmationRe.save(new Confirmation(TimetableStatus.PUBLIC, lecturerService.findById(i), semesterRepo.findById(semesterId)));
             } else {
                 con.setStatus(TimetableStatus.PUBLIC);
-                confirmationRepository.save(con);
+                confirmationRe.save(con);
             }
         });
         return null;
@@ -43,19 +43,19 @@ public class ConfirmationServiceImpl implements ConfirmationService {
 
     @Override
     public Confirmation update(Confirmation confirmation) {
-        Confirmation existed = confirmationRepository.findById(confirmation.getId());
+        Confirmation existed = confirmationRe.findById(confirmation.getId());
         if(confirmation.getStatus() != null) {
             existed.setStatus(confirmation.getStatus());
             existed.setReason(confirmation.getStatus().equals(TimetableStatus.REJECT) ? confirmation.getReason() : null);
         }
         existed.setConfirmed(true);
-        return confirmationRepository.save(existed);
+        return confirmationRe.save(existed);
     }
 
     @Override
     public Confirmation getByLecturerAndSemester(String lecturerId, int semesterId) {
-        return confirmationRepository
-                .findBySemesterAndLecturer(semesterRepository.findById(semesterId),lecturerService.findByGoogleId(lecturerId));
+        return confirmationRe
+                .findBySemesterAndLecturer(semesterRepo.findById(semesterId),lecturerService.findByGoogleId(lecturerId));
     }
 
 

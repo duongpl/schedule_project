@@ -44,14 +44,14 @@ public class TimetableServiceImpl implements TimetableService {
     TimetableProcess timetableProcess;
 
     SemesterService semesterService;
-    TimetableRepository timetableRepository;
-    ExpectedRepository expectedRepository;
-    LecturerRepository lecturerRepository;
+    TimetableRepository timetableRepo;
+    ExpectedRepository expectedRepo;
+    LecturerRepository lecturerRepo;
     SubjectService subjectService;
-    SubjectRepository subjectRepository;
+    SubjectRepository subjectRepo;
     SlotRepository slotRepository;
-    SemesterRepository semesterRepository;
-    RoomRepository roomRepository;
+    SemesterRepository semesterRepo;
+    RoomRepository roomRepo;
     TimetableDetailRepository timetableDetailRepo;
     ConfirmationRepository confirmationRepo;
     @Autowired
@@ -60,7 +60,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Override
     public Timetable findBySemesterTempFalse(Semester semester) {
-        Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semester);
+        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semester);
         if (timetable == null) {
             throw new InvalidRequestException("Don't have data for this timetable");
         }
@@ -76,9 +76,9 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<ExpectedSlot> expectedSlotModels = new Vector<>();
         Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
-        Lecturer lecturer = lecturerRepository.findByGoogleId(lecturerId);
+        Lecturer lecturer = lecturerRepo.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
-        Timetable timetable = timetableRepository.findBySemesterAndTempTrue(semester);
+        Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
         checkGaParameter(gaParameter);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
@@ -131,17 +131,21 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> i.getId() == runId)
                 .findAny()
                 .orElse(null);
-        List<TimetableDetailDTO> timetableDetails = runs.getTimetableEdit().stream().map(i -> i.getTimetable()).flatMap(List::stream).collect(Collectors.toList());
-        Timetable timetable = timetableRepository.findBySemesterAndTempFalse(semesterRepository.findById(semesterId));
+        List<TimetableDetailDTO> timetableDetails = runs.getTimetableEdit()
+                .stream()
+                .map(i -> i.getTimetable())
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(semesterId));
         Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
                 Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
-            timetableMap.get(i.getLineId()).setLecturer(lecturerRepository.findByShortName(i.getLecturerShortName()));
-            timetableMap.get(i.getLineId()).setRoom(roomRepository.findByName(i.getRoom()));
+            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortName(i.getLecturerShortName()));
+            timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
 
         });
         timetable.setTimetableDetails(new ArrayList(timetableMap.values()));
-        timetableRepository.save(timetable);
+        timetableRepo.save(timetable);
     }
 
     private void checkExistedGa(String lecturerId) {
@@ -196,7 +200,7 @@ public class TimetableServiceImpl implements TimetableService {
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
         List<Lecturer> lecturersPublic = confirmationRepo.findAllBySemester(semester).stream().map(Confirmation::getLecturer).collect(Collectors.toList());
-        List<Integer> lineIdPublic = timetableRepository.findBySemesterAndTempFalse(semester)
+        List<Integer> lineIdPublic = timetableRepo.findBySemesterAndTempFalse(semester)
                 .getTimetableDetails()
                 .stream()
                 .filter(i->lecturersPublic.contains(i.getLecturer()))
@@ -207,14 +211,14 @@ public class TimetableServiceImpl implements TimetableService {
                 .stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
                 .collect(Collectors.toList());
-        List<Expected> expected = expectedRepository.findAllBySemester(semester);
+        List<Expected> expected = expectedRepo.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
         //teacher model
-        List<Lecturer> lecturers = lecturerRepository.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
-                .filter(i -> expectedRepository.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
+        List<Lecturer> lecturers = lecturerRepo.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
+                .filter(i -> expectedRepo.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
                 .collect(Collectors.toList());
         lecturers.forEach(i -> {
-            Expected expectedEach = expectedRepository.findBySemesterAndLecturer(semester, i);
+            Expected expectedEach = expectedRepo.findBySemesterAndLecturer(semester, i);
             teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
         });
         //expected model
@@ -224,8 +228,8 @@ public class TimetableServiceImpl implements TimetableService {
                     i.getExpectedSlots().forEach(s -> {
                         expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
                     });
-                    i.getExpectedSubjects().stream().filter(x->!isOnlineSubject(subjectRepository.findByCode(x.getSubjectCode()))).forEach(s -> {
-                        expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepository.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
+                    i.getExpectedSubjects().stream().filter(x->!isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
+                        expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepo.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
                     });
                 });
         //class model
@@ -295,7 +299,7 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepository.findByEmail(teacherMail);
+                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
                     System.out.println(e.getElementsByTagName("Cell").item(0).getTextContent());
                     ExpectedNote expectedNote = new ExpectedNote();
                     expectedNote.setExpected(expected);
@@ -312,11 +316,11 @@ public class TimetableServiceImpl implements TimetableService {
                         System.out.println();
                         expectedSlots.add(expectedSlot);
                     }
-                    expected.setSemester(semesterRepository.getAllByNowIsTrue());
+                    expected.setSemester(semesterRepo.getAllByNowIsTrue());
                     expected.setLecturer(lecturer);
                     expected.setExpectedSlots(expectedSlots);
                     expected.setExpectedNote(expectedNote);
-                    expectedRepository.save(expected);
+                    expectedRepo.save(expected);
 
                 }
             }
@@ -347,14 +351,14 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepository.findByEmail(teacherMail);
-                    Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(), lecturer);
+                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
+                    Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(), lecturer);
                     System.out.println(teacherMail);
                     ;
 
                     for (int t = 0; t < subject.size(); t++) {
                         String subjectCode = subject.get(t);
-                        if (subjectRepository.findByCode(subjectCode) == null) {
+                        if (subjectRepo.findByCode(subjectCode) == null) {
                             continue;
                         }
                         com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
@@ -366,7 +370,7 @@ public class TimetableServiceImpl implements TimetableService {
 
                     }
                     expected.setExpectedSubjects(expectedSubjects);
-                    expectedRepository.save(expected);
+                    expectedRepo.save(expected);
 
                 }
             }

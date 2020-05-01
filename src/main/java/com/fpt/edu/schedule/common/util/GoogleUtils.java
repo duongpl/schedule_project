@@ -25,7 +25,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GoogleUtils {
     private Environment env;
-    private LecturerRepository lecturerRepository;
+    private LecturerRepository lecturerRepo;
 
 
     public GooglePojo getUserInfo(final String accessToken) throws ClientProtocolException, IOException {
@@ -42,7 +42,7 @@ public class GoogleUtils {
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        Lecturer existedUser = lecturerRepository.findByEmail(googlePojo.getEmail());
+        Lecturer existedUser = lecturerRepo.findByEmail(googlePojo.getEmail());
         if (existedUser == null || existedUser.getStatus().equals(StatusLecturer.DEACTIVATE)) {
             throw new InvalidRequestException(MessageResponse.msgLogin);
         }
@@ -55,7 +55,7 @@ public class GoogleUtils {
             existedUser.setPicture(googlePojo.getPicture());
             existedUser.setLogin(true);
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            lecturerRepository.save(existedUser);
+            lecturerRepo.save(existedUser);
         }
 
 

@@ -18,4 +18,6 @@ public interface ConfirmationRepository extends JpaRepository<Confirmation, Inte
 
      void deleteById(int id);
 
+     void deleteAllBySemester(Semester semester);
+
 }

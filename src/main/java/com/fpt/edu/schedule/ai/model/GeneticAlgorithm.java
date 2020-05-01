@@ -33,9 +33,9 @@ public class GeneticAlgorithm {
     public static final int CLASS_NUMBER = 5;
     public static final double IN_CLASS_RATE = 0.9;
     @Autowired
-    TimetableDetailRepository timetableDetailRepository;
+    TimetableDetailRepository timetableDetailRepo;
     @Autowired
-    LecturerRepository lecturerRepository;
+    LecturerRepository lecturerRepo;
     @Autowired
     ApplicationEventPublisher publisher;
     @Autowired
@@ -240,8 +240,8 @@ public class GeneticAlgorithm {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
         records.stream().forEach(i -> {
-            TimetableDetail timetableDetail = timetableDetailRepository.findById(i.getClassId());
-            timetableDetail.setLecturer(lecturerRepository.findById(i.getTeacherId()));
+            TimetableDetail timetableDetail = timetableDetailRepo.findById(i.getClassId());
+            timetableDetail.setLecturer(lecturerRepo.findById(i.getTeacherId()));
             timetableDetails.add(timetableDetail);
         });
         List<TimetableDetailDTO> timetableDetailDTOS = timetableDetails.stream()

@@ -22,20 +22,20 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class RoomServiceImpl implements RoomService {
-    RoomRepository roomRepository;
+    RoomRepository roomRepo;
     TimetableService timetableService;
     SemesterService semesterService;
     LecturerService lecturerService;
-    TimetableDetailRepository timetableDetailRepository;
+    TimetableDetailRepository timetableDetailRepo;
 
     @Override
     public void addRoom(Room room) {
-        roomRepository.save(room);
+        roomRepo.save(room);
     }
 
     @Override
     public Room getRoomByName(String name) {
-        Room room = roomRepository.findByName(name);
+        Room room = roomRepo.findByName(name);
         if (room == null) {
             throw new InvalidRequestException("Don't find this room");
         }
@@ -46,7 +46,7 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> findByCriteria(QueryParam queryParam, String semesterId, String lecturerId) {
         if (semesterId.length() == 0) {
             BaseSpecifications cns = new BaseSpecifications(queryParam);
-            return roomRepository.findAll(cns);
+            return roomRepo.findAll(cns);
         }
         int semester = Integer.parseInt(semesterId);
         Timetable timetable = timetableService.findBySemesterTempFalse(semesterService.findById(semester));
@@ -60,7 +60,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public List<Room> getRoomForUpdate(int timetableDetailId) {
-        TimetableDetail timetableDetail = timetableDetailRepository.findById(timetableDetailId);
+        TimetableDetail timetableDetail = timetableDetailRepo.findById(timetableDetailId);
         Timetable timetable = timetableDetail.getTimetable();
         Set<Room> rooms1 =timetable.getTimetableDetails()
                 .stream()

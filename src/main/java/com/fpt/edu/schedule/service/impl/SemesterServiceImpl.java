@@ -16,16 +16,16 @@ import java.util.List;
 @Transactional
 @AllArgsConstructor
 public class SemesterServiceImpl implements SemesterService {
-    SemesterRepository semesterRepository;
+    SemesterRepository semesterRepo;
 
     @Override
     public int countAllSemester() {
-        return semesterRepository.count();
+        return semesterRepo.count();
     }
 
     @Override
     public Semester save(Semester semester) {
-        return semesterRepository.save(semester);
+        return semesterRepo.save(semester);
     }
 
     @Override
@@ -33,13 +33,13 @@ public class SemesterServiceImpl implements SemesterService {
 
         BaseSpecifications cns = new BaseSpecifications(queryParam);
 
-        return semesterRepository.findAll(cns);
+        return semesterRepo.findAll(cns);
 
     }
 
     @Override
     public Semester findById(int id) {
-        Semester semester = semesterRepository.findById(id);
+        Semester semester = semesterRepo.findById(id);
         if(semester == null){
             throw new InvalidRequestException("Don't find this semester");
         }

@@ -37,17 +37,18 @@ public class RequestServiceImpl implements RequestService {
     ClassNameRepository classNameRepository;
     SubjectService subjectService;
     TimeTableDetailService timeTableDetailService;
-    TimetableDetailRepository timetableDetailRepository;
-    TimetableRepository timetableRepository;
+    TimetableDetailRepository timetableDetailRepo;
+    TimetableRepository timetableRepo;
     SlotService slotService;
     RequestRepository requestRepository;
-    LecturerRepository lecturerRepository;
-    SemesterRepository semesterRepository;
-    RoomRepository roomRepository;
+    LecturerRepository lecturerRepo;
+    SemesterRepository semesterRepo;
+    RoomRepository roomRepo;
     LecturerService lecturerService;
     DepartmentRepository departmentRepository;
-    ExpectedRepository expectedRepository;
+    ExpectedRepository expectedRepo;
     RoleService roleService;
+    ConfirmationRepository confirmationRepos;
     @Autowired
     private JavaMailSender javaMailSender;
 
@@ -100,7 +101,7 @@ public class RequestServiceImpl implements RequestService {
                             departmentRepository.save(new Department(cell.getStringCellValue().trim()));
                             break;
                         case 5:
-                            if (roomRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                            if (roomRepo.findByName(cell.getStringCellValue().trim()) != null) {
                                 break;
                             }
                             roomService.addRoom(new Room(cell.getStringCellValue().trim()));
@@ -118,11 +119,11 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request addRequest(Request request, String lecturerId) {
 
-        request.setSemester(semesterRepository.getAllByNowIsTrue());
+        request.setSemester(semesterRepo.getAllByNowIsTrue());
         request.setCreatedDate(new Date());
         request.setStatus(StatusReport.PENDING);
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
-        Lecturer hod = lecturerRepository.findAllByDepartmentAndRole(lecturer.getDepartment(),roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
+        Lecturer hod = lecturerRepo.findAllByDepartmentAndRole(lecturer.getDepartment(),roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
         request.setLecturer(lecturer);
         String title = "[DSST SYSTEM] New Request";
         String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to response !",lecturer.getEmail(),request.getContent(),Config.domainWebsite);
@@ -175,20 +176,22 @@ public class RequestServiceImpl implements RequestService {
 
     private void saveTimetable(MultipartFile multipartFile, int semesterId) {
         try {
-
+            Semester se = semesterRepo.findById(semesterId);
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
-            List<Timetable> existedTimetable = timetableRepository.findAllBySemester(semesterRepository.findById(semesterId));
+            List<Timetable> existedTimetable = timetableRepo.findAllBySemester(se);
 
             if (existedTimetable.size()>0) {
 
                 existedTimetable.stream().forEach(i->{
-//                    timetableDetailRepository.deleteAllByTimetable(i.getId());
-                    timetableRepository.deleteById(i.getId());
+//                    timetableDetailRepo.deleteAllByTimetable(i.getId());
+                    timetableRepo.deleteById(i.getId());
                 });
-                expectedRepository.deleteAllBySemester(semesterRepository.findById(semesterId));
+                confirmationRepos.deleteAllBySemester(se);
+                expectedRepo.deleteAllBySemester(se);
+
             }
             Timetable timeTable = new Timetable();
             Timetable timeTableTemp = new Timetable();
@@ -202,8 +205,8 @@ public class RequestServiceImpl implements RequestService {
                 Iterator<Cell> cellIterator = row.cellIterator();
                 TimetableDetail timetableDetail = new TimetableDetail();
                 TimetableDetail timetableDetailTemp = new TimetableDetail();
-                timeTable.setSemester(semesterRepository.findById(semesterId));
-                timeTableTemp.setSemester(semesterRepository.findById(semesterId));
+                timeTable.setSemester(semesterRepo.findById(semesterId));
+                timeTableTemp.setSemester(semesterRepo.findById(semesterId));
                 line++;
                 lineTemp++;
                 while (cellIterator.hasNext()) {
@@ -244,8 +247,8 @@ public class RequestServiceImpl implements RequestService {
                     timeTableTemp.getTimetableDetails().add(timetableDetailTemp);
                 }
             }
-            timetableRepository.save(timeTableTemp);
-            timetableRepository.save(timeTable);
+            timetableRepo.save(timeTableTemp);
+            timetableRepo.save(timeTable);
         } catch (Exception e) {
             e.printStackTrace();
         }

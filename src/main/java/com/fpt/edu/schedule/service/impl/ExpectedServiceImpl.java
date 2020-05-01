@@ -25,18 +25,18 @@ public class ExpectedServiceImpl implements ExpectedService {
     LecturerService lecturerService;
     SubjectService subjectService;
     SlotService slotService;
-    ExpectedRepository expectedRepository;
+    ExpectedRepository expectedRepo;
     ExpectedSubjectRepository expectedSubjectRepository;
     ExpectedSlotService expectedSlotService;
     ExpectedSubjectService expectedSubjectService;
     ExpectedNoteRepository expectedNoteRepository;
-    SemesterRepository semesterRepository;
+    SemesterRepository semesterRepo;
     TimetableService timetableService;
     private static final List<String> SLOT_LIST = Arrays.asList("M1", "M2", "M3", "M4", "M5", "E1", "E2", "E3", "E4", "E5");
 
     @Override
     public Expected addExpected(Expected expected) {
-        Expected existedExpected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(expected.getSemester().getId()),
+        Expected existedExpected = expectedRepo.findBySemesterAndLecturer(semesterRepo.findById(expected.getSemester().getId()),
                 lecturerService.findByGoogleId(expected.getLecturer().getGoogleId()));
         if(existedExpected !=null){
             throw new InvalidRequestException("Already have expected for this semester !");
@@ -63,7 +63,7 @@ public class ExpectedServiceImpl implements ExpectedService {
                 .forEach(i -> expected.getExpectedSubjects().add(new ExpectedSubject(i.getCode())));
         slotNotContainInRequest.stream()
                 .forEach(i -> expected.getExpectedSlots().add(new ExpectedSlot(i)));
-        expected.setSemester(semesterRepository.findById(expected.getSemester().getId()));
+        expected.setSemester(semesterRepo.findById(expected.getSemester().getId()));
         expected.setLecturer(lecturer);
         expected.getExpectedNote().setExpected(expected);
 
@@ -72,12 +72,12 @@ public class ExpectedServiceImpl implements ExpectedService {
                 .forEach(i -> i.setExpected(expected));
         expected.getExpectedSubjects().stream()
                 .forEach(i -> i.setExpected(expected));
-        return expectedRepository.save(expected);
+        return expectedRepo.save(expected);
     }
 
     @Override
     public Expected updateExpected(Expected expected) {
-        Expected existedExpected = expectedRepository.findById(expected.getId());
+        Expected existedExpected = expectedRepo.findById(expected.getId());
         if (existedExpected == null) {
             throw new InvalidRequestException("Don't find this expected");
         }
@@ -93,27 +93,27 @@ public class ExpectedServiceImpl implements ExpectedService {
             expected.getExpectedSubjects().stream().forEach(i -> expectedSubjectService.update(i));
         }
         existedExpected.setUpdatedDate(new Date());
-        return expectedRepository.save(existedExpected);
+        return expectedRepo.save(existedExpected);
     }
 
     @Override
     public List<Expected> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        return expectedRepository.findAll(cns);
+        return expectedRepo.findAll(cns);
     }
 
     @Override
     public void removeExpectedById(int expectedId) {
-        Expected existedExpected = expectedRepository.findById(expectedId);
+        Expected existedExpected = expectedRepo.findById(expectedId);
         if (existedExpected == null) {
             throw new InvalidRequestException("Don't find this expected");
         }
-        expectedRepository.removeExpectedById(existedExpected.getId());
+        expectedRepo.removeExpectedById(existedExpected.getId());
     }
 
     @Override
     public Expected getExpectedByLecturerAndSemester(String lecturerId, int semesterId) {
-        Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
+        Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.findById(semesterId),
                 lecturerService.findByGoogleId(lecturerId));
         if (expected == null) {
             Expected newExpected = new Expected();
@@ -127,11 +127,11 @@ public class ExpectedServiceImpl implements ExpectedService {
             newExpected.setExpectedSubjects(expectedSubjectList);
             newExpected.setExpectedSlots(expectedSlot);
             newExpected.setLecturer(lecturerService.findByGoogleId(lecturerId));
-            newExpected.setSemester(semesterRepository.findById(semesterId));
+            newExpected.setSemester(semesterRepo.findById(semesterId));
 
             return newExpected;
         }
-        if (expectedRepository.findBySemesterAndLecturer(semesterRepository.getAllByNowIsTrue(),
+        if (expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(),
                 lecturerService.findByGoogleId(lecturerId)) == null) {
             expected.setCanReuse(true);
         }
@@ -140,7 +140,7 @@ public class ExpectedServiceImpl implements ExpectedService {
 
     @Override
     public Expected saveExistedExpected(String lecturerGoogleId, int semesterId) {
-        Expected expected = expectedRepository.findBySemesterAndLecturer(semesterRepository.findById(semesterId),
+        Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.findById(semesterId),
                 lecturerService.findByGoogleId(lecturerGoogleId));
         if (expected == null) {
             throw new InvalidRequestException("This semester don't have your expected !");
@@ -161,9 +161,9 @@ public class ExpectedServiceImpl implements ExpectedService {
         newExpected.setExpectedNote(new ExpectedNote(expectedNote.getExpectedNumOfClass(), expectedNote.getMaxConsecutiveSlot(), expectedNote.getNote(), newExpected));
         newExpected.setUpdatedDate(new Date());
         newExpected.setCreatedDate(new Date());
-        newExpected.setSemester(semesterRepository.getAllByNowIsTrue());
+        newExpected.setSemester(semesterRepo.getAllByNowIsTrue());
 
-        return expectedRepository.save(newExpected);
+        return expectedRepo.save(newExpected);
     }
 
 
