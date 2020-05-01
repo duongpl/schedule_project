@@ -20,12 +20,10 @@ public class ClassController {
     public ResponseEntity getExpectedByCriteria(@RequestBody QueryParam queryParam,
                                                 @RequestParam(value = "semesterId", defaultValue = "") String semesterId,
                                                 @RequestHeader("GoogleId") String lecturerId) {
-        try {
+
 
             List<ClassName> classNames = classNameService.findByCriteria(queryParam,semesterId,lecturerId);
             return new ResponseEntity(classNames, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

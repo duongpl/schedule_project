@@ -19,47 +19,31 @@ public class RequestController {
 
     @PostMapping("/generate")
     public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam(name = "semesterId") int semesterId) {
-        try {
             requestService.generateExcelFile(multipartFile,semesterId);
             return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @PostMapping("/filter")
     public ResponseEntity<Request> getRequestByCriteria(@RequestBody QueryParam queryParam) {
-        try {
+
             return new ResponseEntity(requestService.findByCriteria(queryParam), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @PostMapping
     public ResponseEntity<Request> addRequest(@RequestBody Request request,
                                              @RequestHeader("GoogleId") String currentLecturerId) {
-        try {
             return new ResponseEntity(requestService.addRequest(request,currentLecturerId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @PutMapping
     public ResponseEntity<Request> updateRequest(@RequestBody Request request,
                                                  @RequestHeader("GoogleId")String lecturerId) {
-        try {
             return new ResponseEntity(requestService.updateRequest(request,lecturerId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @DeleteMapping("/{reportId}")
     public ResponseEntity remove(@PathVariable("reportId") int expectedId) {
-        try {
             requestService.removeRequestById(expectedId);
             return new ResponseEntity( HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
 //    @GetMapping("/sendMail")

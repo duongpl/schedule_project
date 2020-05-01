@@ -21,20 +21,15 @@ public class RoomController {
     public ResponseEntity<Room> getRoomByCriteria(@RequestBody QueryParam queryParam,
                                                        @RequestParam(value = "semesterId", defaultValue = "") String semesterId,
                                                        @RequestHeader("GoogleId") String lecturerId) {
-        try {
             List<Room> roomList = roomService.findByCriteria(queryParam, semesterId,lecturerId);
             return new ResponseEntity(roomList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @GetMapping("/forUpdate")
     public ResponseEntity<Room> getRoomForUpdate(@RequestParam("timetableDetailId") int timetableDetailId) {
-        try {
+
             List<Room> roomList = roomService.getRoomForUpdate(timetableDetailId);
             return new ResponseEntity(roomList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

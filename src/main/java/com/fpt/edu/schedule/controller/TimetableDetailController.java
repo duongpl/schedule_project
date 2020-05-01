@@ -22,52 +22,34 @@ public class TimetableDetailController {
 
     @PostMapping("/filter")
     public ResponseEntity<ClassName> getScheduleByCriteria(@RequestBody QueryParam queryParam) {
-        try {
-            List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam,1);
+        List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam,1);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     @PutMapping()
     public ResponseEntity updateTimeTableDetail(@RequestBody TimetableDetailDTO request) {
-        try {
             return new ResponseEntity(timeTableDetailService.updateTimetableDetail(request), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @PostMapping("/filter/forEdit")
     public ResponseEntity getTimetableForEdit(@RequestBody QueryParam queryParam,
                                               @RequestParam("groupBy") String groupBy,
                                               @RequestParam("semesterId") int semesterId) {
-        try {
-
             List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam,groupBy,semesterId);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @PostMapping("/filter/forView")
     public ResponseEntity getTimetableForView(@RequestBody QueryParam queryParam) {
-        try {
-
             List<TimetableView> timetableDetails = timeTableDetailService.getTimetableForView(queryParam);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @PutMapping("swap/lecturer")
     public ResponseEntity swapLecturerTimetable(@RequestBody List<Integer> ids) {
-        try {
-
           timeTableDetailService.swapTwoTimetableDetail(ids);
             return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

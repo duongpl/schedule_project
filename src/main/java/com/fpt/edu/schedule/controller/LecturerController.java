@@ -61,58 +61,40 @@ public class LecturerController {
     //Test
     @PostMapping("/filter")
     public ResponseEntity<Lecturer> getLecturerByCriteria(@RequestBody QueryParam queryParam,
-                                                          @RequestParam(value = "semesterId",defaultValue = "0") int semesterId) {
-        try {
+                                                          @RequestParam(value = "semesterId", defaultValue = "0") int semesterId) {
 
-            QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam,semesterId);
-            return new ResponseEntity(lecturerList, HttpStatus.OK);
-        } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        QueryParam.PagedResultSet<Lecturer> lecturerList = lecturerService.findByCriteria(queryParam, semesterId);
+        return new ResponseEntity(lecturerList, HttpStatus.OK);
     }
+
 
     @PutMapping
     public ResponseEntity<Lecturer> updateLecturer(@RequestBody Lecturer lecturer) {
-        try {
-            return new ResponseEntity(lecturerService.updateLecturerName(lecturer), HttpStatus.OK);
-        } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        return new ResponseEntity(lecturerService.updateLecturerName(lecturer), HttpStatus.OK);
     }
+
 
     @PutMapping("/transferRole")
     public ResponseEntity<Lecturer> transferRole(@RequestHeader("GoogleId") String hodGoogleId,
                                                  @RequestParam("lecturerGoogleId") String lecturerGoogleId) {
-        try {
-            return new ResponseEntity(lecturerService.transferRole(hodGoogleId, lecturerGoogleId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity(lecturerService.transferRole(hodGoogleId, lecturerGoogleId), HttpStatus.OK);
+
     }
 
     @PutMapping("{lecturerGoogleId}/updateStatus")
     public ResponseEntity<Lecturer> updateStatus(@RequestParam StatusLecturer status,
                                                  @PathVariable("lecturerGoogleId") String lecturerGoogleId) {
-        try {
-            return new ResponseEntity(lecturerService.changeStatus(status, lecturerGoogleId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return new ResponseEntity(lecturerService.changeStatus(status, lecturerGoogleId), HttpStatus.OK);
+
     }
 
     @PostMapping("/forUpdate")
-    public ResponseEntity<Lecturer> findForUpdate(@RequestBody QueryParam queryParam,
+    public ResponseEntity<Lecturer> listForUpdate(@RequestBody QueryParam queryParam,
                                                   @RequestParam int timetableDetailId) {
-        try {
-            List<Lecturer> lecturerList = lecturerService.findForUpdate(timetableDetailId, queryParam);
-            return new ResponseEntity(lecturerList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<Lecturer> lecturerList = lecturerService.findForUpdate(timetableDetailId, queryParam);
+        return new ResponseEntity(lecturerList, HttpStatus.OK);
     }
 
 }

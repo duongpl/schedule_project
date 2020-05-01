@@ -21,49 +21,38 @@ public class TimetableController {
     public ResponseEntity<Subject> autoArrange(@RequestParam("semesterId") int semesterId,
                                                @RequestHeader("GoogleId") String hodGoogleId,
                                                @Valid @RequestBody GaParameter gaParameter) {
-        try {
-            timetableService.autoArrange(semesterId, hodGoogleId, gaParameter);
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (InvalidRequestException e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        timetableService.autoArrange(semesterId, hodGoogleId, gaParameter);
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
     @PostMapping("/stop")
     public ResponseEntity<Subject> stop(@RequestHeader("GoogleId") String lecturerId) {
-        try {
-            timetableService.stop(lecturerId);
 
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        timetableService.stop(lecturerId);
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
     @GetMapping("/generations")
     public ResponseEntity<Subject> getListGeneration(@RequestHeader("GoogleId") String hodGoogleId,
                                                      @RequestParam("page") String page,
                                                      @RequestParam("limit") String limit) {
-        try {
+        int limitParse = Integer.parseInt(limit);
+        int pageParse = Integer.parseInt(page);
+        return new ResponseEntity(timetableService.getGenerationInfo(hodGoogleId, pageParse, limitParse), HttpStatus.OK);
 
-            int limitParse = Integer.parseInt(limit);
-            int pageParse = Integer.parseInt(page);
-            return new ResponseEntity(timetableService.getGenerationInfo(hodGoogleId, pageParse, limitParse), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @PostMapping("/setDefault")
     public ResponseEntity<Subject> setTimetableDetail(@RequestHeader("GoogleId") String hodGoogleId,
                                                       @RequestParam("runId") int runId,
                                                       @RequestParam("semesterId") int semesterId) {
-        try {
-            timetableService.setDefaultTimetable(runId, hodGoogleId, semesterId);
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        timetableService.setDefaultTimetable(runId, hodGoogleId, semesterId);
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
 }

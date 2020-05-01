@@ -268,8 +268,6 @@ public class TimetableServiceImpl implements TimetableService {
         slots.add(e35);
 
     }
-
-
     private void importDataFromFile() {
         try {
 
@@ -284,8 +282,6 @@ public class TimetableServiceImpl implements TimetableService {
 
             NodeList teacherList = lst.getElementsByTagName("Row");
 
-            System.out.println(teacherList);
-            System.out.println("----------------------------");
             for (int i = 0; i < teacherList.getLength(); i++) {
                 Expected expected = new Expected();
                 Node node = teacherList.item(i);
@@ -300,7 +296,6 @@ public class TimetableServiceImpl implements TimetableService {
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
                     Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
-                    System.out.println(e.getElementsByTagName("Cell").item(0).getTextContent());
                     ExpectedNote expectedNote = new ExpectedNote();
                     expectedNote.setExpected(expected);
                     expectedNote.setExpectedNumOfClass(Integer.parseInt(e.getElementsByTagName("Cell").item(slot.size() + 1).getTextContent()));
@@ -310,10 +305,8 @@ public class TimetableServiceImpl implements TimetableService {
                         com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
                         int levelPrefer = Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent());
                         expectedSlot.setSlotName(slot.get(t));
-                        System.out.println(slot.get(t) + " :" + levelPrefer);
                         expectedSlot.setExpected(expected);
                         expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
-                        System.out.println();
                         expectedSlots.add(expectedSlot);
                     }
                     expected.setSemester(semesterRepo.getAllByNowIsTrue());
@@ -333,8 +326,6 @@ public class TimetableServiceImpl implements TimetableService {
 
             NodeList subjectList = lst.getElementsByTagName("Row");
 
-            System.out.println(subjectList);
-            System.out.println("----------------------------");
             for (int i = 0; i < subjectList.getLength(); i++) {
 
                 Node node = subjectList.item(i);
@@ -347,13 +338,12 @@ public class TimetableServiceImpl implements TimetableService {
 
                             subject.add(subjectCode);
                         }
-                        System.out.println("All subject " + subject);
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
                     Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
                     Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(), lecturer);
-                    System.out.println(teacherMail);
+
                     ;
 
                     for (int t = 0; t < subject.size(); t++) {

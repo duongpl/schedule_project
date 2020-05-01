@@ -18,27 +18,20 @@ public class ConfirmationController {
     @PostMapping
     public ResponseEntity addConfirm(@RequestParam("semesterId") int semesterId,
                                      @RequestBody List<Integer> lecturerIds) {
-        try {
+
             return new ResponseEntity(confirmationService.save(lecturerIds,semesterId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     @PutMapping()
     public ResponseEntity updateStatusConfirm(@RequestBody Confirmation confirmation) {
-        try {
+
             return new ResponseEntity(confirmationService.update(confirmation), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
     @GetMapping()
     public ResponseEntity getByLecturerAndSemester(@RequestParam("semesterId") int semesterId,
                                                    @RequestHeader("GoogleId") String lecturerId) {
-        try {
+
             return new ResponseEntity(confirmationService.getByLecturerAndSemester(lecturerId,semesterId), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

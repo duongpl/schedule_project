@@ -18,12 +18,10 @@ public class SubjectController {
     @PostMapping("/filter")
     public ResponseEntity<Subject> getSubjectByCriteria(@RequestParam("semesterId") int semesterId,
                                                         @RequestHeader("GoogleId")String hodGoogleId) {
-        try {
+
             List<Subject> subjectList =subjectService.getAllSubjectBySemester(semesterId,hodGoogleId);
 
             return new ResponseEntity(subjectList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }
