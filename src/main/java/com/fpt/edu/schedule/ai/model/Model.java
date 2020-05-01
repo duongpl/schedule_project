@@ -3,7 +3,7 @@ package com.fpt.edu.schedule.ai.model;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.lib.*;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import java.util.Vector;
 
 @Data
 @Component
+@NoArgsConstructor
 public class Model {
     private Vector<Teacher> teachers;
     private Vector<SlotGroup> slots;
