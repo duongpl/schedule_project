@@ -95,7 +95,7 @@ public class LecturerController {
     }
 
     @PutMapping("{lecturerGoogleId}/updateStatus")
-    public ResponseEntity<Lecturer> transferRole(@RequestParam StatusLecturer status,
+    public ResponseEntity<Lecturer> updateStatus(@RequestParam StatusLecturer status,
                                                  @PathVariable("lecturerGoogleId") String lecturerGoogleId) {
         try {
             return new ResponseEntity(lecturerService.changeStatus(status, lecturerGoogleId), HttpStatus.OK);

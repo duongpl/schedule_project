@@ -167,6 +167,7 @@ public class LecturerServiceImpl implements LecturerService {
         if (status == StatusLecturer.DEACTIVATE) {
             List<TimetableDetail> timetableDetail = timetableDetailRepo.findAllByLecturerAndTimetable(lecturer,
                     timetableRepo.findBySemesterAndTempFalse(semesterRepo.getAllByNowIsTrue()));
+            // remove all confirmation of this lecture
             Confirmation confirmation = confirmationRe.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(),lecturer);
             if(confirmation !=null) {
                 confirmationRe.deleteById(confirmation.getId());
