@@ -46,9 +46,9 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         Confirmation existed = confirmationRepository.findById(confirmation.getId());
         if(confirmation.getStatus() != null) {
             existed.setStatus(confirmation.getStatus());
+            existed.setReason(confirmation.getStatus().equals(TimetableStatus.REJECT) ? confirmation.getReason() : null);
         }
-        existed.setReason(confirmation.getReason());
-
+        existed.setConfirmed(true);
         return confirmationRepository.save(existed);
     }
 

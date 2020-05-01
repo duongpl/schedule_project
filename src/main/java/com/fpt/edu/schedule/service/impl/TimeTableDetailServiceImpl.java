@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.enums.Day;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
@@ -133,10 +134,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         Confirmation con = confirmationRepo.findBySemesterAndLecturer(semester,timetableDetailExisted.getLecturer());
         Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester,lecturerRepo.findByShortName(timetableDetail.getLecturerShortName()));
         if(con!=null){
-            confirmationRepo.deleteById(con.getId());
+            con.setStatus(TimetableStatus.DRAFT);
+            confirmationRepo.save(con);
         }
         if(con1!=null && !isSame(timetableDetail,timetableDetailExisted)){
-            confirmationRepo.deleteById(con1.getId());
+            con1.setStatus(TimetableStatus.DRAFT);
+            confirmationRepo.save(con1);
         }
         if (timetableDetailExisted == null) {
             throw new InvalidRequestException("Not found this timetable !");
@@ -154,6 +157,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         }
         return timetableDetailRepo.save(timetableDetailExisted);
     }
+
     private boolean isSame(TimetableDetailDTO t1,TimetableDetail t2){
         if(t2.getLecturer() == null){
             return false;

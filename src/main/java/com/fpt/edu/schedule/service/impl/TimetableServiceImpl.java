@@ -186,8 +186,8 @@ public class TimetableServiceImpl implements TimetableService {
         }
         return true;
     }
-    private boolean isOnlineTimetable(TimetableDetail time){
-        return Character.isAlphabetic(time.getSubject().getCode().charAt(time.getSubject().getCode().length() - 1));
+    private boolean isOnlineSubject(com.fpt.edu.schedule.model.Subject subject){
+        return Character.isAlphabetic(subject.getCode().charAt(subject.getCode().length() - 1));
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
@@ -205,7 +205,7 @@ public class TimetableServiceImpl implements TimetableService {
      ;
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
                 .stream()
-                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineTimetable(i) && !lineIdPublic.contains(i.getLineId()))
+                .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
                 .collect(Collectors.toList());
         List<Expected> expected = expectedRepository.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
@@ -224,7 +224,7 @@ public class TimetableServiceImpl implements TimetableService {
                     i.getExpectedSlots().forEach(s -> {
                         expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
                     });
-                    i.getExpectedSubjects().forEach(s -> {
+                    i.getExpectedSubjects().stream().filter(x->!isOnlineSubject(subjectRepository.findByCode(x.getSubjectCode()))).forEach(s -> {
                         expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepository.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
                     });
                 });
@@ -233,7 +233,8 @@ public class TimetableServiceImpl implements TimetableService {
             classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId()));
         });
         //subject model
-        subjects.stream().forEach(i -> {
+        // exclude online subject
+        subjects.stream().filter(i->!isOnlineSubject(i)).forEach(i -> {
             subjectModels.add(new Subject(i.getCode(), i.getId()));
         });
 

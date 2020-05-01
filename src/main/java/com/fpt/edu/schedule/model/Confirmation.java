@@ -22,8 +22,8 @@ public class Confirmation {
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
-    String reason;
-
+    private String reason;
+    private boolean confirmed = false;
     public Confirmation(TimetableStatus status, Lecturer lecturer, Semester semester) {
         this.status = status;
         this.lecturer = lecturer;
