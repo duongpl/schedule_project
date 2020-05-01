@@ -57,8 +57,8 @@ public class GeneticAlgorithm {
         this.generation = 0;
         this.model = model;
         this.population = new Population(model.getGaParameter().getPopulationSize(), model);
+
     }
-    ;
 
     public GeneticAlgorithm() {
 
@@ -72,7 +72,7 @@ public class GeneticAlgorithm {
         this.generation++;
 
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
-        System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
+        System.out.println("Best fitness: " + this.population.getBestIndividuals());
         System.out.println("Generation: " + this.generation);
 
         if (this.generation % this.stepGen  == 0 || this.generation == 1) {
@@ -186,11 +186,11 @@ public class GeneticAlgorithm {
         Vector<Slot> slots = SlotGroup.getSlotList(this.model.getSlots());
         Vector<Vector<Integer>> genes = new Vector<>();
         Random random = new Random();
+        int seed = random.nextInt(Integer.MAX_VALUE);
         for (Slot slot : slots) {
             Vector<Integer> p1 = c1.getGenes().get(slot.getId());
             Vector<Integer> p2 = c2.getGenes().get(slot.getId());
-            Vector<Integer> p3 = (new PMX(p1, p2, random.nextInt(Integer.MAX_VALUE))).getChildren();
-
+            Vector<Integer> p3 = (new PMX(p1, p2, seed)).getChildren();
             genes.add(p3);
         }
 
@@ -226,16 +226,20 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
+        if (this.model.getGaParameter().getPopulationSize() % 2 == 1) {
+            this.model.getGaParameter().setPopulationSize(this.model.getGaParameter().getPopulationSize() + 1);
+        }
         while (this.isRunning && !isConverged()) {
             this.updateFitness();
             this.selection1();
             this.mutate();
         }
     }
-
     public void stop() {
         this.isRunning = false;
     }
+
+
     public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
@@ -257,6 +261,8 @@ public class GeneticAlgorithm {
                 .collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits);
+
+        //poll if exceed range
         if (genInfos.size() > RESULT_RANGE) {
             genInfos.poll();
         }
