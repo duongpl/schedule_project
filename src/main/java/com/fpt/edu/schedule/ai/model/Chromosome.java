@@ -252,7 +252,9 @@ public class Chromosome {
             maxSatisfaction = Math.max(p[i], maxSatisfaction);
 
         }
-        double std = Math.sqrt(variance / (teachers.size() - 1));
+        double std = (teachers.size() == 1) ? 0.0 : Math.sqrt(variance / (teachers.size() - 1));
+        //bi doan nay, loi chia cho 0
+        //ok
 
         F1 = maxSatisfaction - minSatisfaction;
 

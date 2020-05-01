@@ -72,7 +72,7 @@ public class GeneticAlgorithm {
         this.generation++;
 
         System.out.println("Fitness Average: " + this.population.getAverageFitness());
-        System.out.println("Best fitness: " + this.population.getBestIndividuals().getFitness());
+        System.out.println("Best fitness: " + this.population.getBestIndividuals());
         System.out.println("Generation: " + this.generation);
 
         if (this.generation % this.stepGen  == 0 || this.generation == 1) {
@@ -238,6 +238,8 @@ public class GeneticAlgorithm {
     public void stop() {
         this.isRunning = false;
     }
+
+
     public void generateTimetable() {
         List<TimetableDetail> timetableDetails = new ArrayList<>();
         Vector<Record> records = population.getBestIndividuals().getSchedule();
@@ -259,6 +261,8 @@ public class GeneticAlgorithm {
                 .collect(Collectors.toList());
         timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         Runs run = new Runs(this.population.getBestIndividuals().getFitness(), this.population.getAverageFitness(), this.population.getBestIndividuals().getNumberOfViolation(), 0, this.generation, this.generation, timetableEdits);
+
+        //poll if exceed range
         if (genInfos.size() > RESULT_RANGE) {
             genInfos.poll();
         }

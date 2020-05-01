@@ -46,7 +46,7 @@ public class PMX {
     public Vector<Integer> getChildren() {
         int sz = p1.size();
         Random random = new Random(this.seed);
-        int swathSize = (sz < 2) ? sz - 1 : random.nextInt(sz - 2) + 2;
+        int swathSize = (sz <= 2) ? sz - 1 : random.nextInt(sz - 2) + 2;
         int l = (sz < 2) ? 0 : random.nextInt(sz - swathSize + 1);
         int r = l + swathSize;
         return this.getChildren(l, r);
