@@ -9,6 +9,7 @@ import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.model.*;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
@@ -136,9 +137,17 @@ public class TimetableServiceImpl implements TimetableService {
                 .map(i -> i.getTimetable())
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(semesterId));
-        Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
-                Collectors.toMap(x -> x.getLineId(), x -> x));
+        Semester semester = semesterRepo.findById(semesterId);
+        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semester);
+        List<Lecturer> list = getListlecturersNotDraft(semester);
+        timetable.getTimetableDetails().stream().forEach(x -> {
+            if(!list.contains(x.getLecturer())) {
+                x.setLecturer(null);
+            }
+        });
+        Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails()
+                .stream()
+                .collect(Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
             timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortName(i.getLecturerShortName()));
             timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
@@ -185,13 +194,23 @@ public class TimetableServiceImpl implements TimetableService {
 
     private boolean isDraft(Lecturer lecturer, Semester semester) {
         Confirmation confirmation = confirmationRepo.findBySemesterAndLecturer(semester, lecturer);
-        if (confirmation != null) {
+        if (confirmation != null && !confirmation.getStatus().equals(TimetableStatus.DRAFT)) {
             return false;
         }
         return true;
     }
-    private boolean isOnlineSubject(com.fpt.edu.schedule.model.Subject subject){
+
+    private boolean isOnlineSubject(com.fpt.edu.schedule.model.Subject subject) {
         return Character.isAlphabetic(subject.getCode().charAt(subject.getCode().length() - 1));
+    }
+
+    private List<Lecturer> getListlecturersNotDraft(Semester semester) {
+        List<Lecturer> lecturersNotSendResource = confirmationRepo.findAllBySemester(semester)
+                .stream()
+                .filter(x -> !x.getStatus().equals(TimetableStatus.DRAFT))
+                .map(Confirmation::getLecturer)
+                .collect(Collectors.toList());
+        return lecturersNotSendResource;
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
@@ -199,14 +218,17 @@ public class TimetableServiceImpl implements TimetableService {
                              Vector<ExpectedSubject> expectedSubjectModel,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
-        List<Lecturer> lecturersPublic = confirmationRepo.findAllBySemester(semester).stream().map(Confirmation::getLecturer).collect(Collectors.toList());
+
+        // exclude all timetable detail not draft
+        List<Lecturer> lecturersNotSendResource = getListlecturersNotDraft(semester);
         List<Integer> lineIdPublic = timetableRepo.findBySemesterAndTempFalse(semester)
                 .getTimetableDetails()
                 .stream()
-                .filter(i->lecturersPublic.contains(i.getLecturer()))
+                .filter(i -> lecturersNotSendResource.contains(i.getLecturer()))
                 .map(TimetableDetail::getLineId)
                 .collect(Collectors.toList());
-     ;
+        ;
+
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
                 .stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
@@ -228,7 +250,7 @@ public class TimetableServiceImpl implements TimetableService {
                     i.getExpectedSlots().forEach(s -> {
                         expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
                     });
-                    i.getExpectedSubjects().stream().filter(x->!isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
+                    i.getExpectedSubjects().stream().filter(x -> !isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
                         expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepo.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
                     });
                 });
@@ -238,7 +260,7 @@ public class TimetableServiceImpl implements TimetableService {
         });
         //subject model
         // exclude online subject
-        subjects.stream().filter(i->!isOnlineSubject(i)).forEach(i -> {
+        subjects.stream().filter(i -> !isOnlineSubject(i)).forEach(i -> {
             subjectModels.add(new Subject(i.getCode(), i.getId()));
         });
 
@@ -268,6 +290,7 @@ public class TimetableServiceImpl implements TimetableService {
         slots.add(e35);
 
     }
+
     private void importDataFromFile() {
         try {
 
@@ -303,7 +326,6 @@ public class TimetableServiceImpl implements TimetableService {
 
                     for (int t = 0; t < slot.size(); t++) {
                         com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
-                        int levelPrefer = Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent());
                         expectedSlot.setSlotName(slot.get(t));
                         expectedSlot.setExpected(expected);
                         expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
