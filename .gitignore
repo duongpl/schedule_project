@@ -26,6 +26,9 @@ target/
 /nbdist/
 /.nb-gradle/
 build/
-
+*.properties
 ### VS Code ###
 .vscode/
+
+## output files
+*.csv
