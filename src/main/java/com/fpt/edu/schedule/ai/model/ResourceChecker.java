@@ -78,7 +78,6 @@ public class ResourceChecker {
         dinic.add(superSource1, source, numberOfClass, Dinic.INF);
 
         int fl = dinic.maxflow();
-
         if (fl == numberOfClass + totalDemand) {
             return true;
         } else return false;
@@ -149,6 +148,7 @@ public class ResourceChecker {
 
         int fl = dinic.maxflow();
 
+
         Vector<Class> res = new Vector<>();
         if (fl == numberOfClass + totalDemand) {
             int[][] flow = dinic.flow;
@@ -170,8 +170,8 @@ public class ResourceChecker {
                     }
                 }
             }
-            return res;
-        } else return null;
+        }
+        return res; //ok
     }
 
     public Vector<Class> getMaximumClass() {
@@ -183,7 +183,7 @@ public class ResourceChecker {
         int maxNumberOfClass = 0;
         while (l <= r) {
             int g = (l + r) / 2;
-            if (check(g)) {
+              if (check(g)) {
                 maxNumberOfClass = g;
                 l = g + 1;
             } else {
