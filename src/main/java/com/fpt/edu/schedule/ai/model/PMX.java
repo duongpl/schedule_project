@@ -47,7 +47,7 @@ public class PMX {
         int sz = p1.size();
         Random random = new Random(this.seed);
         int swathSize = (sz <= 2) ? sz - 1 : random.nextInt(sz - 2) + 2;
-        int l = (sz < 2) ? 0 : random.nextInt(sz - swathSize + 1);
+        int l = (sz <= 2) ? 0 : random.nextInt(sz - swathSize + 1);
         int r = l + swathSize;
         return this.getChildren(l, r);
     }
@@ -64,7 +64,7 @@ public class PMX {
         Collections.sort(aclone);
         Collections.sort(bclone);
         for (int i = 0; i < a.size(); i++) {
-            if (aclone.get(i) != bclone.get(i)) return false;
+            if (!aclone.get(i).equals(bclone.get(i))) return false;
         }
         return true;
     }
