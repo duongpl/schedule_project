@@ -5,7 +5,7 @@ import com.fpt.edu.schedule.repository.base.QueryParam;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface RequestService {
-    void generateExcelFile(MultipartFile multipartFile, int semesterId);
+    void generateExcelFile(MultipartFile multipartFile, int semesterId,String hodGoogleId);
 
     Request addRequest(Request request, String lecturerId);
 

@@ -54,8 +54,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public void generateExcelFile(MultipartFile multipartFile, int semesterId) {
+    public void generateExcelFile(MultipartFile multipartFile, int semesterId,String hodGoogleId) {
         try {
+            Lecturer lecturer = lecturerService.findByGoogleId(hodGoogleId);
             String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
             System.out.println(extension);
             if(!extension.contains("xlsx")){
@@ -69,6 +70,9 @@ public class RequestServiceImpl implements RequestService {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
+                if (isSkip(row,lecturer)) {
+                    continue;
+                }
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -109,7 +113,7 @@ public class RequestServiceImpl implements RequestService {
                     }
                 }
             }
-            saveTimetable(multipartFile, semesterId);
+            saveTimetable(multipartFile, semesterId,lecturer);
 
         } catch (Exception e) {
             throw new InvalidRequestException(e.getMessage());
@@ -174,7 +178,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
 
-    private void saveTimetable(MultipartFile multipartFile, int semesterId) {
+     void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
         try {
             Semester se = semesterRepo.findById(semesterId);
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
@@ -186,7 +190,7 @@ public class RequestServiceImpl implements RequestService {
             if (existedTimetable.size()>0) {
 
                 existedTimetable.stream().forEach(i->{
-//                    timetableDetailRepo.deleteAllByTimetable(i.getId());
+                    timetableDetailRepo.deleteAllByTimetable(i.getId());
                     timetableRepo.deleteById(i.getId());
                 });
                 confirmationRepos.deleteAllBySemester(se);
@@ -202,6 +206,9 @@ public class RequestServiceImpl implements RequestService {
                 int column = 0;
 
                 Row row = rowIterator.next();
+                if (isSkip(row,lecturer)) {
+                    continue;
+                }
                 Iterator<Cell> cellIterator = row.cellIterator();
                 TimetableDetail timetableDetail = new TimetableDetail();
                 TimetableDetail timetableDetailTemp = new TimetableDetail();
@@ -252,6 +259,13 @@ public class RequestServiceImpl implements RequestService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    private boolean isSkip(Row row,Lecturer lecturer){
+        Cell cell = row.getCell(6);
+        if (!row.getCell(3).getStringCellValue().equalsIgnoreCase(lecturer.getDepartment()) ||cell!= null ) {
+            return true;
+        }
+        return false;
     }
     @Async
     void sendEmail(String content,String receiveEmail,String subject) {

@@ -14,12 +14,18 @@ import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableProcess;
+import com.fpt.edu.schedule.model.Slot;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.SemesterService;
 import com.fpt.edu.schedule.service.base.SubjectService;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
@@ -79,6 +85,7 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<SlotGroup> slotGroups = new Vector<>();
         Lecturer lecturer = lecturerRepo.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
+//        importDataSUMFromFile(semester);
         Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
         checkGaParameter(gaParameter);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
@@ -141,7 +148,7 @@ public class TimetableServiceImpl implements TimetableService {
         Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semester);
         List<Lecturer> list = getListlecturersNotDraft(semester);
         timetable.getTimetableDetails().stream().forEach(x -> {
-            if(!list.contains(x.getLecturer())) {
+            if (!list.contains(x.getLecturer())) {
                 x.setLecturer(null);
             }
         });
@@ -227,7 +234,6 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> lecturersNotSendResource.contains(i.getLecturer()))
                 .map(TimetableDetail::getLineId)
                 .collect(Collectors.toList());
-        ;
 
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
                 .stream()
@@ -391,6 +397,91 @@ public class TimetableServiceImpl implements TimetableService {
             e.printStackTrace();
         }
 
+    }
+
+    void importDataSUMFromFile(Semester se) {
+        try {
+
+            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\NTQ\\Downloads\\regiester_sum2020.xlsx"));
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next();
+            List<Timetable> existedTimetable = timetableRepo.findAllBySemester(se);
+            List<String> subjectAll = subjectRepo.findAll().stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
+            List<String> slotAll = slotRepository.findAll().stream().map(Slot::getName).collect(Collectors.toList());
+
+
+            while (rowIterator.hasNext()) {
+                int column = 0;
+
+                Row row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+                Expected expected = new Expected();
+                while (cellIterator.hasNext()) {
+                    column++;
+                    Cell cell = cellIterator.next();
+
+                    if (cell.getCellTypeEnum().equals(CellType.BLANK)) {
+                        break;
+                    }
+                    if (lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()) == null) {
+                        continue;
+                    }
+
+                    switch (column) {
+                        case 3:
+                            String slots[] = cell.getStringCellValue().trim().split(" ");
+                            expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                            List<com.fpt.edu.schedule.model.ExpectedSlot> expectedSlots = new ArrayList<>();
+                            for (int i = 0; i < slots.length; i++) {
+                                com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
+                                expectedSlot.setSlotName(slots[i].trim());
+                                expectedSlot.setExpected(expected);
+                                if (slotAll.contains(slots[i].trim())) {
+                                    expectedSlot.setLevelOfPrefer(1);
+                                } else {
+                                    expectedSlot.setLevelOfPrefer(0);
+
+                                }
+                                expectedSlots.add(expectedSlot);
+
+                            }
+                            expected.setExpectedSlots(expectedSlots);
+
+                            break;
+                        case 4:
+                            String subjects[] = cell.getStringCellValue().trim().split(",");
+                            List<com.fpt.edu.schedule.model.ExpectedSubject> expectedSubjects = new ArrayList<>();
+                            for (int i = 0; i < subjects.length; i++) {
+                                com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
+                                expectedSubject.setSubjectCode(subjects[i].trim());
+                                expectedSubject.setExpected(expected);
+                                if (slotAll.contains(subjects[i].trim())) {
+                                    expectedSubject.setLevelOfPrefer(1);
+                                } else {
+                                    if (subjectRepo.findByCode(subjects[i].trim()) != null) {
+                                        expectedSubject.setLevelOfPrefer(0);
+                                    }
+                                }
+                                expectedSubjects.add(expectedSubject);
+                            }
+                            expected.setExpectedSubjects(expectedSubjects);
+                            break;
+                        case 5:
+                            ExpectedNote expectedNote = new ExpectedNote();
+                            expectedNote.setExpectedNumOfClass(Integer.parseInt(cell.getStringCellValue()));
+                            expectedNote.setExpected(expected);
+                            expected.setExpectedNote(expectedNote);
+                            break;
+                    }
+
+                }
+                expectedRepo.save(expected);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
