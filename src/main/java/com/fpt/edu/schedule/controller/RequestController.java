@@ -18,8 +18,10 @@ public class RequestController {
 
 
     @PostMapping("/generate")
-    public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,@RequestParam(name = "semesterId") int semesterId) {
-            requestService.generateExcelFile(multipartFile,semesterId);
+    public ResponseEntity generateFile(@RequestParam("file") MultipartFile multipartFile,
+                                       @RequestParam(name = "semesterId") int semesterId,
+                                       @RequestHeader("GoogleId") String hodGoogleId) {
+            requestService.generateExcelFile(multipartFile,semesterId,hodGoogleId);
             return new ResponseEntity(HttpStatus.OK);
     }
     @PostMapping("/filter")

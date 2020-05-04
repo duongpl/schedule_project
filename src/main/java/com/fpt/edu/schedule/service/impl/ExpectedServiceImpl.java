@@ -72,12 +72,14 @@ public class ExpectedServiceImpl implements ExpectedService {
                 .forEach(i -> i.setExpected(expected));
         expected.getExpectedSubjects().stream()
                 .forEach(i -> i.setExpected(expected));
+        checkValidExpected(expected);
         return expectedRepo.save(expected);
     }
-
+    @Transactional
     @Override
     public Expected updateExpected(Expected expected) {
         Expected existedExpected = expectedRepo.findById(expected.getId());
+        Lecturer lecturer = existedExpected.getLecturer();
         if (existedExpected == null) {
             throw new InvalidRequestException("Don't find this expected");
         }
@@ -92,10 +94,10 @@ public class ExpectedServiceImpl implements ExpectedService {
         if (expected.getExpectedSubjects() != null) {
             expected.getExpectedSubjects().stream().forEach(i -> expectedSubjectService.update(i));
         }
+        checkValidExpected(existedExpected);
         existedExpected.setUpdatedDate(new Date());
         return expectedRepo.save(existedExpected);
     }
-
     @Override
     public List<Expected> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
@@ -164,6 +166,22 @@ public class ExpectedServiceImpl implements ExpectedService {
         newExpected.setSemester(semesterRepo.getAllByNowIsTrue());
 
         return expectedRepo.save(newExpected);
+    }
+    private void checkValidExpected(Expected expected){
+        List<String> subjectRegister = expected.getExpectedSubjects()
+                .stream()
+                .filter(x->x.getLevelOfPrefer()!=0)
+                .map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
+        List<String> slotRegister = expected.getExpectedSlots()
+                .stream()
+                .filter(x->x.getLevelOfPrefer()!=0)
+                .map(ExpectedSlot::getSlotName).collect(Collectors.toList());
+        if(subjectRegister.size() == 0){
+            throw new InvalidRequestException("You must teach at least one subject!");
+        }
+        if(slotRegister.size() == 0){
+            throw new InvalidRequestException("You must teach at least one slot!");
+        }
     }
 
 

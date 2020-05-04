@@ -17,4 +17,5 @@ public class GaParameter {
     private int stepGeneration;
     private Cofficient cofficient;
     private int convergenceCheckRange;
+    private int modelType;
 }

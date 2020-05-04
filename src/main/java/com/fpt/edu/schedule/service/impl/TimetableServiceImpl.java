@@ -9,16 +9,23 @@ import com.fpt.edu.schedule.ai.lib.Subject;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.model.*;
 import com.fpt.edu.schedule.common.enums.StatusLecturer;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.dto.Runs;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableProcess;
+import com.fpt.edu.schedule.model.Slot;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.SemesterService;
 import com.fpt.edu.schedule.service.base.SubjectService;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
@@ -78,6 +85,7 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<SlotGroup> slotGroups = new Vector<>();
         Lecturer lecturer = lecturerRepo.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
+//        importDataSUMFromFile(semester);
         Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
         checkGaParameter(gaParameter);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
@@ -87,10 +95,8 @@ public class TimetableServiceImpl implements TimetableService {
         Population population = new Population(POPULATION_SIZE, model);
         setAttributeForGa(ga, population, model, lecturerId, gaParameter.getStepGeneration());
         checkExistedGa(lecturerId);
-
         timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
-        System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
     }
 
     @Override
@@ -136,9 +142,17 @@ public class TimetableServiceImpl implements TimetableService {
                 .map(i -> i.getTimetable())
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(semesterId));
-        Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails().stream().collect(
-                Collectors.toMap(x -> x.getLineId(), x -> x));
+        Semester semester = semesterRepo.findById(semesterId);
+        Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semester);
+        List<Lecturer> list = getLecturersNotDraft(semester);
+        timetable.getTimetableDetails().stream().forEach(x -> {
+            if (!list.contains(x.getLecturer())) {
+                x.setLecturer(null);
+            }
+        });
+        Map<Integer, TimetableDetail> timetableMap = timetable.getTimetableDetails()
+                .stream()
+                .collect(Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
             timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortName(i.getLecturerShortName()));
             timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
@@ -185,13 +199,23 @@ public class TimetableServiceImpl implements TimetableService {
 
     private boolean isDraft(Lecturer lecturer, Semester semester) {
         Confirmation confirmation = confirmationRepo.findBySemesterAndLecturer(semester, lecturer);
-        if (confirmation != null) {
+        if (confirmation != null && !confirmation.getStatus().equals(TimetableStatus.DRAFT)) {
             return false;
         }
         return true;
     }
-    private boolean isOnlineSubject(com.fpt.edu.schedule.model.Subject subject){
+
+    private boolean isOnlineSubject(com.fpt.edu.schedule.model.Subject subject) {
         return Character.isAlphabetic(subject.getCode().charAt(subject.getCode().length() - 1));
+    }
+
+    private List<Lecturer> getLecturersNotDraft(Semester semester) {
+        List<Lecturer> lecturersNotSendResource = confirmationRepo.findAllBySemester(semester)
+                .stream()
+                .filter(x -> !x.getStatus().equals(TimetableStatus.DRAFT))
+                .map(Confirmation::getLecturer)
+                .collect(Collectors.toList());
+        return lecturersNotSendResource;
     }
 
     private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
@@ -199,14 +223,16 @@ public class TimetableServiceImpl implements TimetableService {
                              Vector<ExpectedSubject> expectedSubjectModel,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
-        List<Lecturer> lecturersPublic = confirmationRepo.findAllBySemester(semester).stream().map(Confirmation::getLecturer).collect(Collectors.toList());
+
+        // exclude all timetable detail not draft
+        List<Lecturer> lecturersNotSendResource = getLecturersNotDraft(semester);
         List<Integer> lineIdPublic = timetableRepo.findBySemesterAndTempFalse(semester)
                 .getTimetableDetails()
                 .stream()
-                .filter(i->lecturersPublic.contains(i.getLecturer()))
+                .filter(i -> lecturersNotSendResource.contains(i.getLecturer()))
                 .map(TimetableDetail::getLineId)
                 .collect(Collectors.toList());
-     ;
+
         List<TimetableDetail> timetableDetails = timetable.getTimetableDetails()
                 .stream()
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
@@ -228,7 +254,7 @@ public class TimetableServiceImpl implements TimetableService {
                     i.getExpectedSlots().forEach(s -> {
                         expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
                     });
-                    i.getExpectedSubjects().stream().filter(x->!isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
+                    i.getExpectedSubjects().stream().filter(x -> !isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
                         expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepo.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
                     });
                 });
@@ -238,7 +264,7 @@ public class TimetableServiceImpl implements TimetableService {
         });
         //subject model
         // exclude online subject
-        subjects.stream().filter(i->!isOnlineSubject(i)).forEach(i -> {
+        subjects.stream().filter(i -> !isOnlineSubject(i)).forEach(i -> {
             subjectModels.add(new Subject(i.getCode(), i.getId()));
         });
 
@@ -268,6 +294,7 @@ public class TimetableServiceImpl implements TimetableService {
         slots.add(e35);
 
     }
+
     private void importDataFromFile() {
         try {
 
@@ -303,7 +330,6 @@ public class TimetableServiceImpl implements TimetableService {
 
                     for (int t = 0; t < slot.size(); t++) {
                         com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
-                        int levelPrefer = Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent());
                         expectedSlot.setSlotName(slot.get(t));
                         expectedSlot.setExpected(expected);
                         expectedSlot.setLevelOfPrefer(Integer.parseInt(e.getElementsByTagName("Cell").item(t + 1).getTextContent()));
@@ -369,6 +395,91 @@ public class TimetableServiceImpl implements TimetableService {
             e.printStackTrace();
         }
 
+    }
+
+    void importDataSUMFromFile(Semester se) {
+        try {
+
+            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\NTQ\\Downloads\\regiester_sum2020.xlsx"));
+            XSSFSheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rowIterator = sheet.iterator();
+            rowIterator.next();
+            List<Timetable> existedTimetable = timetableRepo.findAllBySemester(se);
+            List<String> subjectAll = subjectRepo.findAll().stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
+            List<String> slotAll = slotRepository.findAll().stream().map(Slot::getName).collect(Collectors.toList());
+
+
+            while (rowIterator.hasNext()) {
+                int column = 0;
+
+                Row row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+                Expected expected = new Expected();
+                while (cellIterator.hasNext()) {
+                    column++;
+                    Cell cell = cellIterator.next();
+
+                    if (cell.getCellTypeEnum().equals(CellType.BLANK)) {
+                        break;
+                    }
+                    if (lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()) == null) {
+                        continue;
+                    }
+
+                    switch (column) {
+                        case 3:
+                            String slots[] = cell.getStringCellValue().trim().split(" ");
+                            expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                            List<com.fpt.edu.schedule.model.ExpectedSlot> expectedSlots = new ArrayList<>();
+                            for (int i = 0; i < slots.length; i++) {
+                                com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
+                                expectedSlot.setSlotName(slots[i].trim());
+                                expectedSlot.setExpected(expected);
+                                if (slotAll.contains(slots[i].trim())) {
+                                    expectedSlot.setLevelOfPrefer(1);
+                                } else {
+                                    expectedSlot.setLevelOfPrefer(0);
+
+                                }
+                                expectedSlots.add(expectedSlot);
+
+                            }
+                            expected.setExpectedSlots(expectedSlots);
+
+                            break;
+                        case 4:
+                            String subjects[] = cell.getStringCellValue().trim().split(",");
+                            List<com.fpt.edu.schedule.model.ExpectedSubject> expectedSubjects = new ArrayList<>();
+                            for (int i = 0; i < subjects.length; i++) {
+                                com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
+                                expectedSubject.setSubjectCode(subjects[i].trim());
+                                expectedSubject.setExpected(expected);
+                                if (slotAll.contains(subjects[i].trim())) {
+                                    expectedSubject.setLevelOfPrefer(1);
+                                } else {
+                                    if (subjectRepo.findByCode(subjects[i].trim()) != null) {
+                                        expectedSubject.setLevelOfPrefer(0);
+                                    }
+                                }
+                                expectedSubjects.add(expectedSubject);
+                            }
+                            expected.setExpectedSubjects(expectedSubjects);
+                            break;
+                        case 5:
+                            ExpectedNote expectedNote = new ExpectedNote();
+                            expectedNote.setExpectedNumOfClass(Integer.parseInt(cell.getStringCellValue()));
+                            expectedNote.setExpected(expected);
+                            expected.setExpectedNote(expectedNote);
+                            break;
+                    }
+
+                }
+                expectedRepo.save(expected);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 

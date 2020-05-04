@@ -137,10 +137,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester, lecturerRepo.findByShortName(timetableDetail.getLecturerShortName()));
         if (con != null) {
             con.setStatus(TimetableStatus.DRAFT);
+            con.setConfirmed(true);
             confirmationRepo.save(con);
         }
         if (con1 != null && !isSame(timetableDetail, timetableDetailExisted)) {
             con1.setStatus(TimetableStatus.DRAFT);
+            con1.setConfirmed(true);
             confirmationRepo.save(con1);
         }
 
@@ -243,7 +245,9 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 .sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         return timetableEdits;
     }
+    private void updateConfirm(Confirmation con, Confirmation con1){
 
+    }
     @Override
     public void swapTwoTimetableDetail(List<Integer> ids) {
         if (ids.size() != 2) {
@@ -259,10 +263,12 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail2.getLecturer());
         if (con != null) {
             con.setStatus(TimetableStatus.DRAFT);
+            con.setConfirmed(true);
             confirmationRepo.save(con);
         }
         if (con1 != null) {
             con1.setStatus(TimetableStatus.DRAFT);
+            con1.setConfirmed(true);
             confirmationRepo.save(con1);
         }
 

@@ -43,7 +43,7 @@ public class LecturerServiceImpl implements LecturerService {
         }
         Lecturer hod = findByGoogleId(hodGoogleId);
         newLecturer.setStatus(StatusLecturer.ACTIVATE);
-        newLecturer.setEmail(lecturer.getEmail());
+        newLecturer.setEmail(lecturer.getEmail().trim());
         newLecturer.setDepartment(hod.getDepartment());
         newLecturer.setShortName(newLecturer.getEmail().substring(0, newLecturer.getEmail().indexOf('@')));
         newLecturer.setRole(roleRepo.findByRoleName(Role.ROLE_USER.getName()));
