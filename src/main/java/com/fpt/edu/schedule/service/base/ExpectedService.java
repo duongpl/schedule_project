@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.base;
 
 
+import com.fpt.edu.schedule.dto.ExpectedView;
 import com.fpt.edu.schedule.model.Expected;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 
@@ -19,5 +20,9 @@ public interface ExpectedService {
     Expected getExpectedByLecturerAndSemester(String lecturerId,int semesterId);
 
     Expected saveExistedExpected(String lecturerGoogleId,int semesterId);
+
+    Expected getExpectedForViewBySemester(String shortName,int semesterId);
+
+    List<ExpectedView> getListExpectedForView(int semesterId, String groupBy);
 
 }

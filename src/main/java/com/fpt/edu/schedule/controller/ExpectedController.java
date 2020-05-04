@@ -48,7 +48,19 @@ public class ExpectedController  {
     @GetMapping()
     public ResponseEntity getByLecturerAndSemester(@RequestParam(name = "lecturerId") String lecturerId,
                                                    @RequestParam(name = "semesterId") int semesterId) {
-            return new ResponseEntity( expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId),HttpStatus.OK);
+        return new ResponseEntity( expectedService.getExpectedByLecturerAndSemester(lecturerId,semesterId),HttpStatus.OK);
+
+    }
+    @GetMapping("/forView")
+    public ResponseEntity getExpectedForView(@RequestParam(name = "shortName") String shortName,
+                                                   @RequestParam(name = "semesterId") int semesterId) {
+        return new ResponseEntity( expectedService.getExpectedForViewBySemester(shortName,semesterId),HttpStatus.OK);
+
+    }
+    @GetMapping("/listedForView")
+    public ResponseEntity getListExpectedForView(@RequestParam(name = "groupBy") String groupBy,
+                                             @RequestParam(name = "semesterId") int semesterId) {
+        return new ResponseEntity( expectedService.getListExpectedForView(semesterId,groupBy),HttpStatus.OK);
 
     }
 }

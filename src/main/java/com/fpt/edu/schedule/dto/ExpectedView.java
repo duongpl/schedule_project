@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimetableEdit {
-    private String room;
+public class ExpectedView {
+    private String lecturerName;
     private List<TimetableDetailDTO> timetable ;
+
 }

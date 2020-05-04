@@ -21,8 +21,9 @@ public class TimetableDetailDTO {
     private int slotNumber;
     private Day day;
     private int lineId;
-    TimetableStatus timetableStatus;
-    String reason;
+    private TimetableStatus timetableStatus;
+    private String reason;
+    private int levelOfPreference;
 
     public TimetableDetailDTO(int id, String lecturerShortName, String room, String className, String slot, String subjectCode,TimetableStatus status,String reason) {
         this.id = id;
@@ -33,6 +34,12 @@ public class TimetableDetailDTO {
         this.subjectCode = subjectCode;
         this.timetableStatus = status;
         this.reason =reason;
+    }
+
+    public TimetableDetailDTO(String lecturerShortName, String subjectCode, int levelOfPreference) {
+        this.lecturerShortName = lecturerShortName;
+        this.subjectCode = subjectCode;
+        this.levelOfPreference = levelOfPreference;
     }
 
     public TimetableDetailDTO(int id, String lecturerShortName, String room, String className, String slot, String subjectCode, int slotNumber, Day day) {

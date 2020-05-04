@@ -2,6 +2,8 @@ package com.fpt.edu.schedule.service.impl;
 
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.dto.ExpectedView;
+import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
@@ -9,9 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +38,7 @@ public class ExpectedServiceImpl implements ExpectedService {
     public Expected addExpected(Expected expected) {
         Expected existedExpected = expectedRepo.findBySemesterAndLecturer(semesterRepo.findById(expected.getSemester().getId()),
                 lecturerService.findByGoogleId(expected.getLecturer().getGoogleId()));
-        if(existedExpected !=null){
+        if (existedExpected != null) {
             throw new InvalidRequestException("Already have expected for this semester !");
         }
         expected.setCreatedDate(new Date());
@@ -75,6 +75,7 @@ public class ExpectedServiceImpl implements ExpectedService {
         checkValidExpected(expected);
         return expectedRepo.save(expected);
     }
+
     @Transactional
     @Override
     public Expected updateExpected(Expected expected) {
@@ -98,6 +99,7 @@ public class ExpectedServiceImpl implements ExpectedService {
         existedExpected.setUpdatedDate(new Date());
         return expectedRepo.save(existedExpected);
     }
+
     @Override
     public List<Expected> findByCriteria(QueryParam queryParam) {
         BaseSpecifications cns = new BaseSpecifications(queryParam);
@@ -119,7 +121,7 @@ public class ExpectedServiceImpl implements ExpectedService {
                 lecturerService.findByGoogleId(lecturerId));
         if (expected == null) {
             Expected newExpected = new Expected();
-            List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId,lecturerId);
+            List<Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
             List<ExpectedSubject> expectedSubjectList = subjects.stream()
                     .map(i -> new ExpectedSubject(i.getCode()))
                     .collect(Collectors.toList());
@@ -167,19 +169,65 @@ public class ExpectedServiceImpl implements ExpectedService {
 
         return expectedRepo.save(newExpected);
     }
-    private void checkValidExpected(Expected expected){
+
+    @Override
+    public Expected getExpectedForViewBySemester(String shortName, int semesterId) {
+        Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.findById(semesterId),
+                lecturerService.findByShortName(shortName));
+
+        return expected;
+    }
+
+    @Override
+    public List<ExpectedView> getListExpectedForView(int semesterId, String groupBy) {
+        Semester se = semesterRepo.findById(semesterId);
+        List<ExpectedView> expectedViewList = new ArrayList<>();
+        List<TimetableDetailDTO> expectedDTOs = new ArrayList<>();
+        List<Expected> expectedList = expectedRepo.findAllBySemester(se);
+
+        if (groupBy.equals("slot")) {
+            List<ExpectedSlot> expectedSlots = expectedList.stream()
+                    .map(i -> i.getExpectedSlots())
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+            expectedDTOs = expectedSlots.stream()
+                    .distinct()
+                    .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSlotName(), i.getLevelOfPrefer()))
+                    .collect(Collectors.toList());
+
+        } else if (groupBy.equals("subject")) {
+            List<ExpectedSubject> expectedSubject = expectedList.stream()
+                    .map(i -> i.getExpectedSubjects())
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+            expectedDTOs = expectedSubject.stream()
+                    .distinct()
+                    .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSubjectCode(), i.getLevelOfPrefer()))
+                    .collect(Collectors.toList());
+        }
+        Map<String, List<TimetableDetailDTO>> collect = expectedDTOs
+                .stream()
+                .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+        expectedViewList = collect
+                .entrySet().stream()
+                .map(i -> new ExpectedView(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
+        return expectedViewList;
+    }
+
+    private void checkValidExpected(Expected expected) {
         List<String> subjectRegister = expected.getExpectedSubjects()
                 .stream()
-                .filter(x->x.getLevelOfPrefer()!=0)
+                .filter(x -> x.getLevelOfPrefer() != 0)
                 .map(ExpectedSubject::getSubjectCode).collect(Collectors.toList());
         List<String> slotRegister = expected.getExpectedSlots()
                 .stream()
-                .filter(x->x.getLevelOfPrefer()!=0)
+                .filter(x -> x.getLevelOfPrefer() != 0)
                 .map(ExpectedSlot::getSlotName).collect(Collectors.toList());
-        if(subjectRegister.size() == 0){
+        if (subjectRegister.size() == 0) {
             throw new InvalidRequestException("You must teach at least one subject!");
         }
-        if(slotRegister.size() == 0){
+        if (slotRegister.size() == 0) {
             throw new InvalidRequestException("You must teach at least one slot!");
         }
     }
