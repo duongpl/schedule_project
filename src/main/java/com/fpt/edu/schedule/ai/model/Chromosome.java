@@ -91,7 +91,7 @@ public class Chromosome {
                 maxSlotSatisfaction += max;
             }
         }
-        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
+//        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o2
         double subjectSatisfaction = 0;
         double maxSubjectSatisfaction = 0;
@@ -106,7 +106,7 @@ public class Chromosome {
                 maxSubjectSatisfaction += max;
             }
         }
-        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
+//        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o3
         double numberOfClassSatisfaction = 0;
         int cnt = 0;
@@ -202,20 +202,13 @@ public class Chromosome {
         double consecutiveClassCoff = this.model.getGaParameter().getCofficient().getConsicutiveClassCoff();
         double F = slotCoff * (maxSlotSatisfaction == 0 ? 0 : 1.0 * slotSatisfaction / maxSlotSatisfaction) +
                 subjectCoff * (maxSubjectSatisfaction == 0 ? 0 : 1.0 * subjectSatisfaction / maxSubjectSatisfaction) +
-                numberOfClassCoff * 1.0 / (Math.pow(2.0, Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass()))) +
+                numberOfClassCoff * 1.0 / (1.0 + Math.abs(cnt - this.model.getTeachers().get(teacherId).getExpectedNumberOfClass())) +
                 distanceCoff * 1.0 / (1.0 + 9.0 * distance / 105.0) +
                 consecutiveClassCoff * 1.0 / (1.0 + o5);
         return F;
-
     }
 
-    public double calculateSatisfaction1(int teacherId) {
-        Vector<Teacher> vt = new Vector<>();
-        vt.add(this.model.getTeachers().get(teacherId));
-        return -this.calculateFitnessForSubGroup(vt);
-    }
-
-    public double calculateFitnessForSubGroup1(Vector<Teacher> teachers) {
+    public double calculateFitnessForSubGroupUsingScalarizingModel(Vector<Teacher> teachers) {
         //o1: maximize do hai long cua giang vien voi slot
         //o2: maximize do hai long cua giang vien voi mon hoc
         //o3: minimize chenh lech so lop duoc xep voi so lop ki vong
@@ -253,9 +246,6 @@ public class Chromosome {
 
         }
         double std = (teachers.size() == 1) ? 0.0 : Math.sqrt(variance / (teachers.size() - 1));
-        //bi doan nay, loi chia cho 0
-        //ok
-
         F1 = maxSatisfaction - minSatisfaction;
 
         double satisfactionSumCoff = this.model.getGaParameter().getCofficient().getSatisfactionSumCoff();
@@ -269,8 +259,6 @@ public class Chromosome {
         double res = 0;
         for (int i = 0; i < a.getNumberOfRows(); i++) {
             for (int j = 0; j < a.getNumberOfColumns(); j++) {
-//                res += Math.pow(Math.abs(Real(a.get(i,j) - b.get(i, j)))
-
                 Real x = (Real) a.get(i, j);
                 Real y = (Real) b.get(i, j);
                 res += Math.pow(Math.abs(x.doubleValue() - y.doubleValue()), 2);
@@ -279,7 +267,7 @@ public class Chromosome {
         return Math.sqrt(res);
     }
 
-    public double calculateFitnessForSubGroup(Vector<Teacher> teachers) {
+    public double calculateFitnessForSubGroupUsingCompromisingModel(Vector<Teacher> teachers) {
         if (teachers.size() == 0) return 1.0;
         Vector<DenseVector<Real>> expectedMatrix = new Vector<>();
         int[][] slotSubject = new int[10][this.model.getSubjects().size()];
@@ -298,6 +286,7 @@ public class Chromosome {
                 row.add(Real.valueOf(expectedThisSlot * this.model.getRegisteredSlots()[teacherId][slotId]));
             }
             row.add(Real.valueOf(Math.pow(this.model.getTeachers().get(teacherId).getExpectedNumberOfClass(), 2)));
+            System.out.println(row.size());
 
             expectedMatrix.add(DenseVector.valueOf(row));
         }
@@ -324,8 +313,24 @@ public class Chromosome {
         }
 
         DenseMatrix fact = DenseMatrix.valueOf(factMatrix);
-        return -distance(expected, fact);
-//        return 0.0;
+        Vector<DenseVector<Real>> zeroMatrix = new Vector<>();
+        for (int i = 0; i < teachers.size(); i++) {
+            int teacherId = teachers.get(i).getId();
+            Vector<Real> row = new Vector<>();
+            for (int slotId = 0; slotId < 10; slotId++) {
+                double expectedThisSlot = 0;
+                for (int j = 0; j < this.model.getSubjects().size(); j++) {
+                    expectedThisSlot = Math.max(expectedThisSlot, slotSubject[slotId][j] * this.model.getRegisteredSubjects()[teacherId][j]);
+                }
+                row.add(Real.valueOf(((expectedThisSlot * 2 > 25) ? 0 : 25) * this.model.getRegisteredSlots()[teacherId][slotId]));
+            }
+            row.add(Real.valueOf(Math.pow((this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * 2 > 10 ? 0 : 10), 2)));
+            row.add(Real.ZERO);
+            zeroMatrix.add(DenseVector.valueOf(row));
+        }
+
+        DenseMatrix zeroMat = DenseMatrix.valueOf(zeroMatrix);
+        return 1.0 - distance(expected, fact) / distance(expected, zeroMat);
     }
 
     public int getNumberOfViolation() {
@@ -357,49 +362,26 @@ public class Chromosome {
 
         double fulltimeCoff = this.model.getGaParameter().getCofficient().getFulltimeCoff();
         double parttimeCoff = this.model.getGaParameter().getCofficient().getParttimeCoff();
-        this.fitness = fulltimeCoff * this.calculateFitnessForSubGroup1(fullTimeTeachers) + parttimeCoff * this.calculateFitnessForSubGroup1(partTimeTeachers);
+        double objectiveValue = 0.0;
+        switch (this.model.getGaParameter().getModelType()) {
+            case (Model.SCALARIZING):
+                objectiveValue = fulltimeCoff * this.calculateFitnessForSubGroupUsingScalarizingModel(fullTimeTeachers) +
+                        parttimeCoff * this.calculateFitnessForSubGroupUsingScalarizingModel(partTimeTeachers);
+                break;
+            case (Model.COMPROMISING):
+                objectiveValue = fulltimeCoff * this.calculateFitnessForSubGroupUsingCompromisingModel(fullTimeTeachers) +
+                        parttimeCoff * this.calculateFitnessForSubGroupUsingCompromisingModel(partTimeTeachers);
+                break;
+            default: {
+                objectiveValue = fulltimeCoff * this.calculateFitnessForSubGroupUsingScalarizingModel(fullTimeTeachers) + parttimeCoff * this.calculateFitnessForSubGroupUsingScalarizingModel(partTimeTeachers);
+            }
+        }
         double hardConstrainCoff = this.model.getGaParameter().getCofficient().getHardConstraintCoff();
         double softConstrainCoff = this.model.getGaParameter().getCofficient().getSoftConstraintCoff();
-        this.fitness = hardConstrainCoff * (1.0 / (1.0 + this.getNumberOfViolation())) + softConstrainCoff * this.fitness;
+        this.fitness = hardConstrainCoff * (1.0 / (1.0 + this.getNumberOfViolation())) + softConstrainCoff * objectiveValue;
         this.needTobeUpdated = false;
         return fitness;
     }
-
-//    public double getStandardDeviation(Vector<Teacher> teachers) {
-//        double p[] = new double[teachers.size()];
-//
-//        double total = 0;
-//
-//        for (int i = 0; i < teachers.size(); i++) {
-//            p[i] = calculateSatisfaction(teachers.get(i).getId());
-//            total += p[i];
-//        }
-//
-//        double F1 = 0;
-//
-//
-//        double variance = 0;
-//        for (int i = 0; i < teachers.size(); i++) {
-//
-//            variance += Math.pow(p[i] - total / teachers.size(), 2);
-//        }
-//        double std = Math.sqrt(variance / (teachers.size() - 1));
-//        return std;
-//    }
-
-
-//    public double getStandardDeviation() {
-//        Vector<Teacher> fullTimeTeachers = new Vector<>();
-//        Vector<Teacher> partTimeTeachers = new Vector<>();
-//        for (Teacher teacher : this.model.getTeachers()) {
-//            if (teacher.getType() == Teacher.FULL_TIME) {
-//                fullTimeTeachers.add(teacher);
-//            } else partTimeTeachers.add(teacher);
-//        }
-//
-//        double sd = 0.7 * this.getStandardDeviation(fullTimeTeachers) + 0.3 * this.getStandardDeviation(partTimeTeachers);
-//        return sd;
-//    }
 
     public double getFitness() {
         if (needTobeUpdated) {
@@ -595,9 +577,13 @@ public class Chromosome {
             for (int j = 0; j < 10; j++) {
                 int classId = this.getGenes().get(j).get(i);
                 if (classId != -1) {
-                    rs.add(new Record(this.getModel().getTeacherIdReverse(i), this.getModel().getClassIdReverse(classId),
-                            this.getModel().getSubjectIdReverse(this.getModel().getClasses().get(classId).getSubjectId()),
-                            this.getModel().getSlotIdReverse(this.getModel().getClasses().get(classId).getSlotId())));
+                    int subjectId = this.model.getClasses().get(classId).getSubjectId();
+                    //validate class before adding to result
+                    if (this.model.getRegisteredSlots()[i][j] > 0 && this.model.getRegisteredSubjects()[i][subjectId] > 0) {
+                        rs.add(new Record(this.getModel().getTeacherIdReverse(i), this.getModel().getClassIdReverse(classId),
+                                this.getModel().getSubjectIdReverse(subjectId),
+                                this.getModel().getSlotIdReverse(this.getModel().getClasses().get(classId).getSlotId())));
+                    }
                 }
             }
         }
