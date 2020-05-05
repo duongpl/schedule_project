@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -201,6 +202,8 @@ public class LecturerServiceImpl implements LecturerService {
         if (isOnlineTimetableDetail(timetableDetail)) {
             return lecturerRepo.findAll(cns);
         }
+
+        // exclude all lecturer already teach in this slot
         List<Lecturer> lecturer = (List<Lecturer>) lecturerRepo
                 .findAll(cns)
                 .stream()
@@ -210,7 +213,28 @@ public class LecturerServiceImpl implements LecturerService {
             Confirmation con = confirmationRe.findBySemesterAndLecturer(semester, u);
             u.setTimetableStatus(con != null ? con.getStatus() : TimetableStatus.DRAFT);
         });
-        return lecturer;
+
+        // exclude all lecturer don't have in expected
+        List<Expected>expectedList = expectedRepo.findAllBySemester(semester);
+        List<ExpectedSlot> expectedSlots = expectedList.stream()
+                .map(i -> i.getExpectedSlots())
+                .flatMap(List::stream)
+                .filter(x->x.getSlotName().equals(timetableDetail.getSlot().getName()) && x.getLevelOfPrefer() > 0)
+                .collect(Collectors.toList());
+
+        List<ExpectedSubject> expectedSubjects = expectedList.stream()
+                .map(i -> i.getExpectedSubjects())
+                .flatMap(List::stream)
+                .filter(x->x.getSubjectCode().equals(timetableDetail.getSubject().getCode()) && x.getLevelOfPrefer() > 0)
+                .collect(Collectors.toList());
+        Set<Lecturer> lecturerHaveSlotInExpected = expectedSlots.stream().map(x->x.getExpected().getLecturer()).collect(Collectors.toSet());
+        Set<Lecturer> lecturerHaveSubjectInExpected = expectedSubjects.stream().map(x->x.getExpected().getLecturer()).collect(Collectors.toSet());
+
+        List intersect = lecturerHaveSlotInExpected.stream()
+                .filter(lecturerHaveSubjectInExpected::contains)
+                .collect(Collectors.toList());
+        List<Lecturer> result = lecturer.stream().filter(x->intersect.contains(x)).collect(Collectors.toList());
+        return result;
     }
 
     boolean isOnlineTimetableDetail(TimetableDetail timetableDetail) {
