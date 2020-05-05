@@ -87,7 +87,10 @@ public class TimetableServiceImpl implements TimetableService {
         Semester semester = semesterService.findById(semesterId);
 //        importDataSUMFromFile(semester);
         Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
-        checkGaParameter(gaParameter);
+        if(gaParameter.getModelType() == Model.SCALARIZING) {
+            checkGaParameter(gaParameter);
+        }
+
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
