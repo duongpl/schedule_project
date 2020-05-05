@@ -150,7 +150,7 @@ public class ResourceChecker {
 
 
         Vector<Class> res = new Vector<>();
-        System.out.println(fl + " " + numberOfClass + " " + totalDemand);
+
         if (fl == numberOfClass + totalDemand) {
             int[][] flow = dinic.flow;
 

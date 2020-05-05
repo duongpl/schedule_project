@@ -38,7 +38,7 @@ public class Room {
     }
 
     public double distance(Room r1) {
-//        System.out.println(this.getBuilding() + " " + r1.getBuilding());
+
         if (this.getName().equalsIgnoreCase(r1.getName())) {
             return 0;
         }

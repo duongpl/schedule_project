@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.ai.model.GaParameter;
-import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Subject;
 import com.fpt.edu.schedule.service.base.TimetableService;
 import lombok.AllArgsConstructor;

@@ -69,7 +69,7 @@ public class Chromosome {
 
         this.fitness = W[0] / (1.0 + 1.0 * S1 / this.model.getTeachers().size())
                 + W[1] / (1.0 + 1.0 * S2 / this.model.getTeachers().size());
-        System.out.println(S1 + " " + S2);
+
         this.needTobeUpdated = false;
     }
 
@@ -286,7 +286,7 @@ public class Chromosome {
                 row.add(Real.valueOf(expectedThisSlot * this.model.getRegisteredSlots()[teacherId][slotId]));
             }
             row.add(Real.valueOf(Math.pow(this.model.getTeachers().get(teacherId).getExpectedNumberOfClass(), 2)));
-            System.out.println(row.size());
+
 
             expectedMatrix.add(DenseVector.valueOf(row));
         }

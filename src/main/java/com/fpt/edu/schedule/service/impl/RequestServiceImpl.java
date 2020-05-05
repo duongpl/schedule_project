@@ -58,7 +58,7 @@ public class RequestServiceImpl implements RequestService {
         try {
             Lecturer lecturer = lecturerService.findByGoogleId(hodGoogleId);
             String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
-            System.out.println(extension);
+
             if(!extension.contains("xlsx")){
                 throw new InvalidRequestException("Wrong file format!");
             }

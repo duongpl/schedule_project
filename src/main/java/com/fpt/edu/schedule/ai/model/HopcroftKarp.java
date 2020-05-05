@@ -102,7 +102,6 @@ public class HopcroftKarp {
     }
 
     public static void main(String[] args) {
-        System.out.println("Running");
         HopcroftKarp hp = new HopcroftKarp(4, 4);
         hp.add(0, 0);
         hp.add(1, 1);
@@ -112,9 +111,9 @@ public class HopcroftKarp {
         hp.add(1, 0);
         hp.match(0, 0);
 
-        System.out.println(hp.maxmat());
+
         for (int i = 0; i < 4; i++) {
-            System.out.println(hp.matx[i]);
+
         }
     }
 

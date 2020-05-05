@@ -145,7 +145,6 @@ public class TestPMX {
         PMX pmx = new PMX(p1, p2, 0);
         int l = 2; int r = 6;
 
-        System.out.println(pmx.getChildren(l, r));
         Integer expected [] = {1, 10, 3, 4, 5, 6, 9, 7, 2, 8};
         Assertions.assertArrayEquals(expected, pmx.getChildren(l, r).toArray());
     }

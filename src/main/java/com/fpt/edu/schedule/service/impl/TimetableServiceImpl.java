@@ -92,6 +92,7 @@ public class TimetableServiceImpl implements TimetableService {
         }
 
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
+
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, gaParameter);

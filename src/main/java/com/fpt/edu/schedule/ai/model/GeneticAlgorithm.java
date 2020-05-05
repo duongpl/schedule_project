@@ -67,7 +67,6 @@ public class GeneticAlgorithm {
 
     @Async
     public void updateFitness() {
-        System.out.println(this.lecturerId);
         this.population.updateFitness();
         this.generation++;
 
@@ -266,7 +265,6 @@ public class GeneticAlgorithm {
         if (genInfos.size() > RESULT_RANGE) {
             genInfos.poll();
         }
-        System.out.println(genInfos.size());
         genInfos.add(run);
 
     }

@@ -77,7 +77,7 @@ public class LecturerServiceImpl implements LecturerService {
                     , queryParam.getLimit(), Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, queryParam.getSortField())));
         }
         if (semesterId != 0) {
-            System.out.println("ok");
+
         }
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
