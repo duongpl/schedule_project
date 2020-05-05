@@ -14,6 +14,8 @@ import java.util.Vector;
 @Component
 @NoArgsConstructor
 public class Model {
+    public static final int SCALARIZING = 0;
+    public static final int COMPROMISING = 1;
     private Vector<Teacher> teachers;
     private Vector<SlotGroup> slots;
     private Vector<Subject> subjects;

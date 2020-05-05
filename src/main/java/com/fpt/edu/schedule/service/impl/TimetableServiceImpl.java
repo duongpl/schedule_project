@@ -95,10 +95,8 @@ public class TimetableServiceImpl implements TimetableService {
         Population population = new Population(POPULATION_SIZE, model);
         setAttributeForGa(ga, population, model, lecturerId, gaParameter.getStepGeneration());
         checkExistedGa(lecturerId);
-
         timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
-        System.out.println("-------------------------Start-----LecturerId :" + lecturerId);
     }
 
     @Override
@@ -146,7 +144,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .collect(Collectors.toList());
         Semester semester = semesterRepo.findById(semesterId);
         Timetable timetable = timetableRepo.findBySemesterAndTempFalse(semester);
-        List<Lecturer> list = getListlecturersNotDraft(semester);
+        List<Lecturer> list = getLecturersNotDraft(semester);
         timetable.getTimetableDetails().stream().forEach(x -> {
             if (!list.contains(x.getLecturer())) {
                 x.setLecturer(null);
@@ -211,7 +209,7 @@ public class TimetableServiceImpl implements TimetableService {
         return Character.isAlphabetic(subject.getCode().charAt(subject.getCode().length() - 1));
     }
 
-    private List<Lecturer> getListlecturersNotDraft(Semester semester) {
+    private List<Lecturer> getLecturersNotDraft(Semester semester) {
         List<Lecturer> lecturersNotSendResource = confirmationRepo.findAllBySemester(semester)
                 .stream()
                 .filter(x -> !x.getStatus().equals(TimetableStatus.DRAFT))
@@ -227,7 +225,7 @@ public class TimetableServiceImpl implements TimetableService {
 
 
         // exclude all timetable detail not draft
-        List<Lecturer> lecturersNotSendResource = getListlecturersNotDraft(semester);
+        List<Lecturer> lecturersNotSendResource = getLecturersNotDraft(semester);
         List<Integer> lineIdPublic = timetableRepo.findBySemesterAndTempFalse(semester)
                 .getTimetableDetails()
                 .stream()
