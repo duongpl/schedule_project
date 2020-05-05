@@ -124,7 +124,7 @@ public class LecturerServiceImpl implements LecturerService {
         existedUser.setPhone(lecturer.getPhone() != null ? lecturer.getPhone() : existedUser.getPhone());
         existedUser.setShortName(lecturer.getShortName() != null ? lecturer.getShortName() : existedUser.getShortName());
         existedUser.setFullTime(lecturer.isFullTime());
-        existedUser.setQuotaClass(lecturer.getQuotaClass() != 0 ? lecturer.getQuotaClass() : existedUser.getQuotaClass());
+        existedUser.setQuotaClass(lecturer.getQuotaClass());
         return lecturerRepo.save(existedUser);
     }
 
@@ -187,6 +187,7 @@ public class LecturerServiceImpl implements LecturerService {
     public List<Lecturer> findForUpdate(int timetableDetailId, QueryParam queryParam) {
         TimetableDetail timetableDetail = timetableDetailRepo.findById(timetableDetailId);
         Semester semester = timetableDetail.getTimetable().getSemester();
+
         Timetable timetable = timetableDetail.getTimetable();
         List<TimetableDetail> list = timetable
                 .getTimetableDetails()
@@ -199,20 +200,7 @@ public class LecturerServiceImpl implements LecturerService {
                 .map(TimetableDetail::getLecturer)
                 .collect(Collectors.toList());
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        if (isOnlineTimetableDetail(timetableDetail)) {
-            return lecturerRepo.findAll(cns);
-        }
 
-        // exclude all lecturer already teach in this slot
-        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepo
-                .findAll(cns)
-                .stream()
-                .filter(i -> !lecturers.contains(i))
-                .collect(Collectors.toList());
-        lecturer.stream().forEach(u-> {
-            Confirmation con = confirmationRe.findBySemesterAndLecturer(semester, u);
-            u.setTimetableStatus(con != null ? con.getStatus() : TimetableStatus.DRAFT);
-        });
 
         // exclude all lecturer don't have in expected
         List<Expected>expectedList = expectedRepo.findAllBySemester(semester);
@@ -233,6 +221,24 @@ public class LecturerServiceImpl implements LecturerService {
         List intersect = lecturerHaveSlotInExpected.stream()
                 .filter(lecturerHaveSubjectInExpected::contains)
                 .collect(Collectors.toList());
+
+
+        if (isOnlineTimetableDetail(timetableDetail)) {
+            return (List<Lecturer>) lecturerRepo.findAll(cns).stream().filter(x->intersect.contains(x)).collect(Collectors.toList());
+        }
+
+        // exclude all lecturer already teach in this slot
+        List<Lecturer> lecturer = (List<Lecturer>) lecturerRepo
+                .findAll(cns)
+                .stream()
+                .filter(i -> !lecturers.contains(i))
+                .collect(Collectors.toList());
+        lecturer.stream().forEach(u-> {
+            Confirmation con = confirmationRe.findBySemesterAndLecturer(semester, u);
+            u.setTimetableStatus(con != null ? con.getStatus() : TimetableStatus.DRAFT);
+        });
+
+
         List<Lecturer> result = lecturer.stream().filter(x->intersect.contains(x)).collect(Collectors.toList());
         return result;
     }

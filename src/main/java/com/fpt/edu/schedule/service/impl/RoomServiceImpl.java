@@ -1,6 +1,7 @@
 package com.fpt.edu.schedule.service.impl;
 
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Room;
 import com.fpt.edu.schedule.model.Timetable;
 import com.fpt.edu.schedule.model.TimetableDetail;
@@ -59,7 +60,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> getRoomForUpdate(int timetableDetailId) {
+    public List<Room> getRoomForUpdate(int timetableDetailId,String hodGoogleId) {
+        Lecturer lecturer = lecturerService.findByGoogleId(hodGoogleId);
         TimetableDetail timetableDetail = timetableDetailRepo.findById(timetableDetailId);
         Timetable timetable = timetableDetail.getTimetable();
         Set<Room> rooms1 =timetable.getTimetableDetails()

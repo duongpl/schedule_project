@@ -26,9 +26,10 @@ public class RoomController {
 
     }
     @GetMapping("/forUpdate")
-    public ResponseEntity<Room> getRoomForUpdate(@RequestParam("timetableDetailId") int timetableDetailId) {
+    public ResponseEntity<Room> getRoomForUpdate(@RequestParam("timetableDetailId") int timetableDetailId,
+                                                 @RequestHeader("GoogleId") String lecturerId) {
 
-            List<Room> roomList = roomService.getRoomForUpdate(timetableDetailId);
+            List<Room> roomList = roomService.getRoomForUpdate(timetableDetailId,lecturerId);
             return new ResponseEntity(roomList, HttpStatus.OK);
 
     }
