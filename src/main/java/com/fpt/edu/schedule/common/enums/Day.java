@@ -1,13 +1,13 @@
 package com.fpt.edu.schedule.common.enums;
 
 public enum Day {
-    MON("ROLE_ADMIN"),
-    TUE("ROLE_USER"),
-    WED("ROLE_ADMIN"),
-    THU("ROLE_USER"),
-    FRI("ROLE_ADMIN"),
-    SAT("ROLE_USER"),
-    SUN("ROLE_ADMIN");
+    MON("Monday"),
+    TUE("Tuesday"),
+    WED("Wednesday"),
+    THU("Thursday"),
+    FRI("Friday"),
+    SAT("Saturday"),
+    SUN("Sunday");
 
 
     private String name;

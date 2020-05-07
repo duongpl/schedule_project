@@ -17,6 +17,7 @@ public interface TimeTableDetailService {
 
     List<TimetableEdit> getTimetableForEdit(QueryParam queryParam,String groupBy,int semesterId);
 
-    void swapTwoTimetableDetail(List<Integer> ids) ;
+    void swapTwoTimetableDetail(List<Integer> ids,String type) ;
+
 
 }

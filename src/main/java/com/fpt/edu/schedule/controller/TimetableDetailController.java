@@ -46,10 +46,11 @@ public class TimetableDetailController {
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
 
     }
-    @PutMapping("swap/lecturer")
-    public ResponseEntity swapLecturerTimetable(@RequestBody List<Integer> ids) {
-          timeTableDetailService.swapTwoTimetableDetail(ids);
+    @PutMapping("swap")
+    public ResponseEntity swapLecturerTimetable(@RequestBody List<Integer> ids,
+                                                @RequestParam String type) {
+          timeTableDetailService.swapTwoTimetableDetail(ids,type);
             return new ResponseEntity(HttpStatus.OK);
-
     }
+
 }

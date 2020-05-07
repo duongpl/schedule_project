@@ -59,6 +59,8 @@ public class RoomServiceImpl implements RoomService {
         return rooms.stream().collect(Collectors.toList());
     }
 
+
+    // Not use
     @Override
     public List<Room> getRoomForUpdate(int timetableDetailId,String hodGoogleId) {
         Lecturer lecturer = lecturerService.findByGoogleId(hodGoogleId);

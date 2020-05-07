@@ -245,11 +245,13 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 .sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
         return timetableEdits;
     }
-    private void updateConfirm(Confirmation con, Confirmation con1){
+
+    private void updateConfirm(Confirmation con, Confirmation con1) {
 
     }
+
     @Override
-    public void swapTwoTimetableDetail(List<Integer> ids) {
+    public void swapTwoTimetableDetail(List<Integer> ids, String type) {
         if (ids.size() != 2) {
             throw new InvalidRequestException("Don't select more than 2 items !");
         }
@@ -257,25 +259,28 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         TimetableDetail timetableDetail2 = timetableDetailRepo.findById(ids.get(1));
         Semester se = timetableDetail2.getTimetable().getSemester();
         TimetableDetail timetableDetail1 = timetableDetailRepo.findById(ids.get(0));
-
-        // change status confirm
-        Confirmation con = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail1.getLecturer());
-        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail2.getLecturer());
-        if (con != null) {
-            con.setStatus(TimetableStatus.DRAFT);
-            con.setConfirmed(true);
-            confirmationRepo.save(con);
-        }
-        if (con1 != null) {
-            con1.setStatus(TimetableStatus.DRAFT);
-            con1.setConfirmed(true);
-            confirmationRepo.save(con1);
-        }
-
         TimetableDetailWrap t1 = new TimetableDetailWrap(timetableDetail1);
         TimetableDetailWrap t2 = new TimetableDetailWrap(timetableDetail2);
-        swapLecturer(t1, t2);
-
+        if (type.equals("LECTURER")) {
+            // change status confirm
+            Confirmation con = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail1.getLecturer());
+            Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail2.getLecturer());
+            if (con != null) {
+                con.setStatus(TimetableStatus.DRAFT);
+                con.setConfirmed(true);
+                confirmationRepo.save(con);
+            }
+            if (con1 != null) {
+                con1.setStatus(TimetableStatus.DRAFT);
+                con1.setConfirmed(true);
+                confirmationRepo.save(con1);
+            }
+            swapLecturer(t1, t2);
+        } else if (type.equals("ROOM")) {
+            swapRoom(t1, t2);
+        } else {
+            throw new InvalidRequestException("Not found type :" + type);
+        }
         timetableDetailRepo.save(t1.detail);
         timetableDetailRepo.save(t2.detail);
     }
@@ -285,6 +290,13 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         Lecturer temp = cw1.detail.getLecturer();
         cw1.detail.setLecturer(cw2.detail.getLecturer());
         cw2.detail.setLecturer(temp);
+    }
+
+    public static void swapRoom(TimetableDetailWrap cw1,
+                                TimetableDetailWrap cw2) {
+        Room temp = cw1.detail.getRoom();
+        cw1.detail.setRoom(cw2.detail.getRoom());
+        cw2.detail.setRoom(temp);
     }
 
     // wrap class for swap

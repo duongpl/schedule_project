@@ -3,6 +3,7 @@ package com.fpt.edu.schedule.service.impl;
 import com.fpt.edu.schedule.common.constant.Config;
 import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusReport;
+import com.fpt.edu.schedule.common.event.Mail;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
@@ -15,16 +16,15 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +49,9 @@ public class RequestServiceImpl implements RequestService {
     ExpectedRepository expectedRepo;
     RoleService roleService;
     ConfirmationRepository confirmationRepos;
+
     @Autowired
-    private JavaMailSender javaMailSender;
+    ApplicationEventPublisher mailEventPublisher;
 
     @Transactional
     @Override
@@ -130,8 +131,8 @@ public class RequestServiceImpl implements RequestService {
         Lecturer hod = lecturerRepo.findAllByDepartmentAndRole(lecturer.getDepartment(),roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
         request.setLecturer(lecturer);
         String title = "[DSST SYSTEM] New Request";
-        String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to response !",lecturer.getEmail(),request.getContent(),Config.domainWebsite);
-        sendEmail(content,hod.getEmail(),title);
+        String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to view response !",lecturer.getEmail(),request.getContent(),Config.domainWebsite);
+        mailEventPublisher.publishEvent(new Mail(this,content, Arrays.asList(hod.getEmail()),title));
         return requestRepository.save(request);
     }
     @Override
@@ -143,10 +144,10 @@ public class RequestServiceImpl implements RequestService {
         }
         existedRequest.setStatus(request.getStatus());
         existedRequest.setReplyContent(request.getReplyContent());
-        String content = String.format("Lecturer: %s response your request: %s\nReply: %s\nStatus: %s\n\nPlease visit %s to response !"
+        String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to response !"
                 ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
         String title = "[DSST SYSTEM] Response Request";
-        sendEmail(content,existedRequest.getLecturer().getEmail(),title);
+        mailEventPublisher.publishEvent(new Mail(this,content, Arrays.asList(existedRequest.getLecturer().getEmail()),title));
         return requestRepository.save(existedRequest);
     }
 
@@ -267,13 +268,5 @@ public class RequestServiceImpl implements RequestService {
         }
         return false;
     }
-    @Async
-    void sendEmail(String content,String receiveEmail,String subject) {
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(receiveEmail);
-        msg.setSubject(subject);
-        msg.setText(content);
-        javaMailSender.send(msg);
 
-    }
 }
