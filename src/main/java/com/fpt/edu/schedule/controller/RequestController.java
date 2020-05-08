@@ -1,13 +1,18 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.model.Request;
+import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RequestService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayInputStream;
 
 
 @AllArgsConstructor
@@ -23,6 +28,20 @@ public class RequestController {
                                        @RequestHeader("GoogleId") String hodGoogleId) {
             requestService.generateExcelFile(multipartFile,semesterId,hodGoogleId);
             return new ResponseEntity(HttpStatus.OK);
+    }
+    @PostMapping("/export")
+    public ResponseEntity exportExcel() {
+        ByteArrayInputStream in = requestService.exportFile(new Semester());
+        // return IOUtils.toByteArray(in);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=timetable.xlsx");
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
+
     }
     @PostMapping("/filter")
     public ResponseEntity<Request> getRequestByCriteria(@RequestBody QueryParam queryParam) {

@@ -10,6 +10,8 @@ import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
 import lombok.AllArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -24,10 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -179,7 +179,75 @@ public class RequestServiceImpl implements RequestService {
     }
 
 
-     void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
+
+    @Override
+    public ByteArrayInputStream exportFile(Semester semester) {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        HSSFSheet sheet = workbook.createSheet("Timetable");
+        List<TimetableDetail> list = timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(1)).getTimetableDetails();
+        list.sort(Comparator.comparing(TimetableDetail::getLineId));
+        int rowNumber = 0;
+        Cell cell;
+        Row row;
+        //
+        row = sheet.createRow(rowNumber);
+        // EmpNo
+        cell = row.createCell(0, CellType.STRING);
+        cell.setCellValue("Class");
+        // EmpName
+        cell = row.createCell(1, CellType.STRING);
+        cell.setCellValue("Subject");
+
+        // Salary
+        cell = row.createCell(2, CellType.STRING);
+        cell.setCellValue("Slot");
+
+        // Grade
+        cell = row.createCell(3, CellType.STRING);
+        cell.setCellValue("Dept");
+
+        // Bonus
+        cell = row.createCell(4, CellType.STRING);
+        cell.setCellValue("Room");
+        cell = row.createCell(5, CellType.STRING);
+        cell.setCellValue("Lecturer");
+
+
+        // Data
+        for (TimetableDetail emp : list) {
+            rowNumber++;
+            row = sheet.createRow(rowNumber);
+
+            // EmpNo (A)
+            cell = row.createCell(0, CellType.STRING);
+            cell.setCellValue(emp.getClassName().getName());
+            // EmpName (B)
+            cell = row.createCell(1, CellType.STRING);
+            cell.setCellValue(emp.getSubject().getCode());
+            // Salary (C)
+            cell = row.createCell(2, CellType.STRING);
+            cell.setCellValue(emp.getSlot().getName());
+            // Grade (D)
+            cell = row.createCell(3, CellType.STRING);
+            cell.setCellValue(emp.getSubject().getDepartment());
+            // Bonus (E)
+
+            cell = row.createCell(4, CellType.STRING);
+            cell.setCellValue(emp.getRoom() != null ? emp.getRoom().getName(): "");
+            cell = row.createCell(5, CellType.STRING);
+            cell.setCellValue(emp.getLecturer() != null ? emp.getLecturer().getShortName(): "");
+        }
+        try {
+            workbook.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+
+    void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
         try {
             Semester se = semesterRepo.findById(semesterId);
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
