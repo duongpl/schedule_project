@@ -246,10 +246,6 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         return timetableEdits;
     }
 
-    private void updateConfirm(Confirmation con, Confirmation con1) {
-
-    }
-
     @Override
     public void swapTwoTimetableDetail(List<Integer> ids, String type) {
         if (ids.size() != 2) {
@@ -263,6 +259,8 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         TimetableDetailWrap t2 = new TimetableDetailWrap(timetableDetail2);
         if (type.equals("LECTURER")) {
             // change status confirm
+            validateLecturer(timetableDetail1.getSlot(),timetableDetail1.getSubject(),timetableDetail2.getLecturer(),se);
+            validateLecturer(timetableDetail2.getSlot(),timetableDetail2.getSubject(),timetableDetail1.getLecturer(),se);
             Confirmation con = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail1.getLecturer());
             Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(se, timetableDetail2.getLecturer());
             if (con != null) {
@@ -275,6 +273,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
                 con1.setConfirmed(true);
                 confirmationRepo.save(con1);
             }
+
             swapLecturer(t1, t2);
         } else if (type.equals("ROOM")) {
             swapRoom(t1, t2);
@@ -306,6 +305,16 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         // Constructor
         TimetableDetailWrap(TimetableDetail detail) {
             this.detail = detail;
+        }
+    }
+    void validateLecturer(Slot slot,Subject subject,Lecturer lecturer,Semester semester){
+        Set<Lecturer> lecturerSlot =  lecturerService.getLecturersCanTeachSlot(slot,semester);
+        Set<Lecturer> lecturerSubject = lecturerService.getLecturersCanTeachSubject(subject,semester);
+        if(!lecturerSlot.contains(lecturer)){
+            throw new InvalidRequestException(lecturer.getShortName()+" not register this slot!");
+        }
+        if(!lecturerSubject.contains(lecturer)){
+            throw new InvalidRequestException(lecturer.getShortName()+" not register this subject!");
         }
     }
 

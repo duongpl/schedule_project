@@ -85,9 +85,9 @@ public class LecturerServiceImpl implements LecturerService {
         page.setResults(lecturers.getContent());
 
         for (Lecturer u : lecturers) {
-            if (semesterId != 0 ){
-                Confirmation con = confirmationRe.findBySemesterAndLecturer(semesterRepo.findById(semesterId),u);
-                u.setTimetableStatus(con !=null ? con.getStatus() : TimetableStatus.DRAFT);
+            if (semesterId != 0) {
+                Confirmation con = confirmationRe.findBySemesterAndLecturer(semesterRepo.findById(semesterId), u);
+                u.setTimetableStatus(con != null ? con.getStatus() : TimetableStatus.DRAFT);
             }
             if (expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(),
                     lecturerRepo.findById(u.getId())) != null) {
@@ -169,8 +169,8 @@ public class LecturerServiceImpl implements LecturerService {
             List<TimetableDetail> timetableDetail = timetableDetailRepo.findAllByLecturerAndTimetable(lecturer,
                     timetableRepo.findBySemesterAndTempFalse(semesterRepo.getAllByNowIsTrue()));
             // remove all confirmation of this lecture
-            Confirmation confirmation = confirmationRe.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(),lecturer);
-            if(confirmation !=null) {
+            Confirmation confirmation = confirmationRe.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(), lecturer);
+            if (confirmation != null) {
                 confirmationRe.deleteById(confirmation.getId());
             }
             // remove all timetable of this lecture
@@ -203,20 +203,9 @@ public class LecturerServiceImpl implements LecturerService {
 
 
         // exclude all lecturer don't have in expected
-        List<Expected>expectedList = expectedRepo.findAllBySemester(semester);
-        List<ExpectedSlot> expectedSlots = expectedList.stream()
-                .map(i -> i.getExpectedSlots())
-                .flatMap(List::stream)
-                .filter(x->x.getSlotName().equals(timetableDetail.getSlot().getName()) && x.getLevelOfPrefer() > 0)
-                .collect(Collectors.toList());
 
-        List<ExpectedSubject> expectedSubjects = expectedList.stream()
-                .map(i -> i.getExpectedSubjects())
-                .flatMap(List::stream)
-                .filter(x->x.getSubjectCode().equals(timetableDetail.getSubject().getCode()) && x.getLevelOfPrefer() > 0)
-                .collect(Collectors.toList());
-        Set<Lecturer> lecturerHaveSlotInExpected = expectedSlots.stream().map(x->x.getExpected().getLecturer()).collect(Collectors.toSet());
-        Set<Lecturer> lecturerHaveSubjectInExpected = expectedSubjects.stream().map(x->x.getExpected().getLecturer()).collect(Collectors.toSet());
+        Set<Lecturer> lecturerHaveSlotInExpected = getLecturersCanTeachSlot(timetableDetail.getSlot(), semester);
+        Set<Lecturer> lecturerHaveSubjectInExpected = getLecturersCanTeachSubject(timetableDetail.getSubject(), semester);
 
         List intersect = lecturerHaveSlotInExpected.stream()
                 .filter(lecturerHaveSubjectInExpected::contains)
@@ -224,7 +213,7 @@ public class LecturerServiceImpl implements LecturerService {
 
 
         if (isOnlineTimetableDetail(timetableDetail)) {
-            return (List<Lecturer>) lecturerRepo.findAll(cns).stream().filter(x->intersect.contains(x)).collect(Collectors.toList());
+            return (List<Lecturer>) lecturerRepo.findAll(cns).stream().filter(x -> intersect.contains(x)).collect(Collectors.toList());
         }
 
         // exclude all lecturer already teach in this slot
@@ -233,13 +222,13 @@ public class LecturerServiceImpl implements LecturerService {
                 .stream()
                 .filter(i -> !lecturers.contains(i))
                 .collect(Collectors.toList());
-        lecturer.stream().forEach(u-> {
+        lecturer.stream().forEach(u -> {
             Confirmation con = confirmationRe.findBySemesterAndLecturer(semester, u);
             u.setTimetableStatus(con != null ? con.getStatus() : TimetableStatus.DRAFT);
         });
 
 
-        List<Lecturer> result = lecturer.stream().filter(x->intersect.contains(x)).collect(Collectors.toList());
+        List<Lecturer> result = lecturer.stream().filter(x -> intersect.contains(x)).collect(Collectors.toList());
         return result;
     }
 
@@ -247,5 +236,33 @@ public class LecturerServiceImpl implements LecturerService {
         return Character
                 .isAlphabetic(timetableDetail.getSubject().getCode()
                         .charAt(timetableDetail.getSubject().getCode().length() - 1));
+    }
+    @Override
+    public Set<Lecturer> getLecturersCanTeachSubject(Subject subject, Semester semester) {
+        List<Expected> expectedList = expectedRepo.findAllBySemester(semester);
+        List<ExpectedSubject> expectedSubjects = expectedList.stream()
+                .map(i -> i.getExpectedSubjects())
+                .flatMap(List::stream)
+                .filter(x -> x.getSubjectCode().equals(subject.getCode()) && x.getLevelOfPrefer() > 0)
+                .collect(Collectors.toList());
+        Set<Lecturer> set = expectedSubjects
+                .stream()
+                .map(x -> x.getExpected().getLecturer())
+                .collect(Collectors.toSet());
+        return set;
+    }
+    @Override
+    public Set<Lecturer> getLecturersCanTeachSlot(Slot slot, Semester semester) {
+        List<Expected> expectedList = expectedRepo.findAllBySemester(semester);
+        List<ExpectedSlot> expectedSlots = expectedList.stream()
+                .map(i -> i.getExpectedSlots())
+                .flatMap(List::stream)
+                .filter(x -> x.getSlotName().equals(slot.getName()) && x.getLevelOfPrefer() > 0)
+                .collect(Collectors.toList());
+        Set<Lecturer> set = expectedSlots
+                .stream()
+                .map(x -> x.getExpected().getLecturer())
+                .collect(Collectors.toSet());
+        return set;
     }
 }
