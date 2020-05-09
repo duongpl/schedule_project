@@ -311,10 +311,10 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         Set<Lecturer> lecturerSlot =  lecturerService.getLecturersCanTeachSlot(slot,semester);
         Set<Lecturer> lecturerSubject = lecturerService.getLecturersCanTeachSubject(subject,semester);
         if(!lecturerSlot.contains(lecturer)){
-            throw new InvalidRequestException(lecturer.getShortName()+" not register this slot!");
+            throw new InvalidRequestException(lecturer.getShortName()+" not register slot:"+slot.getName()+" !");
         }
         if(!lecturerSubject.contains(lecturer)){
-            throw new InvalidRequestException(lecturer.getShortName()+" not register this subject!");
+            throw new InvalidRequestException(lecturer.getShortName()+" not register subject:"+subject.getCode()+" !");
         }
     }
 
