@@ -195,6 +195,7 @@ public class ExpectedServiceImpl implements ExpectedService {
                     .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSlotName(), i.getLevelOfPrefer()))
                     .collect(Collectors.toList());
 
+
         } else if (groupBy.equals("subject")) {
             List<ExpectedSubject> expectedSubject = expectedList.stream()
                     .map(i -> i.getExpectedSubjects())
@@ -212,6 +213,8 @@ public class ExpectedServiceImpl implements ExpectedService {
                 .entrySet().stream()
                 .map(i -> new ExpectedView(i.getKey(), i.getValue()))
                 .collect(Collectors.toList());
+        expectedViewList.stream().sorted(Comparator.comparing(ExpectedView::getLecturerName));
+
         return expectedViewList;
     }
 

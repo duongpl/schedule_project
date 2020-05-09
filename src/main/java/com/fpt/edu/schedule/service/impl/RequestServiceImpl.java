@@ -181,11 +181,12 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    public ByteArrayInputStream exportFile(Semester semester) {
+    public ByteArrayInputStream exportFile(int semesterId) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        HSSFSheet sheet = workbook.createSheet("Timetable");
-        List<TimetableDetail> list = timetableRepo.findBySemesterAndTempFalse(semesterRepo.findById(1)).getTimetableDetails();
+        Semester se = semesterRepo.findById(semesterId);
+        HSSFSheet sheet = workbook.createSheet(se.getSeason()+" "+se.getYear());
+        List<TimetableDetail> list = timetableRepo.findBySemesterAndTempFalse(se).getTimetableDetails();
         list.sort(Comparator.comparing(TimetableDetail::getLineId));
         int rowNumber = 0;
         Cell cell;

@@ -28,7 +28,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.w3c.dom.Document;
@@ -74,7 +73,6 @@ public class TimetableServiceImpl implements TimetableService {
         return timetable;
     }
 
-    @Async
     @Override
     public void autoArrange(int semesterId, String lecturerId, GaParameter gaParameter) {
         Vector<Teacher> teacherModels = new Vector<>();
@@ -92,7 +90,9 @@ public class TimetableServiceImpl implements TimetableService {
         }
 
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
-
+        if(teacherModels.size() == 0){
+            throw new InvalidRequestException("Not enough resource to run arrange !");
+        }
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
         Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, gaParameter);

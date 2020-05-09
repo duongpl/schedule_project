@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.controller;
 
 import com.fpt.edu.schedule.model.Request;
-import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.repository.base.QueryParam;
 import com.fpt.edu.schedule.service.base.RequestService;
 import lombok.AllArgsConstructor;
@@ -30,8 +29,8 @@ public class RequestController {
             return new ResponseEntity(HttpStatus.OK);
     }
     @PostMapping("/export")
-    public ResponseEntity exportExcel() {
-        ByteArrayInputStream in = requestService.exportFile(new Semester());
+    public ResponseEntity exportExcel(@RequestParam(name = "semesterId") int semesterId) {
+        ByteArrayInputStream in = requestService.exportFile(semesterId);
         // return IOUtils.toByteArray(in);
 
         HttpHeaders headers = new HttpHeaders();
