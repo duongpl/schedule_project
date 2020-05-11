@@ -52,6 +52,7 @@ public class GoogleUtils {
             existedUser.setStatus(StatusLecturer.ACTIVATE);
             existedUser.setGoogleId(googlePojo.getId());
             existedUser.setFullName(googlePojo.getGiven_name());
+            existedUser.setShortName(existedUser.getEmail().substring(0, existedUser.getEmail().indexOf('@')));
             existedUser.setPicture(googlePojo.getPicture());
             existedUser.setLogin(true);
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
