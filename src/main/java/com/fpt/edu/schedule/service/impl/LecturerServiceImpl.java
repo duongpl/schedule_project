@@ -39,7 +39,7 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public Lecturer addLecture(Lecturer lecturer, String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
-        if (lecturerRepo.findByEmail(lecturer.getEmail()) != null) {
+        if (lecturerRepo.findByEmail(lecturer.getEmail()) != null ) {
             throw new InvalidRequestException(String.format(MessageResponse.msgAlreadyHaveEmail, lecturer.getEmail()));
         }
         Lecturer hod = findByGoogleId(hodGoogleId);

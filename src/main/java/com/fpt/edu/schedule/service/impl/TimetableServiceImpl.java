@@ -83,12 +83,11 @@ public class TimetableServiceImpl implements TimetableService {
         Vector<SlotGroup> slotGroups = new Vector<>();
         Lecturer lecturer = lecturerRepo.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
-//        importDataSUMFromFile(semester);
         Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
         if(gaParameter.getModelType() == Model.SCALARIZING) {
             checkGaParameter(gaParameter);
         }
-
+//        importDataSUMFromFile(semester);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         if(teacherModels.size() == 0){
             throw new InvalidRequestException("Not enough resource to run arrange !");
@@ -408,8 +407,10 @@ public class TimetableServiceImpl implements TimetableService {
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
-            List<Timetable> existedTimetable = timetableRepo.findAllBySemester(se);
-            List<String> subjectAll = subjectRepo.findAll().stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
+           Timetable existedTimetable = timetableRepo.findBySemesterAndTempTrue(se);
+           Set< com.fpt.edu.schedule.model.Subject > subjectSet = existedTimetable.getTimetableDetails().stream().filter(i->i.getSubject().getDepartment()
+                    .equals("CF")).map(i -> i.getSubject()).collect(Collectors.toSet());
+           List<String> subjectAll = subjectSet.stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
             List<String> slotAll = slotRepository.findAll().stream().map(Slot::getName).collect(Collectors.toList());
 
 
@@ -419,6 +420,8 @@ public class TimetableServiceImpl implements TimetableService {
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
                 Expected expected = new Expected();
+                expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                expected.setSemester(se);
                 while (cellIterator.hasNext()) {
                     column++;
                     Cell cell = cellIterator.next();
@@ -432,38 +435,38 @@ public class TimetableServiceImpl implements TimetableService {
 
                     switch (column) {
                         case 3:
-                            String slots[] = cell.getStringCellValue().trim().split(" ");
-                            expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                            String abc [] =cell.getStringCellValue().trim().split(" ");
+                           List slots  = Arrays.asList(abc);
+
                             List<com.fpt.edu.schedule.model.ExpectedSlot> expectedSlots = new ArrayList<>();
-                            for (int i = 0; i < slots.length; i++) {
+                            for (int i = 0; i < slotAll.size(); i++) {
                                 com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();
-                                expectedSlot.setSlotName(slots[i].trim());
+                                expectedSlot.setSlotName(slotAll.get(i).trim());
                                 expectedSlot.setExpected(expected);
-                                if (slotAll.contains(slots[i].trim())) {
-                                    expectedSlot.setLevelOfPrefer(1);
-                                } else {
-                                    expectedSlot.setLevelOfPrefer(0);
+                                    if (slots.contains(slotAll.get(i).trim())) {
+                                        expectedSlot.setLevelOfPrefer(1);
+                                    } else {
+                                        expectedSlot.setLevelOfPrefer(0);
 
-                                }
+                                    }
                                 expectedSlots.add(expectedSlot);
-
                             }
                             expected.setExpectedSlots(expectedSlots);
 
                             break;
                         case 4:
-                            String subjects[] = cell.getStringCellValue().trim().split(",");
+                           List<String> subjects = Arrays.asList(cell.getStringCellValue().trim().split(","));
+                            subjects = subjects.stream().map(i->i.trim()).collect(Collectors.toList());
                             List<com.fpt.edu.schedule.model.ExpectedSubject> expectedSubjects = new ArrayList<>();
-                            for (int i = 0; i < subjects.length; i++) {
+                            for (int i = 0; i < subjectAll.size(); i++) {
                                 com.fpt.edu.schedule.model.ExpectedSubject expectedSubject = new com.fpt.edu.schedule.model.ExpectedSubject();
-                                expectedSubject.setSubjectCode(subjects[i].trim());
+                                expectedSubject.setSubjectCode(subjectAll.get(i).trim());
                                 expectedSubject.setExpected(expected);
-                                if (slotAll.contains(subjects[i].trim())) {
+                                if (subjects.contains(subjectAll.get(i).trim())) {
                                     expectedSubject.setLevelOfPrefer(1);
                                 } else {
-                                    if (subjectRepo.findByCode(subjects[i].trim()) != null) {
-                                        expectedSubject.setLevelOfPrefer(0);
-                                    }
+                                    expectedSubject.setLevelOfPrefer(0);
+
                                 }
                                 expectedSubjects.add(expectedSubject);
                             }
@@ -471,7 +474,7 @@ public class TimetableServiceImpl implements TimetableService {
                             break;
                         case 5:
                             ExpectedNote expectedNote = new ExpectedNote();
-                            expectedNote.setExpectedNumOfClass(Integer.parseInt(cell.getStringCellValue()));
+                            expectedNote.setExpectedNumOfClass(((int)cell.getNumericCellValue()));
                             expectedNote.setExpected(expected);
                             expected.setExpectedNote(expectedNote);
                             break;
