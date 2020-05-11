@@ -42,7 +42,7 @@ public class GoogleUtils {
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        Lecturer existedUser = lecturerRepo.findByEmail(googlePojo.getEmail());
+        Lecturer existedUser = lecturerRepo.findByEmailContainingIgnoreCase(googlePojo.getEmail());
         if (existedUser == null || existedUser.getStatus().equals(StatusLecturer.DEACTIVATE)) {
             throw new InvalidRequestException(MessageResponse.msgLogin);
         }

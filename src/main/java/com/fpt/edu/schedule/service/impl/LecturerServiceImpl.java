@@ -39,7 +39,7 @@ public class LecturerServiceImpl implements LecturerService {
     @Override
     public Lecturer addLecture(Lecturer lecturer, String hodGoogleId) {
         Lecturer newLecturer = new Lecturer();
-        if (lecturerRepo.findByEmail(lecturer.getEmail()) != null ) {
+        if (lecturerRepo.findByEmailContainingIgnoreCase(lecturer.getEmail()) != null ) {
             throw new InvalidRequestException(String.format(MessageResponse.msgAlreadyHaveEmail, lecturer.getEmail()));
         }
         Lecturer hod = findByGoogleId(hodGoogleId);
@@ -115,7 +115,7 @@ public class LecturerServiceImpl implements LecturerService {
         if (existedUser == null) {
             throw new InvalidRequestException("Don't find this user!");
         }
-        Lecturer checkDupShortName = lecturerRepo.findByShortName(lecturer.getShortName());
+        Lecturer checkDupShortName = lecturerRepo.findByShortNameContainingIgnoreCase(lecturer.getShortName());
         if (checkDupShortName != null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())) {
             throw new InvalidRequestException("Already have this short name:" + checkDupShortName.getShortName() + "!");
         }
@@ -146,7 +146,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer findByShortName(String shortName) {
-        Lecturer lecturer = lecturerRepo.findByShortName(shortName);
+        Lecturer lecturer = lecturerRepo.findByShortNameContainingIgnoreCase(shortName);
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find this lecturer");
         }
