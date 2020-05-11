@@ -1,7 +1,5 @@
 package com.fpt.edu.schedule.config;
 
-import com.fpt.edu.schedule.common.enums.StatusLecturer;
-import com.fpt.edu.schedule.model.Lecturer;
 import com.fpt.edu.schedule.model.Role;
 import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.repository.base.LecturerRepository;
@@ -33,14 +31,14 @@ public class InitData implements ApplicationListener<ContextRefreshedEvent> {
             semesterService.save(new Semester("summer","2020",true));
             semesterService.save(new Semester("spring","2020",false));
         }
-        if(lecturerRepo.findByEmail("dsst.dummy@gmail.com") == null){
-            Lecturer lecturer = new Lecturer();
-            lecturer.setDepartment("CF");
-            lecturer.setShortName("admin");
-            lecturer.setEmail("dsst.dummy@gmail.com");
-            lecturer.setStatus(StatusLecturer.ACTIVATE);
-            lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
-            lecturerRepo.save(lecturer);
-        }
+//        if(lecturerRepo.findByEmail("dsst.dummy@gmail.com") == null){
+//            Lecturer lecturer = new Lecturer();
+//            lecturer.setDepartment("CF");
+//            lecturer.setShortName("admin");
+//            lecturer.setEmail("dsst.dummy@gmail.com");
+//            lecturer.setStatus(StatusLecturer.ACTIVATE);
+//            lecturer.setRole(roleService.getRoleByName("ROLE_ADMIN"));
+//            lecturerRepo.save(lecturer);
+//        }
     }
 }
