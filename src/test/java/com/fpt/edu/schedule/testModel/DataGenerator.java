@@ -3,7 +3,7 @@ package com.fpt.edu.schedule.testModel;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.model.GaParameter;
-import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.InputData;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -208,14 +208,14 @@ public class DataGenerator {
         return expectedSubjects;
     }
 
-    public static Model generateModel(int teacherNumber, int subjectNumber, int classNumber) {
+    public static InputData generateModel(int teacherNumber, int subjectNumber, int classNumber) {
         Vector<Teacher> teachers = DataGenerator.generateTeachers(teacherNumber);
         Vector<Subject> subjects = DataGenerator.generateSubject(subjectNumber);
         Vector<SlotGroup> slots = DataGenerator.generateSlots();
         Vector<Class> classes = DataGenerator.generateClasses(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        return model;
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        return inputData;
     }
 }

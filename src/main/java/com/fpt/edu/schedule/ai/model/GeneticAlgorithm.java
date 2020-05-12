@@ -41,7 +41,7 @@ public class GeneticAlgorithm {
     @Autowired
     Population population;
     @Autowired
-    Model model;
+    InputData inputData;
     public final int RESULT_RANGE = 29;
     private int generation;
     private boolean isRunning = true;
@@ -53,10 +53,10 @@ public class GeneticAlgorithm {
 
 
 
-    public GeneticAlgorithm(Model model) {
+    public GeneticAlgorithm(InputData inputData) {
         this.generation = 0;
-        this.model = model;
-        this.population = new Population(model.getGaParameter().getPopulationSize(), model);
+        this.inputData = inputData;
+        this.population = new Population(inputData.getGaParameter().getPopulationSize(), inputData);
 
     }
 
@@ -82,8 +82,8 @@ public class GeneticAlgorithm {
     public Chromosome selectParent() {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
-            int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
+        for (int i = 0; i < this.inputData.getGaParameter().getTournamentSize(); i++) {
+            int idx = random.nextInt(this.inputData.getGaParameter().getPopulationSize());
             candidates.add(this.population.getIndividuals().get(idx));
         }
 
@@ -100,14 +100,14 @@ public class GeneticAlgorithm {
 
     public Chromosome selectParentRandomly() {
         Random random = new Random();
-        int idx = random.nextInt(this.model.getGaParameter().getPopulationSize());
+        int idx = random.nextInt(this.inputData.getGaParameter().getPopulationSize());
         return this.population.getIndividuals().get(idx);
     }
 
     public Chromosome selectParent(Vector<Chromosome> individuals) {
         Random random = new Random();
         Vector<Chromosome> candidates = new Vector<>();
-        for (int i = 0; i < this.model.getGaParameter().getTournamentSize(); i++) {
+        for (int i = 0; i < this.inputData.getGaParameter().getTournamentSize(); i++) {
             int idx = random.nextInt(individuals.size());
             candidates.add(individuals.get(idx));
         }
@@ -124,20 +124,20 @@ public class GeneticAlgorithm {
     }
 
     public void selection1() {
-        Population population1 = new Population(this.model);
-        while (population1.getSize() < this.model.getGaParameter().getPopulationSize()) {
+        Population population1 = new Population(this.inputData);
+        while (population1.getSize() < this.inputData.getGaParameter().getPopulationSize()) {
             Chromosome p1 = selectParent();
             Chromosome p2 = selectParent();
             Chromosome c1 = this.crossover(p1, p2);
             Chromosome c2 = this.crossover(p2, p1);
             population1.addIndividual(c1);
-            if (population1.getSize() < this.model.getGaParameter().getPopulationSize()) population1.addIndividual(c2);
+            if (population1.getSize() < this.inputData.getGaParameter().getPopulationSize()) population1.addIndividual(c2);
         }
         this.population = population1;
     }
 
     public void selection() {
-        Population population1 = new Population(this.model);
+        Population population1 = new Population(this.inputData);
 
         this.population.sortByFitnetss();
         Vector<Vector<Chromosome>> individualsByClass = new Vector();
@@ -182,7 +182,7 @@ public class GeneticAlgorithm {
     }
 
     public Chromosome crossover(Chromosome c1, Chromosome c2) {
-        Vector<Slot> slots = SlotGroup.getSlotList(this.model.getSlots());
+        Vector<Slot> slots = SlotGroup.getSlotList(this.inputData.getSlots());
         Vector<Vector<Integer>> genes = new Vector<>();
         Random random = new Random();
         int seed = random.nextInt(Integer.MAX_VALUE);
@@ -193,14 +193,14 @@ public class GeneticAlgorithm {
             genes.add(p3);
         }
 
-        return new Chromosome(this.model, genes);
+        return new Chromosome(this.inputData, genes);
     }
 
     public void mutate() {
         Random random = new Random();
-        for (int i = 0; i < this.model.getGaParameter().getPopulationSize(); i++) {
+        for (int i = 0; i < this.inputData.getGaParameter().getPopulationSize(); i++) {
             for (int j = 0; j < 1; j++) {
-                if (random.nextDouble() < this.model.getGaParameter().getMutationRate()) {
+                if (random.nextDouble() < this.inputData.getGaParameter().getMutationRate()) {
                     this.population.getIndividuals().get(i).mutate();
                 }
             }
@@ -214,7 +214,7 @@ public class GeneticAlgorithm {
             count ++;
         } else count = 0;
         this.lastFitness =  bestFitness;
-        if (count >= this.model.getGaParameter().getConvergenceCheckRange()) {
+        if (count >= this.inputData.getGaParameter().getConvergenceCheckRange()) {
             generateTimetable();
             this.isRunning =false;
             return true;
@@ -225,8 +225,8 @@ public class GeneticAlgorithm {
 
     @Async
     public void start() {
-        if (this.model.getGaParameter().getPopulationSize() % 2 == 1) {
-            this.model.getGaParameter().setPopulationSize(this.model.getGaParameter().getPopulationSize() + 1);
+        if (this.inputData.getGaParameter().getPopulationSize() % 2 == 1) {
+            this.inputData.getGaParameter().setPopulationSize(this.inputData.getGaParameter().getPopulationSize() + 1);
         }
         while (this.isRunning && !isConverged()) {
             this.updateFitness();

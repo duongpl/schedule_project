@@ -3,13 +3,13 @@ package com.fpt.edu.schedule.testModel;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.model.GaParameter;
-import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.InputData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Vector;
 
-public class TestModel {
+public class TestInputData {
     @Test
     public void teacherIdAfterIdMappingShouldBeContinuous() {
         int teacherNumber = 4;
@@ -22,9 +22,9 @@ public class TestModel {
         Vector<Class> classes = DataGenerator.generateClassesWithIdRandom(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
         for (int i = 0; i < teachers.size(); i++) {
-            Assertions.assertEquals(i, model.getTeachers().get(i).getId());
+            Assertions.assertEquals(i, inputData.getTeachers().get(i).getId());
         }
     }
 
@@ -40,9 +40,9 @@ public class TestModel {
         Vector<Class> classes = DataGenerator.generateClassesWithIdRandom(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
         for (int i = 0; i < subjects.size(); i++) {
-            Assertions.assertEquals(i, model.getSubjects().get(i).getId());
+            Assertions.assertEquals(i, inputData.getSubjects().get(i).getId());
         }
     }
 
@@ -58,8 +58,8 @@ public class TestModel {
         Vector<Class> classes = DataGenerator.generateClassesWithIdRandom(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        Vector<Slot> slotList = SlotGroup.getSlotList(model.getSlots());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        Vector<Slot> slotList = SlotGroup.getSlotList(inputData.getSlots());
         for (int i = 0; i < slotList.size(); i++) {
             Assertions.assertEquals(i, slotList.get(i).getId());
         }
@@ -77,10 +77,10 @@ public class TestModel {
         Vector<Class> classes = DataGenerator.generateClassesWithIdRandom(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        Vector<Slot> slotList = SlotGroup.getSlotList(model.getSlots());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        Vector<Slot> slotList = SlotGroup.getSlotList(inputData.getSlots());
         for (int i = 0; i < classes.size(); i++) {
-            Assertions.assertEquals(i, model.getClasses().get(i).getId());
+            Assertions.assertEquals(i, inputData.getClasses().get(i).getId());
         }
     }
 
@@ -101,11 +101,11 @@ public class TestModel {
         expectedSlots.add(new ExpectedSlot(teachers.get(1).getId(), slotList.get(7).getId(), 5));
 
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
         for (int i = 0; i < classes.size(); i++) {
-            Assertions.assertEquals(i, model.getClasses().get(i).getId());
+            Assertions.assertEquals(i, inputData.getClasses().get(i).getId());
         }
-        double [][] expectedSlotMatrix = model.getRegisteredSlots();
+        double [][] expectedSlotMatrix = inputData.getRegisteredSlots();
         Assertions.assertEquals(3, expectedSlotMatrix[0][4], 1e-8);
         Assertions.assertEquals(5, expectedSlotMatrix[1][7], 1e-8);
         Assertions.assertEquals(0, expectedSlotMatrix[0][0], 1e-8);
@@ -126,8 +126,8 @@ public class TestModel {
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         expectedSubjects.add(new ExpectedSubject(teachers.get(0).getId(), subjects.get(2).getId(), 1));
         expectedSubjects.add(new ExpectedSubject(teachers.get(1).getId(), subjects.get(3).getId(), 4));
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        double [][] expectedSubjectMatrix = model.getRegisteredSubjects();
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        double [][] expectedSubjectMatrix = inputData.getRegisteredSubjects();
         Assertions.assertEquals(1, expectedSubjectMatrix[0][2], 1e-8);
         Assertions.assertEquals(4, expectedSubjectMatrix[1][3], 1e-8);
         Assertions.assertEquals(0, expectedSubjectMatrix[0][0], 1e-8);
@@ -149,9 +149,9 @@ public class TestModel {
         classes.add(new Class("c1", slotList.get(3).getId(), subjects.get(2).getId(), new Room("AL123", 1, "AL"), 123, 1));
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        Assertions.assertEquals(3, model.getClasses().get(0).getSlotId());
-        Assertions.assertEquals(2, model.getClasses().get(0).getSubjectId());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        Assertions.assertEquals(3, inputData.getClasses().get(0).getSlotId());
+        Assertions.assertEquals(2, inputData.getClasses().get(0).getSubjectId());
     }
     @Test
     public void idReverseShouldReturnOriginId() {
@@ -172,11 +172,11 @@ public class TestModel {
         int classId = classes.get(0).getId();
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        Assertions.assertEquals(teacherId, model.getTeacherIdReverse(0));
-        Assertions.assertEquals(subjectId, model.getSubjectIdReverse(0));
-        Assertions.assertEquals(slotId, model.getSlotIdReverse(0));
-        Assertions.assertEquals(classId, model.getClassIdReverse(0));
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        Assertions.assertEquals(teacherId, inputData.getTeacherIdReverse(0));
+        Assertions.assertEquals(subjectId, inputData.getSubjectIdReverse(0));
+        Assertions.assertEquals(slotId, inputData.getSlotIdReverse(0));
+        Assertions.assertEquals(classId, inputData.getClassIdReverse(0));
     }
     @Test
     public void checkResourceShouldMarkStatusForClasses() {
@@ -199,11 +199,11 @@ public class TestModel {
 
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
 
         int expectedMaximumNumberOfClass = 4;
         int actualNumberOfClass = 0;
-        for(Class _class:model.getClasses()) {
+        for(Class _class: inputData.getClasses()) {
             if (_class.getStatus() == Class.OK) {
                 actualNumberOfClass ++;
             }
@@ -235,11 +235,11 @@ public class TestModel {
             expectedSlot.setLevelOfPreference(0);
         }
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
 
         int expectedMaximumNumberOfClass = 0;
         int actualNumberOfClass = 0;
-        for(Class _class:model.getClasses()) {
+        for(Class _class: inputData.getClasses()) {
             if (_class.getStatus() == Class.OK) {
                 actualNumberOfClass ++;
             }
