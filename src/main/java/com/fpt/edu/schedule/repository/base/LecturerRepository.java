@@ -16,7 +16,7 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
 
     Lecturer findByGoogleId(String id);
 
-    Lecturer findByShortNameContainingIgnoreCase(String shortName);
+    Lecturer findByShortNameIgnoreCase(String shortName);
 
     Lecturer findByEmailContainingIgnoreCase(String email);
 

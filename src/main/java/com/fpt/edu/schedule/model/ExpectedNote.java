@@ -18,6 +18,7 @@ public class ExpectedNote {
     private int expectedNumOfClass;
     private int maxConsecutiveSlot;
     private String note;
+
     @JsonIgnore
     @OneToOne
     @JoinColumn(name = "expected_id")

@@ -80,37 +80,35 @@ public class RequestServiceImpl implements RequestService {
                     if (column == 6) {
                         break;
                     }
-                    switch (column) {
-                        case 1:
-                            if (classNameRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                    try {
+                        switch (column) {
+                            case 1:
+                                if (classNameRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                                    break;
+                                }
+                                classNameService.addClassName(new ClassName(cell.getStringCellValue().trim()));
                                 break;
-                            }
-                            classNameService.addClassName(new ClassName(cell.getStringCellValue().trim()));
-                            break;
-                        case 2:
-                            if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
+                            case 2:
+                                if (subjectService.getSubjectByCode(cell.getStringCellValue().trim()) != null) {
+                                    break;
+                                }
+                                subjectService.addSubject(new Subject(cell.getStringCellValue().trim(), row.getCell(3).getStringCellValue()));
                                 break;
-                            }
-                            subjectService.addSubject(new Subject(cell.getStringCellValue().trim(), row.getCell(3).getStringCellValue()));
-                            break;
-                        case 3:
-                            if (slotService.getSlotByName(cell.getStringCellValue().trim()) != null) {
+                            case 4:
+                                if (departmentRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                                    break;
+                                }
+                                departmentRepository.save(new Department(cell.getStringCellValue().trim()));
                                 break;
-                            }
-                            slotService.addSlot(new Slot(cell.getStringCellValue().trim()));
-                            break;
-                        case 4:
-                            if (departmentRepository.findByName(cell.getStringCellValue().trim()) != null) {
+                            case 5:
+                                if (roomRepo.findByName(cell.getStringCellValue().trim()) != null) {
+                                    break;
+                                }
+                                roomService.addRoom(new Room(cell.getStringCellValue().trim()));
                                 break;
-                            }
-                            departmentRepository.save(new Department(cell.getStringCellValue().trim()));
-                            break;
-                        case 5:
-                            if (roomRepo.findByName(cell.getStringCellValue().trim()) != null) {
-                                break;
-                            }
-                            roomService.addRoom(new Room(cell.getStringCellValue().trim()));
-                            break;
+                        }
+                    }catch (Exception e){
+                        throw new InvalidRequestException("no");
                     }
                 }
             }
@@ -264,7 +262,6 @@ public class RequestServiceImpl implements RequestService {
                     timetableRepo.deleteById(i.getId());
                 });
                 confirmationRepos.deleteAllBySemester(se);
-                expectedRepo.deleteAllBySemester(se);
 
             }
             Timetable timeTable = new Timetable();

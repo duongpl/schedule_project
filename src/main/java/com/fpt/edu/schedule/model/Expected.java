@@ -20,18 +20,23 @@ public class Expected implements Cloneable {
     private int id;
     private Date createdDate;
     private Date updatedDate;
+
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
+
     @ManyToOne
     @JoinColumn(name = "lecturer_id")
     private Lecturer lecturer;
+
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     private List<ExpectedSlot> expectedSlots;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "expected", cascade = CascadeType.ALL)
     private List<ExpectedSubject> expectedSubjects;
+
     @OneToOne(mappedBy = "expected", cascade = CascadeType.ALL)
     private ExpectedNote expectedNote;
     @Transient

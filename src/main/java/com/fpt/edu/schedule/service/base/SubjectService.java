@@ -9,4 +9,5 @@ public interface SubjectService {
     Subject getSubjectByCode(String code);
 
     List<Subject> getAllSubjectBySemester(int semesterId,String hodGoogleId);
+
 }

@@ -87,7 +87,8 @@ public class TimetableServiceImpl implements TimetableService {
         if(gaParameter.getModelType() == Model.SCALARIZING) {
             checkGaParameter(gaParameter);
         }
-//        importDataSUMFromFile(semester);
+//        importDataFromFile();
+        importDataSUMFromFile(semester);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         if(teacherModels.size() == 0){
             throw new InvalidRequestException("Not enough resource to run arrange !");
@@ -105,7 +106,7 @@ public class TimetableServiceImpl implements TimetableService {
     @Override
     public void stop(String lecturerId) {
         timetableProcess.getMap().get(lecturerId).stop();
-        System.out.println("-------------------------Stop-----LecturerId :" + lecturerId);
+
     }
 
     @Override
@@ -129,7 +130,6 @@ public class TimetableServiceImpl implements TimetableService {
         pagedResultSet.setResults(runsListComplete);
         pagedResultSet.setSize(runsListComplete.size());
         pagedResultSet.setPage(page);
-        System.out.println("size-map-------------" + timetableProcess.getMap().size());
         return pagedResultSet;
     }
 
@@ -157,7 +157,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .stream()
                 .collect(Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
-            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortNameContainingIgnoreCase(i.getLecturerShortName()));
+            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortNameIgnoreCase(i.getLecturerShortName()));
             timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
 
         });
@@ -403,14 +403,13 @@ public class TimetableServiceImpl implements TimetableService {
     void importDataSUMFromFile(Semester se) {
         try {
 
-            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\NTQ\\Downloads\\regiester_sum2020.xlsx"));
+            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\CMT\\Downloads\\regiester_sum2020.xlsx"));
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
            Timetable existedTimetable = timetableRepo.findBySemesterAndTempTrue(se);
-           Set< com.fpt.edu.schedule.model.Subject > subjectSet = existedTimetable.getTimetableDetails().stream().filter(i->i.getSubject().getDepartment()
-                    .equals("CF")).map(i -> i.getSubject()).collect(Collectors.toSet());
-           List<String> subjectAll = subjectSet.stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
+
+           List<String> subjectAll = subjectRepo.findAllByDepartment("CF").stream().map(com.fpt.edu.schedule.model.Subject::getCode).collect(Collectors.toList());
             List<String> slotAll = slotRepository.findAll().stream().map(Slot::getName).collect(Collectors.toList());
 
 

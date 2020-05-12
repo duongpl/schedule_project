@@ -115,7 +115,7 @@ public class LecturerServiceImpl implements LecturerService {
         if (existedUser == null) {
             throw new InvalidRequestException("Don't find this user!");
         }
-        Lecturer checkDupShortName = lecturerRepo.findByShortNameContainingIgnoreCase(lecturer.getShortName());
+        Lecturer checkDupShortName = lecturerRepo.findByShortNameIgnoreCase(lecturer.getShortName());
         if (checkDupShortName != null && !lecturer.getShortName().equalsIgnoreCase(existedUser.getShortName())) {
             throw new InvalidRequestException("Already have this short name:" + checkDupShortName.getShortName() + "!");
         }
@@ -146,7 +146,7 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer findByShortName(String shortName) {
-        Lecturer lecturer = lecturerRepo.findByShortNameContainingIgnoreCase(shortName);
+        Lecturer lecturer = lecturerRepo.findByShortNameIgnoreCase(shortName);
         if (lecturer == null) {
             throw new InvalidRequestException("Don't find this lecturer");
         }

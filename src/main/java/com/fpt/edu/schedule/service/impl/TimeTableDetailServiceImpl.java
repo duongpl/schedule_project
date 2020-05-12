@@ -134,7 +134,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
         // change status confirm
         Confirmation con = confirmationRepo.findBySemesterAndLecturer(semester, timetableDetailExisted.getLecturer());
-        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester, lecturerRepo.findByShortNameContainingIgnoreCase(timetableDetail.getLecturerShortName()));
+        Confirmation con1 = confirmationRepo.findBySemesterAndLecturer(semester, lecturerRepo.findByShortNameIgnoreCase(timetableDetail.getLecturerShortName()));
         if (con != null) {
             con.setStatus(TimetableStatus.DRAFT);
             con.setConfirmed(true);

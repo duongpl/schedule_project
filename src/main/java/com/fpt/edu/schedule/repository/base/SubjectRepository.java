@@ -12,5 +12,7 @@ public interface SubjectRepository extends Repository<Subject,Integer> {
 
     List<Subject> findAll();
 
+    List<Subject> findAllByDepartment(String department);
+
 
 }

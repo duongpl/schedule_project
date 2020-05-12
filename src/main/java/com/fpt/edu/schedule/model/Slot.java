@@ -19,9 +19,14 @@ public class Slot {
     private String name;
     @JsonIgnore
     @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL)
+
     private List<TimetableDetail> timetableDetailList;
     public Slot(String name) {
         this.name = name;
     }
 
+    public Slot(int id,String name) {
+        this.id = id;
+        this.name = name;
+    }
 }
