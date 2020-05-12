@@ -88,7 +88,7 @@ public class TimetableServiceImpl implements TimetableService {
             checkGaParameter(gaParameter);
         }
 //        importDataFromFile();
-        importDataSUMFromFile(semester);
+//        importDataSUMFromFile(semester);
         convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         if(teacherModels.size() == 0){
             throw new InvalidRequestException("Not enough resource to run arrange !");
@@ -241,7 +241,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
                 .collect(Collectors.toList());
         List<Expected> expected = expectedRepo.findAllBySemester(semester);
-        List<com.fpt.edu.schedule.model.Subject> subjects = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
+        List<com.fpt.edu.schedule.model.Subject> subjects = subjectRepo.findAllByDepartment(lecturer.getDepartment());
         //teacher model
         List<Lecturer> lecturers = lecturerRepo.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
                 .filter(i -> expectedRepo.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
@@ -403,7 +403,7 @@ public class TimetableServiceImpl implements TimetableService {
     void importDataSUMFromFile(Semester se) {
         try {
 
-            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\CMT\\Downloads\\regiester_sum2020.xlsx"));
+            XSSFWorkbook workbook = new XSSFWorkbook(new File("C:\\Users\\CMT\\Downloads\\BB172120.xlsx"));
             XSSFSheet sheet = workbook.getSheetAt(0);
             Iterator<Row> rowIterator = sheet.iterator();
             rowIterator.next();
