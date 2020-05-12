@@ -157,7 +157,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .stream()
                 .collect(Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
-            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortName(i.getLecturerShortName()));
+            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortNameContainingIgnoreCase(i.getLecturerShortName()));
             timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
 
         });
@@ -325,7 +325,7 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
+                    Lecturer lecturer = lecturerRepo.findByEmailContainingIgnoreCase(teacherMail);
                     ExpectedNote expectedNote = new ExpectedNote();
                     expectedNote.setExpected(expected);
                     expectedNote.setExpectedNumOfClass(Integer.parseInt(e.getElementsByTagName("Cell").item(slot.size() + 1).getTextContent()));
@@ -370,7 +370,7 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
+                    Lecturer lecturer = lecturerRepo.findByEmailContainingIgnoreCase(teacherMail);
                     Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(), lecturer);
 
                     ;
@@ -420,7 +420,7 @@ public class TimetableServiceImpl implements TimetableService {
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
                 Expected expected = new Expected();
-                expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                expected.setLecturer(lecturerRepo.findByEmailContainingIgnoreCase(row.getCell(1).getStringCellValue()));
                 expected.setSemester(se);
                 while (cellIterator.hasNext()) {
                     column++;
@@ -429,7 +429,7 @@ public class TimetableServiceImpl implements TimetableService {
                     if (cell.getCellTypeEnum().equals(CellType.BLANK)) {
                         break;
                     }
-                    if (lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()) == null) {
+                    if (lecturerRepo.findByEmailContainingIgnoreCase(row.getCell(1).getStringCellValue()) == null) {
                         continue;
                     }
 
