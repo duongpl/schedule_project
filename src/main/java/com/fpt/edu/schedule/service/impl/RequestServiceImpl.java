@@ -142,7 +142,7 @@ public class RequestServiceImpl implements RequestService {
         }
         existedRequest.setStatus(request.getStatus());
         existedRequest.setReplyContent(request.getReplyContent());
-        String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to response !"
+        String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to view !"
                 ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
         String title = "[DSST SYSTEM] Response Request";
         mailEventPublisher.publishEvent(new Mail(this,content, Arrays.asList(existedRequest.getLecturer().getEmail()),title));
