@@ -5,6 +5,8 @@ import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusReport;
 import com.fpt.edu.schedule.common.event.Mail;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.dto.TimetableDetailDTO;
+import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.model.*;
 import com.fpt.edu.schedule.repository.base.*;
 import com.fpt.edu.schedule.service.base.*;
@@ -13,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -26,8 +29,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -55,12 +61,12 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public void generateExcelFile(MultipartFile multipartFile, int semesterId,String hodGoogleId) {
+    public void generateExcelFile(MultipartFile multipartFile, int semesterId, String hodGoogleId) {
         try {
             Lecturer lecturer = lecturerService.findByGoogleId(hodGoogleId);
             String extension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
 
-            if(!extension.contains("xlsx")){
+            if (!extension.contains("xlsx")) {
                 throw new InvalidRequestException("Wrong file format!");
             }
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
@@ -71,7 +77,7 @@ public class RequestServiceImpl implements RequestService {
                 int column = 0;
                 Row row = rowIterator.next();
                 Iterator<Cell> cellIterator = row.cellIterator();
-                if (isSkip(row,lecturer)) {
+                if (isSkip(row, lecturer)) {
                     continue;
                 }
                 while (cellIterator.hasNext()) {
@@ -107,12 +113,12 @@ public class RequestServiceImpl implements RequestService {
                                 roomService.addRoom(new Room(cell.getStringCellValue().trim()));
                                 break;
                         }
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         throw new InvalidRequestException("no");
                     }
                 }
             }
-            saveTimetable(multipartFile, semesterId,lecturer);
+            saveTimetable(multipartFile, semesterId, lecturer);
 
         } catch (Exception e) {
             throw new InvalidRequestException(e.getMessage());
@@ -126,15 +132,16 @@ public class RequestServiceImpl implements RequestService {
         request.setCreatedDate(new Date());
         request.setStatus(StatusReport.PENDING);
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
-        Lecturer hod = lecturerRepo.findAllByDepartmentAndRole(lecturer.getDepartment(),roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
+        Lecturer hod = lecturerRepo.findAllByDepartmentAndRole(lecturer.getDepartment(), roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
         request.setLecturer(lecturer);
         String title = "[DSST SYSTEM] New Request";
-        String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to view response !",lecturer.getEmail(),request.getContent(),Config.domainWebsite);
-        mailEventPublisher.publishEvent(new Mail(this,content, Arrays.asList(hod.getEmail()),title));
+        String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to view response !", lecturer.getEmail(), request.getContent(), Config.domainWebsite);
+        mailEventPublisher.publishEvent(new Mail(this, content, Arrays.asList(hod.getEmail()), title));
         return requestRepository.save(request);
     }
+
     @Override
-    public Request updateRequest(Request request,String lecturerId) {
+    public Request updateRequest(Request request, String lecturerId) {
         Lecturer hod = lecturerService.findByGoogleId(lecturerId);
         Request existedRequest = requestRepository.findReportById(request.getId());
         if (existedRequest == null) {
@@ -143,9 +150,9 @@ public class RequestServiceImpl implements RequestService {
         existedRequest.setStatus(request.getStatus());
         existedRequest.setReplyContent(request.getReplyContent());
         String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to response !"
-                ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
+                , hod.getEmail(), existedRequest.getContent(), existedRequest.getReplyContent(), existedRequest.getStatus(), Config.domainWebsite);
         String title = "[DSST SYSTEM] Response Request";
-        mailEventPublisher.publishEvent(new Mail(this,content, Arrays.asList(existedRequest.getLecturer().getEmail()),title));
+        mailEventPublisher.publishEvent(new Mail(this, content, Arrays.asList(existedRequest.getLecturer().getEmail()), title));
         return requestRepository.save(existedRequest);
     }
 
@@ -162,13 +169,13 @@ public class RequestServiceImpl implements RequestService {
     public QueryParam.PagedResultSet<Request> findByCriteria(QueryParam queryParam) {
         QueryParam.PagedResultSet page = new QueryParam.PagedResultSet();
         BaseSpecifications cns = new BaseSpecifications(queryParam);
-        page.setTotalCount((int)requestRepository.count(cns));
-        if(queryParam.getPage() < 1){
+        page.setTotalCount((int) requestRepository.count(cns));
+        if (queryParam.getPage() < 1) {
             queryParam.setPage(1);
             queryParam.setLimit(1000);
         }
-        Page<Lecturer> requests = requestRepository.findAll(cns, PageRequest.of(queryParam.getPage()-1, queryParam.getLimit()
-                , Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC,queryParam.getSortField())));
+        Page<Lecturer> requests = requestRepository.findAll(cns, PageRequest.of(queryParam.getPage() - 1, queryParam.getLimit()
+                , Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, queryParam.getSortField())));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
         page.setSize(requests.getContent().size());
@@ -177,21 +184,20 @@ public class RequestServiceImpl implements RequestService {
     }
 
 
-
     @Override
-    public ByteArrayInputStream exportFile(int semesterId) {
+    public ByteArrayInputStream exportFile(int semesterId,String groupBy) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Semester se = semesterRepo.findById(semesterId);
-        HSSFSheet sheet = workbook.createSheet(se.getSeason()+" "+se.getYear());
+        HSSFSheet sheet = workbook.createSheet(se.getSeason() + " " + se.getYear());
         List<TimetableDetail> list = timetableRepo.findBySemesterAndTempFalse(se).getTimetableDetails();
-        list.sort(Comparator.comparing(TimetableDetail::getLineId));
         int rowNumber = 0;
         Cell cell;
         Row row;
-        //
+        if(groupBy.equals("line")) {
+        list.sort(Comparator.comparing(TimetableDetail::getLineId));
         row = sheet.createRow(rowNumber);
-        // EmpNo
+        // Class
         cell = row.createCell(0, CellType.STRING);
         cell.setCellValue("Class");
         // EmpName
@@ -236,16 +242,113 @@ public class RequestServiceImpl implements RequestService {
             cell.setCellValue(emp.getRoom() != null ? emp.getRoom().getName(): "");
             cell = row.createCell(5, CellType.STRING);
             cell.setCellValue(emp.getLecturer() != null ? emp.getLecturer().getShortName(): "");
+        } } else {
+            CellStyle cs = workbook.createCellStyle();
+            cs.setWrapText(true);
+            List<TimetableDetailDTO> timetableDetailDTOS = list.stream()
+                    .distinct()
+                    .map(i -> new TimetableDetailDTO(i.getId(),
+                            i.getLecturer() != null ? i.getLecturer().getShortName() : " NOT_ASSIGN",
+                            i.getRoom() != null ? i.getRoom().getName() : "NOT_ASSIGN",
+                            i.getClassName().getName(), i.getSlot().getName(), i.getSubject().getCode(), i.getTimetableStatus(), i.getReason()))
+                    .collect(Collectors.toList());
+            Map<String, List<TimetableDetailDTO>> collect = timetableDetailDTOS.stream().collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+            List<TimetableEdit> timetableEdits = collect
+                    .entrySet()
+                    .stream()
+                    .map(i -> new TimetableEdit(i.getKey(), i.getValue())).collect(Collectors.toList());
+            timetableEdits.sort(Comparator.comparing(TimetableEdit::getRoom).reversed());
+            row = sheet.createRow(rowNumber);
+            cell = row.createCell(1, CellType.STRING);
+            cell.setCellValue("M1");
+            cell = row.createCell(2, CellType.STRING);
+            cell.setCellValue("M2");
+            cell = row.createCell(3, CellType.STRING);
+            cell.setCellValue("M3");
+            cell = row.createCell(4, CellType.STRING);
+            cell.setCellValue("E1");
+            cell = row.createCell(5, CellType.STRING);
+            cell.setCellValue("E2");
+            cell = row.createCell(6, CellType.STRING);
+            cell.setCellValue("E3");
+            cell = row.createCell(7, CellType.STRING);
+            cell.setCellValue("M4");
+            cell = row.createCell(8, CellType.STRING);
+            cell.setCellValue("M5");
+            cell = row.createCell(9, CellType.STRING);
+            cell.setCellValue("E4");
+            cell = row.createCell(10, CellType.STRING);
+            cell.setCellValue("E5");
+
+//
+
+            // Data
+            for (TimetableEdit time : timetableEdits) {
+                rowNumber++;
+                row = sheet.createRow(rowNumber);
+
+                // EmpNo (A)
+                cell = row.createCell(0, CellType.STRING);
+                cell.setCellValue(time.getRoom());
+                // EmpName (B)
+                for (TimetableDetailDTO t : time.getTimetable()) {
+                    if (t.getSlot().equals("M1")) {
+                        cell = row.createCell(1, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("M2")) {
+                        cell = row.createCell(2, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("M3")) {
+                        cell = row.createCell(3, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("E1")) {
+                        cell = row.createCell(4, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("E2")) {
+                        cell = row.createCell(5, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("E3")) {
+                        cell = row.createCell(6, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("M4")) {
+                        cell = row.createCell(7, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("M5")) {
+                        cell = row.createCell(8, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("E4")) {
+                        cell = row.createCell(9, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    if (t.getSlot().equals("E5")) {
+                        cell = row.createCell(10, CellType.STRING);
+                        setContentForCell(cell, t, cs);
+                    }
+                    // Salary (C)
+                }
+            }
         }
         try {
             workbook.write(out);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-
+        private void setContentForCell(Cell cell,TimetableDetailDTO t,CellStyle cs){
+            cell.setCellValue(t.getRoom() + "\n" + t.getSubjectCode() + "\n" + t.getClassName());
+            cell.setCellStyle(cs);
+        }
     void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
         try {
             Semester se = semesterRepo.findById(semesterId);

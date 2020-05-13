@@ -244,6 +244,7 @@ public class TimetableServiceImpl implements TimetableService {
         List<Expected> expected = expectedRepo.findAllBySemester(semester);
         List<com.fpt.edu.schedule.model.Subject> subjects = subjectRepo.findAllByDepartment(lecturer.getDepartment());
         //teacher model
+        //filter teacher ACTIVATE,and have expected and not DRAFT
         List<Lecturer> lecturers = lecturerRepo.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
                 .filter(i -> expectedRepo.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
                 .collect(Collectors.toList());

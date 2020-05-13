@@ -17,5 +17,6 @@ public interface RequestService {
 
     QueryParam.PagedResultSet<Request> findByCriteria(QueryParam queryParam);
 
-    ByteArrayInputStream exportFile(int semesterId);
+    ByteArrayInputStream exportFile(int semesterId,String groupBy);
+
 }
