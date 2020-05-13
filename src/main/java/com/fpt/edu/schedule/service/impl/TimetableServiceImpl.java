@@ -109,6 +109,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     }
 
+
     @Override
     public QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit) {
         QueryParam.PagedResultSet<Runs> pagedResultSet = new QueryParam.PagedResultSet<>();
@@ -247,9 +248,11 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> expectedRepo.findBySemesterAndLecturer(semester, i) != null && isDraft(i, semester))
                 .collect(Collectors.toList());
         lecturers.forEach(i -> {
+
             Expected expectedEach = expectedRepo.findBySemesterAndLecturer(semester, i);
             teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
         });
+
         //expected model
         expected.stream()
                 .filter(i -> lecturers.contains(i.getLecturer()))
