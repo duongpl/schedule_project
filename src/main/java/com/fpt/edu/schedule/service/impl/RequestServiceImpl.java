@@ -134,7 +134,7 @@ public class RequestServiceImpl implements RequestService {
         Lecturer lecturer = lecturerService.findByGoogleId(lecturerId);
         Lecturer hod = lecturerRepo.findAllByDepartmentAndRole(lecturer.getDepartment(), roleService.getRoleByName(Role.ROLE_ADMIN.getName()));
         request.setLecturer(lecturer);
-        String title = "[DSST SYSTEM] New Request";
+        String title = "[DSTT SYSTEM] New Request";
         String content = String.format("Lecturer: %s \nRequest: %s\n\n\nPlease visit %s to view response !", lecturer.getEmail(), request.getContent(), Config.domainWebsite);
         mailEventPublisher.publishEvent(new Mail(this, content, Arrays.asList(hod.getEmail()), title));
         return requestRepository.save(request);
@@ -151,7 +151,7 @@ public class RequestServiceImpl implements RequestService {
         existedRequest.setReplyContent(request.getReplyContent());
         String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to view !"
                 ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
-        String title = "[DSST SYSTEM] Response Request";
+        String title = "[DSTT SYSTEM] Response Request";
         mailEventPublisher.publishEvent(new Mail(this, content, Arrays.asList(existedRequest.getLecturer().getEmail()), title));
         return requestRepository.save(existedRequest);
     }
