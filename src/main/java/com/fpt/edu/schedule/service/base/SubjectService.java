@@ -10,4 +10,5 @@ public interface SubjectService {
 
     List<Subject> getAllSubjectBySemester(int semesterId,String hodGoogleId);
 
+
 }

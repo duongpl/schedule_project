@@ -7,16 +7,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 
 public interface RequestService {
-    void generateExcelFile(MultipartFile multipartFile, int semesterId,String hodGoogleId);
+    void generateExcelFile(MultipartFile multipartFile, int semesterId, String hodGoogleId);
 
     Request addRequest(Request request, String lecturerId);
 
-    Request updateRequest(Request request,String lecturerId);
+    Request updateRequest(Request request, String lecturerId);
 
     void removeRequestById(int id);
 
     QueryParam.PagedResultSet<Request> findByCriteria(QueryParam queryParam);
 
-    ByteArrayInputStream exportFile(int semesterId,String groupBy);
+    ByteArrayInputStream exportFile(int semesterId, String groupBy);
+
+    ByteArrayInputStream exportExpected(int semesterId);
+
 
 }

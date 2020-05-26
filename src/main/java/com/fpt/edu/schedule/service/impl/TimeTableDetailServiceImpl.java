@@ -29,6 +29,7 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
     private ConfirmationRepository confirmationRepo;
     private SemesterRepository semesterRepo;
     private LecturerRepository lecturerRepo;
+    private TimetableRepository timetableRepo;
     final static List<Integer> slotNumbers = Arrays.asList(1, 2, 3, 4, 5, 6);
 
     @Override
@@ -178,7 +179,6 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
 
         List<TimetableDetail> timetableDetails = findByCriteria(queryParam, semesterId);
 
-
         // check not_assign
         Object lecturer = queryParam.getInCriteria().get("lecturer");
         if (lecturer instanceof Map) {
@@ -284,8 +284,17 @@ public class TimeTableDetailServiceImpl implements TimeTableDetailService {
         timetableDetailRepo.save(t2.detail);
     }
 
+    @Override
+    public TimetableDetail saveTimetableDetail(TimetableDetail timetableDetail) {
+        TimetableDetail newDetail = new TimetableDetail();
+        int lineId =  timetableDetailRepo.findFirstByTimetableOrderByLineIdDesc(timetableRepo.findBySemesterAndTempTrue(semesterRepo.findById(2))).getLineId();
+        System.out.println(lineId);
+        return newDetail;
+    }
+
     public static void swapLecturer(TimetableDetailWrap cw1,
                                     TimetableDetailWrap cw2) {
+
         Lecturer temp = cw1.detail.getLecturer();
         cw1.detail.setLecturer(cw2.detail.getLecturer());
         cw2.detail.setLecturer(temp);

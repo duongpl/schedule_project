@@ -5,6 +5,7 @@ import com.fpt.edu.schedule.common.enums.Role;
 import com.fpt.edu.schedule.common.enums.StatusReport;
 import com.fpt.edu.schedule.common.event.Mail;
 import com.fpt.edu.schedule.common.exception.InvalidRequestException;
+import com.fpt.edu.schedule.dto.ExpectedView;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
 import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.model.*;
@@ -42,6 +43,7 @@ public class RequestServiceImpl implements RequestService {
     ClassNameService classNameService;
     ClassNameRepository classNameRepository;
     SubjectService subjectService;
+    SubjectRepository subjectRepo;
     TimeTableDetailService timeTableDetailService;
     TimetableDetailRepository timetableDetailRepo;
     TimetableRepository timetableRepo;
@@ -55,6 +57,7 @@ public class RequestServiceImpl implements RequestService {
     ExpectedRepository expectedRepo;
     RoleService roleService;
     ConfirmationRepository confirmationRepos;
+    SlotRepository slotRepo;
 
     @Autowired
     ApplicationEventPublisher mailEventPublisher;
@@ -185,7 +188,7 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    public ByteArrayInputStream exportFile(int semesterId,String groupBy) {
+    public ByteArrayInputStream exportFile(int semesterId, String groupBy) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Semester se = semesterRepo.findById(semesterId);
@@ -194,55 +197,56 @@ public class RequestServiceImpl implements RequestService {
         int rowNumber = 0;
         Cell cell;
         Row row;
-        if(groupBy.equals("line")) {
-        list.sort(Comparator.comparing(TimetableDetail::getLineId));
-        row = sheet.createRow(rowNumber);
-        // Class
-        cell = row.createCell(0, CellType.STRING);
-        cell.setCellValue("Class");
-        // EmpName
-        cell = row.createCell(1, CellType.STRING);
-        cell.setCellValue("Subject");
-
-        // Salary
-        cell = row.createCell(2, CellType.STRING);
-        cell.setCellValue("Slot");
-
-        // Grade
-        cell = row.createCell(3, CellType.STRING);
-        cell.setCellValue("Dept");
-
-        // Bonus
-        cell = row.createCell(4, CellType.STRING);
-        cell.setCellValue("Room");
-        cell = row.createCell(5, CellType.STRING);
-        cell.setCellValue("Lecturer");
-
-
-        // Data
-        for (TimetableDetail emp : list) {
-            rowNumber++;
+        if (groupBy.equals("line")) {
+            list.sort(Comparator.comparing(TimetableDetail::getLineId));
             row = sheet.createRow(rowNumber);
-
-            // EmpNo (A)
+            // Class
             cell = row.createCell(0, CellType.STRING);
-            cell.setCellValue(emp.getClassName().getName());
-            // EmpName (B)
+            cell.setCellValue("Class");
+            // EmpName
             cell = row.createCell(1, CellType.STRING);
-            cell.setCellValue(emp.getSubject().getCode());
-            // Salary (C)
-            cell = row.createCell(2, CellType.STRING);
-            cell.setCellValue(emp.getSlot().getName());
-            // Grade (D)
-            cell = row.createCell(3, CellType.STRING);
-            cell.setCellValue(emp.getSubject().getDepartment());
-            // Bonus (E)
+            cell.setCellValue("Subject");
 
+            // Salary
+            cell = row.createCell(2, CellType.STRING);
+            cell.setCellValue("Slot");
+
+            // Grade
+            cell = row.createCell(3, CellType.STRING);
+            cell.setCellValue("Dept");
+
+            // Bonus
             cell = row.createCell(4, CellType.STRING);
-            cell.setCellValue(emp.getRoom() != null ? emp.getRoom().getName(): "");
+            cell.setCellValue("Room");
             cell = row.createCell(5, CellType.STRING);
-            cell.setCellValue(emp.getLecturer() != null ? emp.getLecturer().getShortName(): "");
-        } } else {
+            cell.setCellValue("Lecturer");
+
+
+            // Data
+            for (TimetableDetail emp : list) {
+                rowNumber++;
+                row = sheet.createRow(rowNumber);
+
+                // EmpNo (A)
+                cell = row.createCell(0, CellType.STRING);
+                cell.setCellValue(emp.getClassName().getName());
+                // EmpName (B)
+                cell = row.createCell(1, CellType.STRING);
+                cell.setCellValue(emp.getSubject().getCode());
+                // Salary (C)
+                cell = row.createCell(2, CellType.STRING);
+                cell.setCellValue(emp.getSlot().getName());
+                // Grade (D)
+                cell = row.createCell(3, CellType.STRING);
+                cell.setCellValue(emp.getSubject().getDepartment());
+                // Bonus (E)
+
+                cell = row.createCell(4, CellType.STRING);
+                cell.setCellValue(emp.getRoom() != null ? emp.getRoom().getName() : "");
+                cell = row.createCell(5, CellType.STRING);
+                cell.setCellValue(emp.getLecturer() != null ? emp.getLecturer().getShortName() : "");
+            }
+        } else {
             CellStyle cs = workbook.createCellStyle();
             cs.setWrapText(true);
             List<TimetableDetailDTO> timetableDetailDTOS = list.stream()
@@ -344,11 +348,115 @@ public class RequestServiceImpl implements RequestService {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
+    @Override
+    public ByteArrayInputStream exportExpected(int semesterId) {
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Semester se = semesterRepo.findById(semesterId);
+        HSSFSheet sheet = workbook.createSheet("Subject");
 
-        private void setContentForCell(Cell cell,TimetableDetailDTO t,CellStyle cs){
-            cell.setCellValue(t.getRoom() + "\n" + t.getSubjectCode() + "\n" + t.getClassName());
-            cell.setCellStyle(cs);
+        int rowNumber = 0;
+        Cell cell;
+        Row row;
+
+            CellStyle cs = workbook.createCellStyle();
+            cs.setWrapText(true);
+            List<ExpectedView> expectedViewList = new ArrayList<>();
+            List<TimetableDetailDTO> expectedDTOs ;
+            List<Expected> expectedList = expectedRepo.findAllBySemester(se);
+
+        List<ExpectedSubject> expectedSubject = expectedList.stream()
+                .map(i -> i.getExpectedSubjects())
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        expectedDTOs = expectedSubject.stream()
+                .distinct()
+                .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSubjectCode(), i.getLevelOfPrefer()))
+                .collect(Collectors.toList());
+
+
+            List<String> subjects = subjectRepo.findAll().stream().filter(i->i.getDepartment().equalsIgnoreCase("CF")).map(Subject::getCode).collect(Collectors.toList());
+            row = sheet.createRow(rowNumber);
+            for(int i=0;i<subjects.size();i++) {
+                cell = row.createCell(i+1, CellType.STRING);
+                cell.setCellValue(subjects.get(i));
+            }
+
+            for (ExpectedView exp : expectedViewList) {
+                rowNumber++;
+                row = sheet.createRow(rowNumber);
+                cell = row.createCell(0, CellType.STRING);
+                cell.setCellValue(exp.getLecturerName());
+                for (TimetableDetailDTO t : exp.getTimetable()) {
+                    int rowCell = 0;
+                    for(int i=0;i<subjects.size();i++) {
+                        rowCell++;
+                        if (t.getSubjectCode().equals(subjects.get(i))) {
+                            cell = row.createCell(rowCell, CellType.STRING);
+                            cell.setCellValue(t.getLevelOfPreference());
+                        }
+                    }
+                }
+            }
+
+
+        HSSFSheet sheetSlot = workbook.createSheet("Slot");
+        rowNumber = 0;
+        List<Slot> slotsSort = slotRepo.findAll().stream().sorted(Comparator.comparing(Slot::getId)).collect(Collectors.toList());
+        List<String> slots= slotsSort.stream().map(Slot::getName).collect(Collectors.toList());
+                List<ExpectedSlot> expectedSlots = expectedList.stream()
+                        .map(i -> i.getExpectedSlots())
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+                expectedDTOs = expectedSlots.stream()
+                        .distinct()
+                        .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSlotName(), i.getLevelOfPrefer()))
+                        .collect(Collectors.toList());
+        Map<String, List<TimetableDetailDTO>> collect = expectedDTOs
+                .stream()
+                .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+        expectedViewList = collect
+                .entrySet().stream()
+                .map(i -> new ExpectedView(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
+        expectedViewList.stream().sorted(Comparator.comparing(ExpectedView::getLecturerName));
+
+        row = sheetSlot.createRow(rowNumber);
+        for(int i=0;i<slots.size();i++) {
+            cell = row.createCell(i+1, CellType.STRING);
+            cell.setCellValue(subjects.get(i));
         }
+        for (ExpectedView exp : expectedViewList) {
+            rowNumber++;
+            row = sheetSlot.createRow(rowNumber);
+            cell = row.createCell(0, CellType.STRING);
+            cell.setCellValue(exp.getLecturerName());
+            for (TimetableDetailDTO t : exp.getTimetable()) {
+                int rowCell = 0;
+                for(int i=0;i<slots.size();i++) {
+                    rowCell++;
+                    if (t.getSlot().equals(slots.get(i))) {
+                        cell = row.createCell(rowCell, CellType.STRING);
+                        cell.setCellValue(t.getLevelOfPreference());
+                    }
+                }
+            }
+        }
+
+
+        try {
+            workbook.write(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    private void setContentForCell(Cell cell, TimetableDetailDTO t, CellStyle cs) {
+        cell.setCellValue(t.getRoom() + "\n" + t.getSubjectCode() + "\n" + t.getClassName());
+        cell.setCellStyle(cs);
+    }
     void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
         try {
             Semester se = semesterRepo.findById(semesterId);

@@ -32,17 +32,24 @@ public class RequestController {
     public ResponseEntity exportExcel(@RequestParam(name = "semesterId") int semesterId,
                                       @RequestParam(name = "groupBy") String groupBy) {
         ByteArrayInputStream in = requestService.exportFile(semesterId,groupBy);
-        // return IOUtils.toByteArray(in);
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=timetable.xlsx");
-
         return ResponseEntity
                 .ok()
                 .headers(headers)
                 .body(new InputStreamResource(in));
-
     }
+    @PostMapping("/exportExp")
+    public ResponseEntity exportExpectedExcel(@RequestParam(name = "semesterId") int semesterId) {
+        ByteArrayInputStream in = requestService.exportExpected(semesterId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=expected.csv");
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
+    }
+
     @PostMapping("/filter")
     public ResponseEntity<Request> getRequestByCriteria(@RequestBody QueryParam queryParam) {
 

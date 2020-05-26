@@ -19,5 +19,8 @@ public interface TimeTableDetailService {
 
     void swapTwoTimetableDetail(List<Integer> ids,String type) ;
 
+    TimetableDetail saveTimetableDetail(TimetableDetail timetableDetail);
+
+
 
 }
