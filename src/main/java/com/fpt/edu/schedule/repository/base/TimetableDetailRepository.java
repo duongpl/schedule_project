@@ -24,5 +24,5 @@ public interface TimetableDetailRepository extends Repository<TimetableDetail, I
 
 
     List<TimetableDetail> findAllByLecturerAndTimetable(Lecturer lecturer, Timetable timetable);
-
+    TimetableDetail findFirstByTimetableOrderByLineIdDesc(Timetable timetable);
 }

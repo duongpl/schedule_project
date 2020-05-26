@@ -117,7 +117,7 @@ public class RequestServiceImpl implements RequestService {
                                 break;
                         }
                     } catch (Exception e) {
-                        throw new InvalidRequestException("no");
+                        throw new InvalidRequestException(e.getMessage());
                     }
                 }
             }
@@ -153,7 +153,7 @@ public class RequestServiceImpl implements RequestService {
         existedRequest.setStatus(request.getStatus());
         existedRequest.setReplyContent(request.getReplyContent());
         String content = String.format("Lecturer: %s response your request: %s\n\nReply: %s\nStatus: %s\n\nPlease visit %s to view !"
-                ,hod.getEmail(),existedRequest.getContent(),existedRequest.getReplyContent(),existedRequest.getStatus(),Config.domainWebsite);
+                , hod.getEmail(), existedRequest.getContent(), existedRequest.getReplyContent(), existedRequest.getStatus(), Config.domainWebsite);
         String title = "[DSTT SYSTEM] Response Request";
         mailEventPublisher.publishEvent(new Mail(this, content, Arrays.asList(existedRequest.getLecturer().getEmail()), title));
         return requestRepository.save(existedRequest);
@@ -170,14 +170,14 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public QueryParam.PagedResultSet<Request> findByCriteria(QueryParam queryParam) {
-        QueryParam.PagedResultSet page = new QueryParam.PagedResultSet();
-        BaseSpecifications cns = new BaseSpecifications(queryParam);
+        QueryParam.PagedResultSet<Request> page = new QueryParam.PagedResultSet();
+        BaseSpecifications<Request> cns = new BaseSpecifications(queryParam);
         page.setTotalCount((int) requestRepository.count(cns));
         if (queryParam.getPage() < 1) {
             queryParam.setPage(1);
             queryParam.setLimit(1000);
         }
-        Page<Lecturer> requests = requestRepository.findAll(cns, PageRequest.of(queryParam.getPage() - 1, queryParam.getLimit()
+        Page<Request> requests = requestRepository.findAll(cns, PageRequest.of(queryParam.getPage() - 1, queryParam.getLimit()
                 , Sort.by(queryParam.isAscending() ? Sort.Direction.ASC : Sort.Direction.DESC, queryParam.getSortField())));
         page.setPage(queryParam.getPage());
         page.setLimit(queryParam.getLimit());
@@ -226,21 +226,14 @@ public class RequestServiceImpl implements RequestService {
             for (TimetableDetail emp : list) {
                 rowNumber++;
                 row = sheet.createRow(rowNumber);
-
-                // EmpNo (A)
                 cell = row.createCell(0, CellType.STRING);
                 cell.setCellValue(emp.getClassName().getName());
-                // EmpName (B)
                 cell = row.createCell(1, CellType.STRING);
                 cell.setCellValue(emp.getSubject().getCode());
-                // Salary (C)
                 cell = row.createCell(2, CellType.STRING);
                 cell.setCellValue(emp.getSlot().getName());
-                // Grade (D)
                 cell = row.createCell(3, CellType.STRING);
                 cell.setCellValue(emp.getSubject().getDepartment());
-                // Bonus (E)
-
                 cell = row.createCell(4, CellType.STRING);
                 cell.setCellValue(emp.getRoom() != null ? emp.getRoom().getName() : "");
                 cell = row.createCell(5, CellType.STRING);
@@ -346,8 +339,10 @@ public class RequestServiceImpl implements RequestService {
             e.printStackTrace();
         }
 
+
         return new ByteArrayInputStream(out.toByteArray());
     }
+
     @Override
     public ByteArrayInputStream exportExpected(int semesterId) {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -359,11 +354,11 @@ public class RequestServiceImpl implements RequestService {
         Cell cell;
         Row row;
 
-            CellStyle cs = workbook.createCellStyle();
-            cs.setWrapText(true);
-            List<ExpectedView> expectedViewList = new ArrayList<>();
-            List<TimetableDetailDTO> expectedDTOs ;
-            List<Expected> expectedList = expectedRepo.findAllBySemester(se);
+        CellStyle cs = workbook.createCellStyle();
+        cs.setWrapText(true);
+        List<ExpectedView> expectedViewList;
+        List<TimetableDetailDTO> expectedDTOs;
+        List<Expected> expectedList = expectedRepo.findAllBySemester(se);
 
         List<ExpectedSubject> expectedSubject = expectedList.stream()
                 .map(i -> i.getExpectedSubjects())
@@ -373,45 +368,6 @@ public class RequestServiceImpl implements RequestService {
                 .distinct()
                 .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSubjectCode(), i.getLevelOfPrefer()))
                 .collect(Collectors.toList());
-
-
-            List<String> subjects = subjectRepo.findAll().stream().filter(i->i.getDepartment().equalsIgnoreCase("CF")).map(Subject::getCode).collect(Collectors.toList());
-            row = sheet.createRow(rowNumber);
-            for(int i=0;i<subjects.size();i++) {
-                cell = row.createCell(i+1, CellType.STRING);
-                cell.setCellValue(subjects.get(i));
-            }
-
-            for (ExpectedView exp : expectedViewList) {
-                rowNumber++;
-                row = sheet.createRow(rowNumber);
-                cell = row.createCell(0, CellType.STRING);
-                cell.setCellValue(exp.getLecturerName());
-                for (TimetableDetailDTO t : exp.getTimetable()) {
-                    int rowCell = 0;
-                    for(int i=0;i<subjects.size();i++) {
-                        rowCell++;
-                        if (t.getSubjectCode().equals(subjects.get(i))) {
-                            cell = row.createCell(rowCell, CellType.STRING);
-                            cell.setCellValue(t.getLevelOfPreference());
-                        }
-                    }
-                }
-            }
-
-
-        HSSFSheet sheetSlot = workbook.createSheet("Slot");
-        rowNumber = 0;
-        List<Slot> slotsSort = slotRepo.findAll().stream().sorted(Comparator.comparing(Slot::getId)).collect(Collectors.toList());
-        List<String> slots= slotsSort.stream().map(Slot::getName).collect(Collectors.toList());
-                List<ExpectedSlot> expectedSlots = expectedList.stream()
-                        .map(i -> i.getExpectedSlots())
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-                expectedDTOs = expectedSlots.stream()
-                        .distinct()
-                        .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSlotName(), i.getLevelOfPrefer()))
-                        .collect(Collectors.toList());
         Map<String, List<TimetableDetailDTO>> collect = expectedDTOs
                 .stream()
                 .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
@@ -419,12 +375,60 @@ public class RequestServiceImpl implements RequestService {
                 .entrySet().stream()
                 .map(i -> new ExpectedView(i.getKey(), i.getValue()))
                 .collect(Collectors.toList());
-        expectedViewList.stream().sorted(Comparator.comparing(ExpectedView::getLecturerName));
+        expectedViewList.stream()
+                .sorted(Comparator.comparing(ExpectedView::getLecturerName));
+
+
+        List<String> subjects = subjectRepo.findAll().stream().filter(i -> i.getDepartment().equalsIgnoreCase("CF")).map(Subject::getCode).collect(Collectors.toList());
+        row = sheet.createRow(rowNumber);
+        for (int i = 0; i < subjects.size(); i++) {
+            cell = row.createCell(i + 1, CellType.STRING);
+            cell.setCellValue(subjects.get(i));
+        }
+
+        for (ExpectedView exp : expectedViewList) {
+            rowNumber++;
+            row = sheet.createRow(rowNumber);
+            cell = row.createCell(0, CellType.STRING);
+            cell.setCellValue(exp.getLecturerName());
+            for (TimetableDetailDTO t : exp.getTimetable()) {
+                int rowCell = 0;
+                for (int i = 0; i < subjects.size(); i++) {
+                    rowCell++;
+                    if (t.getSubjectCode().equals(subjects.get(i))) {
+                        cell = row.createCell(rowCell, CellType.STRING);
+                        cell.setCellValue(t.getLevelOfPreference());
+                    }
+                }
+            }
+        }
+
+
+        HSSFSheet sheetSlot = workbook.createSheet("Slot");
+        rowNumber = 0;
+        List<Slot> slotsSort = slotRepo.findAll().stream().sorted(Comparator.comparing(Slot::getId)).collect(Collectors.toList());
+        List<String> slots = slotsSort.stream().map(Slot::getName).collect(Collectors.toList());
+        List<ExpectedSlot> expectedSlots = expectedList.stream()
+                .map(Expected::getExpectedSlots)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+        expectedDTOs = expectedSlots.stream()
+                .distinct()
+                .map(i -> new TimetableDetailDTO(i.getExpected().getLecturer().getShortName(), i.getSlotName(), i.getLevelOfPrefer()))
+                .collect(Collectors.toList());
+        collect = expectedDTOs
+                .stream()
+                .collect(Collectors.groupingBy(TimetableDetailDTO::getLecturerShortName));
+        expectedViewList = collect.entrySet().stream()
+                .map(i -> new ExpectedView(i.getKey(), i.getValue()))
+                .collect(Collectors.toList());
+        expectedViewList.stream()
+                .sorted(Comparator.comparing(ExpectedView::getLecturerName));
 
         row = sheetSlot.createRow(rowNumber);
-        for(int i=0;i<slots.size();i++) {
-            cell = row.createCell(i+1, CellType.STRING);
-            cell.setCellValue(subjects.get(i));
+        for (int i = 0; i < slots.size(); i++) {
+            cell = row.createCell(i + 1, CellType.STRING);
+            cell.setCellValue(slots.get(i));
         }
         for (ExpectedView exp : expectedViewList) {
             rowNumber++;
@@ -433,16 +437,15 @@ public class RequestServiceImpl implements RequestService {
             cell.setCellValue(exp.getLecturerName());
             for (TimetableDetailDTO t : exp.getTimetable()) {
                 int rowCell = 0;
-                for(int i=0;i<slots.size();i++) {
+                for (int i = 0; i < slots.size(); i++) {
                     rowCell++;
-                    if (t.getSlot().equals(slots.get(i))) {
+                    if (t.getSubjectCode().equals(slots.get(i))) {
                         cell = row.createCell(rowCell, CellType.STRING);
                         cell.setCellValue(t.getLevelOfPreference());
                     }
                 }
             }
         }
-
 
         try {
             workbook.write(out);
@@ -457,7 +460,8 @@ public class RequestServiceImpl implements RequestService {
         cell.setCellValue(t.getRoom() + "\n" + t.getSubjectCode() + "\n" + t.getClassName());
         cell.setCellStyle(cs);
     }
-    void saveTimetable(MultipartFile multipartFile, int semesterId,Lecturer lecturer) {
+
+    void saveTimetable(MultipartFile multipartFile, int semesterId, Lecturer lecturer) {
         try {
             Semester se = semesterRepo.findById(semesterId);
             XSSFWorkbook workbook = new XSSFWorkbook(multipartFile.getInputStream());
@@ -466,9 +470,9 @@ public class RequestServiceImpl implements RequestService {
             rowIterator.next();
             List<Timetable> existedTimetable = timetableRepo.findAllBySemester(se);
 
-            if (existedTimetable.size()>0) {
+            if (existedTimetable.size() > 0) {
 
-                existedTimetable.stream().forEach(i->{
+                existedTimetable.stream().forEach(i -> {
                     timetableDetailRepo.deleteAllByTimetable(i.getId());
                     timetableRepo.deleteById(i.getId());
                 });
@@ -479,12 +483,12 @@ public class RequestServiceImpl implements RequestService {
             Timetable timeTableTemp = new Timetable();
             timeTableTemp.setTemp(true);
             int line = 0;
-            int lineTemp =0;
+            int lineTemp = 0;
             while (rowIterator.hasNext()) {
                 int column = 0;
 
                 Row row = rowIterator.next();
-                if (isSkip(row,lecturer)) {
+                if (isSkip(row, lecturer)) {
                     continue;
                 }
                 Iterator<Cell> cellIterator = row.cellIterator();
@@ -521,6 +525,7 @@ public class RequestServiceImpl implements RequestService {
                             timetableDetail.setRoom(roomService.getRoomByName(cell.getStringCellValue().trim()));
                             timetableDetailTemp.setRoom(roomService.getRoomByName(cell.getStringCellValue().trim()));
                             break;
+                        default:
                     }
                     timetableDetail.setTimetable(timeTable);
                     timetableDetail.setLineId(line);
@@ -538,9 +543,10 @@ public class RequestServiceImpl implements RequestService {
             e.printStackTrace();
         }
     }
-    private boolean isSkip(Row row,Lecturer lecturer){
+
+    private boolean isSkip(Row row, Lecturer lecturer) {
         Cell cell = row.getCell(6);
-        if (!row.getCell(3).getStringCellValue().equalsIgnoreCase(lecturer.getDepartment()) ||cell!= null ) {
+        if (!row.getCell(3).getStringCellValue().equalsIgnoreCase(lecturer.getDepartment()) || cell != null) {
             return true;
         }
         return false;
