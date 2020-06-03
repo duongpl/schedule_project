@@ -75,29 +75,22 @@ public class TimetableServiceImpl implements TimetableService {
 
     @Override
     public void autoArrange(int semesterId, String lecturerId, GaParameter gaParameter) {
-        Vector<Teacher> teacherModels = new Vector<>();
-        Vector<Subject> subjectModels = new Vector<>();
-        Vector<com.fpt.edu.schedule.ai.lib.Class> classModels = new Vector<>();
-        Vector<ExpectedSlot> expectedSlotModels = new Vector<>();
-        Vector<ExpectedSubject> expectedSubjectModel = new Vector<>();
+        Vector<Teacher> teachers = new Vector<>();
+        Vector<Subject> subjects = new Vector<>();
+        Vector<com.fpt.edu.schedule.ai.lib.Class> classes = new Vector<>();
+        Vector<ExpectedSlot> expectedSlots = new Vector<>();
+        Vector<ExpectedSubject> expectedSubjects = new Vector<>();
         Vector<SlotGroup> slotGroups = new Vector<>();
         Lecturer lecturer = lecturerRepo.findByGoogleId(lecturerId);
         Semester semester = semesterService.findById(semesterId);
         Timetable timetable = timetableRepo.findBySemesterAndTempTrue(semester);
-        if(gaParameter.getModelType() == Model.SCALARIZING) {
-            checkGaParameter(gaParameter);
-        }
-//        importDataFromFile();
-//        importDataSUMFromFile(semester);
-        convertData(teacherModels, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
-        if(teacherModels.size() == 0){
-            throw new InvalidRequestException("Not enough resource to run arrange !");
-        }
+        checkGaParameter(gaParameter);
+        convertData(teachers, subjects, classes, expectedSlots, expectedSubjects, semesterId, lecturerId, slotGroups, lecturer, semester, timetable);
         //To do: lay parameter info tu fe truyen vao bien gaParameter
         GeneticAlgorithm ga = applicationContext.getBean(GeneticAlgorithm.class);
-        Model model = new Model(teacherModels, slotGroups, subjectModels, classModels, expectedSlotModels, expectedSubjectModel, gaParameter);
-        Population population = new Population(POPULATION_SIZE, model);
-        setAttributeForGa(ga, population, model, lecturerId, gaParameter.getStepGeneration());
+        InputData inputData = new InputData(teachers, slotGroups, subjects, classes, expectedSlots, expectedSubjects, gaParameter);
+        Population population = new Population(POPULATION_SIZE, inputData);
+        setAttributeForGa(ga, population, inputData, lecturerId, gaParameter.getStepGeneration());
         checkExistedGa(lecturerId);
         timetableProcess.getMap().put(lecturerId, ga);
         ga.start();
@@ -175,10 +168,10 @@ public class TimetableServiceImpl implements TimetableService {
         }
     }
 
-    private void setAttributeForGa(GeneticAlgorithm ga, Population population, Model model, String lecturerId, int step) {
+    private void setAttributeForGa(GeneticAlgorithm ga, Population population, InputData inputData, String lecturerId, int step) {
         ga.setPopulation(population);
         ga.setGeneration(0);
-        ga.setModel(model);
+        ga.setInputData(inputData);
         ga.setStepGen(step);
         ga.setRunning(true);
         ga.setLecturerId(lecturerId);
@@ -222,9 +215,9 @@ public class TimetableServiceImpl implements TimetableService {
         return lecturersNotSendResource;
     }
 
-    private void convertData(Vector<Teacher> teacherModels, Vector<Subject> subjectModels,
-                             Vector<com.fpt.edu.schedule.ai.lib.Class> classModels, Vector<ExpectedSlot> expectedSlotModels,
-                             Vector<ExpectedSubject> expectedSubjectModel,
+    private void convertData(Vector<Teacher> teachers, Vector<Subject> subjects,
+                             Vector<com.fpt.edu.schedule.ai.lib.Class> classes, Vector<ExpectedSlot> expectedSlots,
+                             Vector<ExpectedSubject> expectedSubject,
                              int semesterId, String lecturerId, Vector<SlotGroup> slots, Lecturer lecturer, Semester semester, Timetable timetable) {
 
 
@@ -242,7 +235,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> i.getSubject().getDepartment().equals(lecturer.getDepartment()) && !isOnlineSubject(i.getSubject()) && !lineIdPublic.contains(i.getLineId()))
                 .collect(Collectors.toList());
         List<Expected> expected = expectedRepo.findAllBySemester(semester);
-        List<com.fpt.edu.schedule.model.Subject> subjects = subjectRepo.findAllByDepartment(lecturer.getDepartment());
+        List<com.fpt.edu.schedule.model.Subject> subjectsFromDb = subjectService.getAllSubjectBySemester(semesterId, lecturerId);
         //teacher model
         //filter teacher ACTIVATE,and have expected and not DRAFT
         List<Lecturer> lecturers = lecturerRepo.findAllByDepartmentAndStatus(lecturer.getDepartment(), StatusLecturer.ACTIVATE).stream()
@@ -251,7 +244,7 @@ public class TimetableServiceImpl implements TimetableService {
         lecturers.forEach(i -> {
 
             Expected expectedEach = expectedRepo.findBySemesterAndLecturer(semester, i);
-            teacherModels.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
+            teachers.add(new Teacher(i.getEmail(), i.getFullName(), i.getId(), i.isFullTime() ? 1 : 0, expectedEach.getExpectedNote().getExpectedNumOfClass(), expectedEach.getExpectedNote().getMaxConsecutiveSlot(), i.getQuotaClass()));
         });
 
         //expected model
@@ -259,20 +252,20 @@ public class TimetableServiceImpl implements TimetableService {
                 .filter(i -> lecturers.contains(i.getLecturer()))
                 .forEach(i -> {
                     i.getExpectedSlots().forEach(s -> {
-                        expectedSlotModels.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
+                        expectedSlots.add(new ExpectedSlot(s.getExpected().getLecturer().getId(), slotRepository.findByName(s.getSlotName()).getId(), s.getLevelOfPrefer()));
                     });
                     i.getExpectedSubjects().stream().filter(x -> !isOnlineSubject(subjectRepo.findByCode(x.getSubjectCode()))).forEach(s -> {
-                        expectedSubjectModel.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepo.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
+                        expectedSubject.add(new ExpectedSubject(s.getExpected().getLecturer().getId(), subjectRepo.findByCode(s.getSubjectCode()).getId(), s.getLevelOfPrefer()));
                     });
                 });
         //class model
         timetableDetails.stream().forEach(i -> {
-            classModels.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId(), Class.OK));
+            classes.add(new Class(i.getClassName().getName(), i.getSlot().getId(), i.getSubject().getId(), new Room(i.getRoom().getName()), i.getId(), Class.OK));
         });
         //subject model
         // exclude online subject
-        subjects.stream().filter(i -> !isOnlineSubject(i)).forEach(i -> {
-            subjectModels.add(new Subject(i.getCode(), i.getId()));
+        subjectsFromDb.stream().filter(i -> !isOnlineSubject(i)).forEach(i -> {
+            subjects.add(new Subject(i.getCode(), i.getId()));
         });
 
         //slot model
