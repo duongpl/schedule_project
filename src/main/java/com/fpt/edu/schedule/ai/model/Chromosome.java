@@ -23,54 +23,57 @@ public class Chromosome {
         this.needTobeUpdated = true;
     }
 
-    public void calculateFitness2() {
+    public int getNumberOfSessionPerWeek(int teacherId) {
+        int numberOfSessionsPerWeek = 0;
+        int group[] = new int[10];
 
-//        System.out.println(1);
-        Vector<SlotGroup> slots = this.inputData.getSlots();
+        boolean mark[] = new boolean[4];
 
-        int S1 = 0;
-        for (SlotGroup slotGroup : this.inputData.getSlots()) {
-            int total = 0;
-            for (Teacher teacher : this.inputData.getTeachers()) {
-                int teachingSlotNumber = 0;
-                for (Slot slot : slotGroup.getSlots()) {
-                    if (this.genes.get(slot.getId()).get(teacher.getId()) != -1) {
-                        teachingSlotNumber++;
-                    }
-                }
-//                System.out.println(teachingSlotNumber);
-                if (teachingSlotNumber == 1) total++;
+        for (SlotGroup sg : this.inputData.getSlots()) {
+            for (Slot slot : sg.getSlots()) {
+                group[slot.getId()] = sg.getId();
             }
-            S1 += total * slotGroup.getCoff();
         }
-        int S2 = 0;
-        for (SlotGroup slotGroup : this.inputData.getSlots()) {
-            int total = 0;
-            for (Teacher teacher : this.inputData.getTeachers()) {
-                int changeNumber = 0;
-                String last = "";
-
-                for (Slot slot : slotGroup.getSlots()) {
-                    if (this.genes.get(slot.getId()).get(teacher.getId()) != -1) {
-                        int classId = this.genes.get(slot.getId()).get(teacher.getId());
-                        String building = this.inputData.getClasses().get(classId).getRoom().getBuilding();
-                        if (!building.equalsIgnoreCase(last)) {
-                            changeNumber++;
-                            last = building;
-                        }
-                    }
-                }
-                total += Math.max(0, changeNumber - 1);
+        for (int i = 0; i < 10; i++) {
+            int classId = this.getGenes().get(i).get(teacherId);
+            if (classId != -1) {
+                mark[group[this.inputData.getClasses().get(classId).getSlotId()]] = true;
             }
-            S2 += total * slotGroup.getCoff();
         }
 
-//        assert(S1 != -1);
+        for (int i = 0; i < 4; i++) {
+            if (mark[i]) numberOfSessionsPerWeek++;
+        }
+        return numberOfSessionsPerWeek;
+    }
 
-        this.fitness = W[0] / (1.0 + 1.0 * S1 / this.inputData.getTeachers().size())
-                + W[1] / (1.0 + 1.0 * S2 / this.inputData.getTeachers().size());
-        System.out.println(S1 + " " + S2);
-        this.needTobeUpdated = false;
+    double getPod(int teacherId) {
+        int cnt = 0;
+        for (int i = 0; i < 10; i++) {
+            int classId = this.getGenes().get(i).get(teacherId);
+            if (classId != -1) {
+                cnt++;
+            }
+        }
+        double pod = 0;
+
+        int numberOfSessionsPerWeek = getNumberOfSessionPerWeek(teacherId);
+        if (cnt <= 3) {
+            if (numberOfSessionsPerWeek == 1) pod = 100;
+            else if (numberOfSessionsPerWeek == 2) pod = 20;
+            else pod = 0;
+        } else if (cnt <= 6) {
+            if (numberOfSessionsPerWeek == 2) pod = 100;
+            else if (numberOfSessionsPerWeek == 3) pod = 20;
+            else pod = 0;
+        } else if (cnt <= 8) {
+            if (numberOfSessionsPerWeek == 3) pod = 100;
+            else if (numberOfSessionsPerWeek == 4) pod = 50;
+            else pod = 0;
+        } else {
+            pod = 100;
+        }
+        return pod;
     }
 
     public double calculateSatisfaction(int teacherId) {
@@ -91,7 +94,7 @@ public class Chromosome {
                 maxSlotSatisfaction += max;
             }
         }
-//        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
+        maxSlotSatisfaction = Math.max(maxSlotSatisfaction, this.inputData.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o2
         double subjectSatisfaction = 0;
         double maxSubjectSatisfaction = 0;
@@ -106,7 +109,7 @@ public class Chromosome {
                 maxSubjectSatisfaction += max;
             }
         }
-//        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.model.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
+        maxSubjectSatisfaction = Math.max(maxSubjectSatisfaction, this.inputData.getTeachers().get(teacherId).getExpectedNumberOfClass() * max);
         //o3
         double numberOfClassSatisfaction = 0;
         int cnt = 0;
@@ -195,17 +198,27 @@ public class Chromosome {
         else consecutiveSlot = 0;
         if (consecutiveSlot > lim) overLimit++;
 
+        /// calculate satisfaction with number of parts of day in a week
+
+        int numberOfSessionsPerWeek = getNumberOfSessionPerWeek(teacherId);
+
+        double pod = getPod(teacherId);
+
+
         double slotCoff = this.inputData.getGaParameter().getCofficient().getSlotCoff();
         double subjectCoff = this.inputData.getGaParameter().getCofficient().getSubjectCoff();
         double numberOfClassCoff = this.inputData.getGaParameter().getCofficient().getNumberOfClassCoff();
         double distanceCoff = this.inputData.getGaParameter().getCofficient().getDistanceCoff();
         double consecutiveClassCoff = this.inputData.getGaParameter().getCofficient().getConsicutiveClassCoff();
+        double partOfDayCoff = this.inputData.getGaParameter().getCofficient().getPartOfDayCoff();
         double F = slotCoff * (maxSlotSatisfaction == 0 ? 0 : 1.0 * slotSatisfaction / maxSlotSatisfaction) +
                 subjectCoff * (maxSubjectSatisfaction == 0 ? 0 : 1.0 * subjectSatisfaction / maxSubjectSatisfaction) +
                 numberOfClassCoff * 1.0 / (1.0 + Math.abs(cnt - this.inputData.getTeachers().get(teacherId).getExpectedNumberOfClass())) +
                 distanceCoff * 1.0 / (1.0 + 9.0 * distance / 105.0) +
+                partOfDayCoff * pod / 100 +
                 consecutiveClassCoff * 1.0 / (1.0 + o5);
         return F;
+
     }
 
     public double calculateFitnessForSubGroupUsingScalarizingModel(Vector<Teacher> teachers) {
@@ -243,7 +256,6 @@ public class Chromosome {
             variance += Math.pow(p[i] - total / teachers.size(), 2);
             minSatisfaction = Math.min(p[i], minSatisfaction);
             maxSatisfaction = Math.max(p[i], maxSatisfaction);
-
         }
         double std = (teachers.size() == 1) ? 0.0 : Math.sqrt(variance / (teachers.size() - 1));
         F1 = maxSatisfaction - minSatisfaction;
@@ -268,7 +280,6 @@ public class Chromosome {
     }
 
     public double calculateFitnessForSubGroupUsingCompromisingModel(Vector<Teacher> teachers) {
-        if (teachers.size() == 0) return 1.0;
         Vector<DenseVector<Real>> expectedMatrix = new Vector<>();
         int[][] slotSubject = new int[10][this.inputData.getSubjects().size()];
 
@@ -286,7 +297,7 @@ public class Chromosome {
                 row.add(Real.valueOf(expectedThisSlot * this.inputData.getRegisteredSlots()[teacherId][slotId]));
             }
             row.add(Real.valueOf(Math.pow(this.inputData.getTeachers().get(teacherId).getExpectedNumberOfClass(), 2)));
-            System.out.println(row.size());
+            row.add(Real.valueOf(100));
 
             expectedMatrix.add(DenseVector.valueOf(row));
         }
@@ -309,6 +320,7 @@ public class Chromosome {
                 }
             }
             row.add(Real.valueOf(numberOfClassAssigned * numberOfClassAssigned));
+            row.add(Real.valueOf(this.getPod(teacherId)));
             factMatrix.add(DenseVector.valueOf(row));
         }
 
@@ -316,6 +328,7 @@ public class Chromosome {
         Vector<DenseVector<Real>> zeroMatrix = new Vector<>();
         for (int i = 0; i < teachers.size(); i++) {
             int teacherId = teachers.get(i).getId();
+            int numberOfClassAssigned = 0;
             Vector<Real> row = new Vector<>();
             for (int slotId = 0; slotId < 10; slotId++) {
                 double expectedThisSlot = 0;
