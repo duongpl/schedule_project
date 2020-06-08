@@ -14,5 +14,6 @@ public class Cofficient {
     private double stdCoff;
     private double satisfactionSumCoff;
     private double distanceCoff;
+    private double partOfDayCoff;
     private double consicutiveClassCoff;
 }

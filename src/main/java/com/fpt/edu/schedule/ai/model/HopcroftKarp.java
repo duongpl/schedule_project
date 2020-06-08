@@ -101,20 +101,4 @@ public class HopcroftKarp {
         return this.matx;
     }
 
-    public static void main(String[] args) {
-        HopcroftKarp hp = new HopcroftKarp(4, 4);
-        hp.add(0, 0);
-        hp.add(1, 1);
-        hp.add(2, 2);
-        hp.add(3, 3);
-        hp.add(0, 1);
-        hp.add(1, 0);
-        hp.match(0, 0);
-
-
-        for (int i = 0; i < 4; i++) {
-
-        }
-    }
-
 }

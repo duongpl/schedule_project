@@ -4,7 +4,7 @@ import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.model.Chromosome;
 import com.fpt.edu.schedule.ai.model.GaParameter;
-import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.InputData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,12 +17,12 @@ public class TestChromosome {
         int teacherNumber = 4;
         int subjectNumber = 4;
         int classNumber = 4;
-        Model model = DataGenerator.generateModel(teacherNumber, subjectNumber, classNumber);
-        model.getClasses().get(0).setSlotId(0);
-        model.getClasses().get(2).setSlotId(0);
-        model.getClasses().get(1).setSlotId(1);
-        model.getClasses().get(3).setSlotId(1);
-        Chromosome chromosome = new Chromosome(model);
+        InputData inputData = DataGenerator.generateModel(teacherNumber, subjectNumber, classNumber);
+        inputData.getClasses().get(0).setSlotId(0);
+        inputData.getClasses().get(2).setSlotId(0);
+        inputData.getClasses().get(1).setSlotId(1);
+        inputData.getClasses().get(3).setSlotId(1);
+        Chromosome chromosome = new Chromosome(inputData);
         Collections.sort(chromosome.getGenes().get(0));
         Collections.sort(chromosome.getGenes().get(1));
         Integer expected0[] = {-1, -1, 0, 2};
@@ -51,8 +51,8 @@ public class TestChromosome {
         classes.add(new Class("C3", 2, 0, new Room("a", 1, "AL"), 2, 0));
         classes.add(new Class("C4", 3, 0, new Room("a", 1, "AL"), 3, 0));
         classes.add(new Class("C5", 0, 0, new Room("a", 1, "AL"), 4, 0));
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        Chromosome chromosome = new Chromosome(model);
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        Chromosome chromosome = new Chromosome(inputData);
         Collections.sort(chromosome.getGenes().get(0));
         Collections.sort(chromosome.getGenes().get(1));
         Collections.sort(chromosome.getGenes().get(2));

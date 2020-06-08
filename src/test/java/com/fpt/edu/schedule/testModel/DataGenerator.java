@@ -3,7 +3,7 @@ package com.fpt.edu.schedule.testModel;
 import com.fpt.edu.schedule.ai.lib.*;
 import com.fpt.edu.schedule.ai.lib.Class;
 import com.fpt.edu.schedule.ai.model.GaParameter;
-import com.fpt.edu.schedule.ai.model.Model;
+import com.fpt.edu.schedule.ai.model.InputData;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -80,22 +80,22 @@ public class DataGenerator {
 
     public static Vector<SlotGroup> generateSlots() {
         Vector<SlotGroup> slots = new Vector<>();
-        SlotGroup m246 = new SlotGroup(3);
+        SlotGroup m246 = new SlotGroup(3, 0);
         m246.addSlot(new Slot("M1", 0));
         m246.addSlot(new Slot("M2", 1));
         m246.addSlot(new Slot("M3", 2));
-        SlotGroup e246 = new SlotGroup(3);
+        SlotGroup e246 = new SlotGroup(3, 1);
 
         e246.addSlot(new Slot("E1", 3));
         e246.addSlot(new Slot("E2", 4));
         e246.addSlot(new Slot("E3", 5));
 
-        SlotGroup m35 = new SlotGroup(1);
+        SlotGroup m35 = new SlotGroup(1, 2);
 
         m35.addSlot(new Slot("M4", 6));
         m35.addSlot(new Slot("M5", 7));
 
-        SlotGroup e35 = new SlotGroup(1);
+        SlotGroup e35 = new SlotGroup(1, 3);
 
         e35.addSlot(new Slot("E4", 8));
         e35.addSlot(new Slot("E5", 9));
@@ -121,22 +121,22 @@ public class DataGenerator {
         }
 
         Vector<SlotGroup> slots = new Vector<>();
-        SlotGroup m246 = new SlotGroup(3);
+        SlotGroup m246 = new SlotGroup(3, 0);
         m246.addSlot(new Slot("M1", ids.get(0)));
         m246.addSlot(new Slot("M2", ids.get(1)));
         m246.addSlot(new Slot("M3", ids.get(2)));
-        SlotGroup e246 = new SlotGroup(3);
+        SlotGroup e246 = new SlotGroup(3, 1);
 
         e246.addSlot(new Slot("E1", ids.get(3)));
         e246.addSlot(new Slot("E2", ids.get(4)));
         e246.addSlot(new Slot("E3", ids.get(5)));
 
-        SlotGroup m35 = new SlotGroup(1);
+        SlotGroup m35 = new SlotGroup(1, 2);
 
         m35.addSlot(new Slot("M4", ids.get(6)));
         m35.addSlot(new Slot("M5", ids.get(7)));
 
-        SlotGroup e35 = new SlotGroup(1);
+        SlotGroup e35 = new SlotGroup(1, 3);
 
         e35.addSlot(new Slot("E4", ids.get(8)));
         e35.addSlot(new Slot("E5", ids.get(9)));
@@ -208,14 +208,14 @@ public class DataGenerator {
         return expectedSubjects;
     }
 
-    public static Model generateModel(int teacherNumber, int subjectNumber, int classNumber) {
+    public static InputData generateModel(int teacherNumber, int subjectNumber, int classNumber) {
         Vector<Teacher> teachers = DataGenerator.generateTeachers(teacherNumber);
         Vector<Subject> subjects = DataGenerator.generateSubject(subjectNumber);
         Vector<SlotGroup> slots = DataGenerator.generateSlots();
         Vector<Class> classes = DataGenerator.generateClasses(subjects, slots, classNumber);
         Vector<ExpectedSlot> expectedSlots = DataGenerator.generateExpectedSlotWithMaximumPreference(teachers, slots);
         Vector<ExpectedSubject> expectedSubjects = DataGenerator.generateExpectedSubjectWithMaximumPreference(teachers, subjects);
-        Model model = new Model(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
-        return model;
+        InputData inputData = new InputData(teachers, slots, subjects, classes, expectedSlots, expectedSubjects, new GaParameter());
+        return inputData;
     }
 }
