@@ -256,7 +256,6 @@ public class Chromosome {
             variance += Math.pow(p[i] - total / teachers.size(), 2);
             minSatisfaction = Math.min(p[i], minSatisfaction);
             maxSatisfaction = Math.max(p[i], maxSatisfaction);
-
         }
         double std = (teachers.size() == 1) ? 0.0 : Math.sqrt(variance / (teachers.size() - 1));
         F1 = maxSatisfaction - minSatisfaction;

@@ -29,4 +29,6 @@ public interface LecturerRepository extends Repository<Lecturer,String>,JpaSpeci
     Lecturer findAllByDepartmentAndRole(String department, Role role);
 
 
+
+
 }

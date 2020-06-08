@@ -154,7 +154,7 @@ public class TimetableServiceImpl implements TimetableService {
                 .stream()
                 .collect(Collectors.toMap(x -> x.getLineId(), x -> x));
         timetableDetails.stream().forEach(i -> {
-            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortName(i.getLecturerShortName()));
+            timetableMap.get(i.getLineId()).setLecturer(lecturerRepo.findByShortNameIgnoreCase(i.getLecturerShortName()));
             timetableMap.get(i.getLineId()).setRoom(roomRepo.findByName(i.getRoom()));
 
         });
@@ -182,7 +182,7 @@ public class TimetableServiceImpl implements TimetableService {
 
     private void checkGaParameter(GaParameter gaParam) {
         Cofficient cofficient = gaParam.getCofficient();
-        if (cofficient.getSlotCoff() + cofficient.getSubjectCoff() + cofficient.getNumberOfClassCoff() + cofficient.getDistanceCoff()+cofficient.getPartOfDayCoff() != 1) {
+        if (cofficient.getSlotCoff() + cofficient.getSubjectCoff() + cofficient.getNumberOfClassCoff() + cofficient.getDistanceCoff() + cofficient.getPartOfDayCoff() != 1) {
             throw new InvalidRequestException("Sum of slotCoff,subjectCoff,numberOfClassCoff,distanceCoff,partOfDayCoff must be equal 1!");
         }
         if (cofficient.getStdCoff() + cofficient.getSatisfactionSumCoff() != 1) {
@@ -270,12 +270,12 @@ public class TimetableServiceImpl implements TimetableService {
 
         //slot model
         SlotGroup m246 = new SlotGroup(3, 0);
-        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M1", 3));
+        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M1", 1));
         m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M2", 2));
-        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M3", 1));
+        m246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("M3", 3));
         SlotGroup e246 = new SlotGroup(3, 1);
 
-        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E1", 10));
+        e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E1", 6));
         e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E2", 7));
         e246.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E3", 8));
 
@@ -287,11 +287,12 @@ public class TimetableServiceImpl implements TimetableService {
         SlotGroup e35 = new SlotGroup(2, 3);
 
         e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E4", 9));
-        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E5", 6));
+        e35.addSlot(new com.fpt.edu.schedule.ai.lib.Slot("E5", 10));
         slots.add(m246);
         slots.add(e246);
         slots.add(m35);
         slots.add(e35);
+
 
     }
 
@@ -322,7 +323,7 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
+                    Lecturer lecturer = lecturerRepo.findByEmailContainingIgnoreCase(teacherMail);
                     ExpectedNote expectedNote = new ExpectedNote();
                     expectedNote.setExpected(expected);
                     expectedNote.setExpectedNumOfClass(Integer.parseInt(e.getElementsByTagName("Cell").item(slot.size() + 1).getTextContent()));
@@ -367,7 +368,7 @@ public class TimetableServiceImpl implements TimetableService {
                         continue;
                     }
                     String teacherMail = e.getElementsByTagName("Cell").item(0).getTextContent();
-                    Lecturer lecturer = lecturerRepo.findByEmail(teacherMail);
+                    Lecturer lecturer = lecturerRepo.findByEmailContainingIgnoreCase(teacherMail);
                     Expected expected = expectedRepo.findBySemesterAndLecturer(semesterRepo.getAllByNowIsTrue(), lecturer);
 
                     ;
@@ -422,14 +423,14 @@ public class TimetableServiceImpl implements TimetableService {
                     if (cell.getCellTypeEnum().equals(CellType.BLANK)) {
                         break;
                     }
-                    if (lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()) == null) {
+                    if (lecturerRepo.findByEmailContainingIgnoreCase(row.getCell(1).getStringCellValue()) == null) {
                         continue;
                     }
 
                     switch (column) {
                         case 3:
                             String slots[] = cell.getStringCellValue().trim().split(" ");
-                            expected.setLecturer(lecturerRepo.findByEmail(row.getCell(1).getStringCellValue()));
+                            expected.setLecturer(lecturerRepo.findByEmailContainingIgnoreCase(row.getCell(1).getStringCellValue()));
                             List<com.fpt.edu.schedule.model.ExpectedSlot> expectedSlots = new ArrayList<>();
                             for (int i = 0; i < slots.length; i++) {
                                 com.fpt.edu.schedule.model.ExpectedSlot expectedSlot = new com.fpt.edu.schedule.model.ExpectedSlot();

@@ -54,9 +54,13 @@ public class InputData {
         }
 
         for (ExpectedSubject es : registeredSubjects) {
-            int teacherId = teacherIdMapping.get(es.getTeacherId());
-            int subjectId = subjectIdMapping.get(es.getSubjectId());
-            this.registeredSubjects[teacherId][subjectId] = es.getLevelOfPreference();
+            try {
+                int teacherId = teacherIdMapping.get(es.getTeacherId());
+                int subjectId = subjectIdMapping.get(es.getSubjectId());
+                this.registeredSubjects[teacherId][subjectId] = es.getLevelOfPreference();
+            } catch (Exception e) {
+                // online subjects have been excluded
+            }
         }
 
         checkResource();
@@ -111,7 +115,7 @@ public class InputData {
 
         Vector<Slot> slots = SlotGroup.getSlotList(this.slots);
         for (int i = 0; i < slots.size(); i++) {
-            slots.get(i).setId(i);
+//            slots.get(i).setId(i);
             slotIdMapping.put(slots.get(i).getId(), i);
             slotIdMappingReverse.put(i, slots.get(i).getId());
         }
