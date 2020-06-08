@@ -25,13 +25,29 @@ public class Semester {
     private List<Expected> expectedList;
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Report> reportList;
+    private List<Request> requestList;
     @JsonIgnore
-    @OneToOne(mappedBy = "semester",cascade=CascadeType.ALL)
-    private Timetable timeTable;
-    public Semester(String season,String year) {
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    private List<Timetable> timeTable;
+    @JsonIgnore
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL)
+    private List<Confirmation> confirmations;
+
+    public Semester(String season, String year, boolean now) {
         this.season = season;
         this.year = year;
+        this.now = now;
     }
     public boolean now;
+    @Transient
+    private boolean hasData;
+
+    public boolean isHasData() {
+        if(this.timeTable.size() >0 ){
+           return true;
+        }
+        return false;
+    }
+
+
 }

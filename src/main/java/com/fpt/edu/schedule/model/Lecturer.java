@@ -1,6 +1,8 @@
 package com.fpt.edu.schedule.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fpt.edu.schedule.common.enums.StatusLecturer;
+import com.fpt.edu.schedule.common.enums.TimetableStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +21,7 @@ public class Lecturer {
     private int id;
     private String googleId;
     private String fullName;
+    @Column(unique = true)
     private String shortName;
     private String email;
     private String phone;
@@ -26,6 +29,7 @@ public class Lecturer {
     private int quotaClass;
     private boolean fullTime;
     private boolean login = false;
+    private StatusLecturer status;
     @Type(type = "text")
     private String picture;
     @ManyToOne
@@ -37,7 +41,7 @@ public class Lecturer {
     private List<Expected> expectedList;
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Report> reportList ;
+    private List<Request> requestList;
     @Transient
     private boolean fillingExpected;
     @Transient
@@ -46,4 +50,15 @@ public class Lecturer {
     public Lecturer(String email) {
         this.email = email;
     }
+    @JsonIgnore
+    @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL)
+    private List<Confirmation> confirmations;
+    @Transient
+    TimetableStatus timetableStatus = TimetableStatus.DRAFT;
+    @Override
+    public boolean equals(Object obj) {
+        Lecturer lecturer = (Lecturer) obj;
+        return id == lecturer.getId();
+    }
+
 }

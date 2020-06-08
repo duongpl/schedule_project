@@ -11,4 +11,6 @@ public interface SemesterRepository extends Repository<Semester, Integer>, JpaSp
    Semester save(Semester semester);
 
    Semester findById(int id);
+
+   Semester getAllByNowIsTrue();
 }

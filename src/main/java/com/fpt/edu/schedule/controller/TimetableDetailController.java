@@ -1,6 +1,8 @@
 package com.fpt.edu.schedule.controller;
 
+import com.fpt.edu.schedule.dto.TimetableView;
 import com.fpt.edu.schedule.dto.TimetableDetailDTO;
+import com.fpt.edu.schedule.dto.TimetableEdit;
 import com.fpt.edu.schedule.model.ClassName;
 import com.fpt.edu.schedule.model.TimetableDetail;
 import com.fpt.edu.schedule.repository.base.QueryParam;
@@ -20,20 +22,35 @@ public class TimetableDetailController {
 
     @PostMapping("/filter")
     public ResponseEntity<ClassName> getScheduleByCriteria(@RequestBody QueryParam queryParam) {
-        try {
-            List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam);
+        List<TimetableDetail> timetableDetails = timeTableDetailService.findByCriteria(queryParam,1);
             return new ResponseEntity(timetableDetails, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     @PutMapping()
     public ResponseEntity updateTimeTableDetail(@RequestBody TimetableDetailDTO request) {
-        try {
             return new ResponseEntity(timeTableDetailService.updateTimetableDetail(request), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
+    @PostMapping("/filter/forEdit")
+    public ResponseEntity getTimetableForEdit(@RequestBody QueryParam queryParam,
+                                              @RequestParam("groupBy") String groupBy,
+                                              @RequestParam("semesterId") int semesterId) {
+            List<TimetableEdit> timetableDetails = timeTableDetailService.getTimetableForEdit(queryParam,groupBy,semesterId);
+            return new ResponseEntity(timetableDetails, HttpStatus.OK);
+
+    }
+    @PostMapping("/filter/forView")
+    public ResponseEntity getTimetableForView(@RequestBody QueryParam queryParam) {
+            List<TimetableView> timetableDetails = timeTableDetailService.getTimetableForView(queryParam);
+            return new ResponseEntity(timetableDetails, HttpStatus.OK);
+
+    }
+    @PutMapping("swap")
+    public ResponseEntity swapLecturerTimetable(@RequestBody List<Integer> ids,
+                                                @RequestParam String type) {
+          timeTableDetailService.swapTwoTimetableDetail(ids,type);
+            return new ResponseEntity(HttpStatus.OK);
+    }
+
 }

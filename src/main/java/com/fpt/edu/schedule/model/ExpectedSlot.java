@@ -26,7 +26,11 @@ public class ExpectedSlot {
 
     public ExpectedSlot(String slotName) {
         this.slotName = slotName;
-
     }
 
+    public ExpectedSlot(String slotName,int levelOfPrefer, Expected expected) {
+        this.levelOfPrefer = levelOfPrefer;
+        this.expected = expected;
+        this.slotName = slotName;
+    }
 }

@@ -1,7 +1,6 @@
 package com.fpt.edu.schedule.common.enums;
 
-public enum Status {
+public enum  StatusLecturer {
     ACTIVATE,
-    DEACTIVATE,
-    PENDING
+    DEACTIVATE
 }

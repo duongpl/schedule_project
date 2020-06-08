@@ -25,12 +25,16 @@ public class ExpectedSubject {
     private String subjectCode;
 
     public void setSubjectCode(String subjectCode) {
-        System.out.println("abc");
         this.subjectCode = subjectCode;
     }
 
     public ExpectedSubject(String subjectCode) {
         this.subjectCode = subjectCode;
+    }
 
+    public ExpectedSubject(String subjectCode,int levelOfPrefer, Expected expected) {
+        this.levelOfPrefer = levelOfPrefer;
+        this.expected = expected;
+        this.subjectCode =subjectCode;
     }
 }

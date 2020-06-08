@@ -20,7 +20,6 @@ public class BaseSpecifications<T> implements Specification<T> {
         Map<String, Object> criteria = queryParam.getCriteria();
         Map<String, Object> inCriteria = queryParam.getInCriteria();
         ObjectMapper oMapper = new ObjectMapper();
-        String sortField = queryParam.getSortField();
         List<Predicate> predicates = new ArrayList();
 
         if (criteria != null) {
@@ -28,15 +27,20 @@ public class BaseSpecifications<T> implements Specification<T> {
                 if (entry.getValue() instanceof Map) {
                     Map<String, Object> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
                     for (Map.Entry<String, Object> entry1 : mapEntry.entrySet()) {
-                        if (entry.getValue() instanceof String) {
-                            predicates.add(criteriaBuilder.like(getPath(root,entry.getKey()).get(entry.getKey()), "%" + entry.getValue() + "%"));
+                        if (entry1.getValue() instanceof String) {
+                            predicates.add(criteriaBuilder.like(getPath(root, entry.getKey()).get(entry1.getKey()), "%" + entry1.getValue() + "%"));
+                        } else if (entry1.getValue() == null) {
+                            predicates.add(criteriaBuilder.isNull(getPath(root, entry.getKey())));
                         } else {
-                            predicates.add(criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), entry1.getValue()));
+                            predicates.add(criteriaBuilder.equal(getPath(root, entry.getKey()).get(entry1.getKey()), entry1.getValue()));
                         }
+
                     }
                 } else {
                     if (entry.getValue() instanceof String) {
                         predicates.add(criteriaBuilder.like(root.get(entry.getKey()), "%" + entry.getValue() + "%"));
+                    } else if (entry.getValue() == null) {
+                        predicates.add(criteriaBuilder.isNull(root.get(entry.getKey())));
                     } else {
                         predicates.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
                     }
@@ -44,32 +48,44 @@ public class BaseSpecifications<T> implements Specification<T> {
             }
         }
         if (inCriteria != null) {
-            List<Predicate> predicateList = new ArrayList<>();
-            for (Map.Entry<String, Object> entry : inCriteria.entrySet()) {
-                if(entry.getValue() instanceof Map){
-                    Map<String, List<Object>> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
-                    for (Map.Entry<String, List<Object>> entry1 : mapEntry.entrySet()) {
-                        entry1.getValue().forEach(i -> {
-                            Predicate predicate = (i instanceof String) ? criteriaBuilder.like(getPath(root,entry.getKey()).get(entry1.getKey()), "%" + i + "%")
-                                    : criteriaBuilder.equal(getPath(root,entry.getKey()).get(entry1.getKey()), i);
-                            predicateList.add(predicate);
-                        });
-                    }
 
+            List<Predicate> predicateList1 = new ArrayList<>();
+            Predicate predicate1 = null;
+            for (Map.Entry<String, Object> entry : inCriteria.entrySet()) {
+                if (entry.getValue() instanceof Map) {
+                    Map<String, List<Object>> mapEntry = oMapper.convertValue(entry.getValue(), Map.class);
+                    List<Predicate> predicateList = new ArrayList<>();
+                    for (Map.Entry<String, List<Object>> entry1 : mapEntry.entrySet()) {
+                        if (entry1.getValue().size() == 0) {
+                            break;
+                        }
+                        entry1.getValue().forEach(i -> {
+                            if (i instanceof String) {
+                                predicateList.add(criteriaBuilder.like(getPath(root, entry.getKey()).get(entry1.getKey()), "%" + i + "%"));
+                            } else if (i == null) {
+                                predicateList.add(criteriaBuilder.isNull(getPath(root, entry.getKey())));
+                            } else {
+                                predicateList.add(criteriaBuilder.equal(getPath(root, entry.getKey()).get(entry1.getKey()), i));
+                            }
+                        });
+                        predicate1 = criteriaBuilder.or(predicateList.toArray(new Predicate[0]));
+                        predicateList1.add(predicate1);
+                    }
                 } else {
-                    ArrayList<Object> array = (ArrayList)entry.getValue();
-                    array.forEach(i -> {
+                    ArrayList<Object> array = (ArrayList) entry.getValue();
+                    if (array.size() == 0) {
+                        break;
+                    }
+                    array.stream().forEach(i -> {
+
                         Predicate predicate = (i instanceof String) ? criteriaBuilder.like(root.get(entry.getKey()), "%" + i + "%")
                                 : criteriaBuilder.equal(root.get(entry.getKey()), i);
-                        predicateList.add(predicate);
+//                        predicateList.add(predicate);
                     });
                 }
             }
 
-            predicates.add(criteriaBuilder.or(predicateList.toArray(new Predicate[0])));
-        }
-        if (sortField != null && sortField.length() > 0) {
-            query.orderBy(queryParam.isAscending() ? criteriaBuilder.asc(root.get(sortField)) : criteriaBuilder.desc(root.get(sortField)));
+            predicates.add(criteriaBuilder.and(predicateList1.toArray(new Predicate[0])));
         }
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
@@ -81,7 +97,8 @@ public class BaseSpecifications<T> implements Specification<T> {
         }
         return key;
     }
-    protected Path<Comparable> getPath(Root<T> root,String key) {
+
+    protected Path<Comparable> getPath(Root<T> root, String key) {
         Path<Comparable> path;
         if (key.contains(".")) {
             String[] split = key.split("\\.");

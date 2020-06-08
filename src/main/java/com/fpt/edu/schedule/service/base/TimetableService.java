@@ -1,12 +1,22 @@
 package com.fpt.edu.schedule.service.base;
 
-import com.fpt.edu.schedule.dto.TimetableEdit;
+import com.fpt.edu.schedule.ai.model.GaParameter;
+import com.fpt.edu.schedule.dto.Runs;
+import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.model.Timetable;
-
-import java.util.List;
+import com.fpt.edu.schedule.repository.base.QueryParam;
 
 public interface TimetableService {
-    Timetable save(Timetable timeTable);
 
-    List<TimetableEdit> getTimetableBySemester(int semesterId);
+    Timetable findBySemesterTempFalse(Semester semester);
+    
+    void autoArrange(int semesterId, String hodGoogleId, GaParameter gaParameter);
+
+    void stop(String googleId);
+
+    QueryParam.PagedResultSet<Runs> getGenerationInfo(String lecturerId, int page, int limit);
+
+    void setDefaultTimetable(int runId,String lecturerId,int semesterId);
+
+
 }

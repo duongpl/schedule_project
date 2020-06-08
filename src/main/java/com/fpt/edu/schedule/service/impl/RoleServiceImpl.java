@@ -12,14 +12,14 @@ import javax.transaction.Transactional;
 @Service
 @Transactional
 public class RoleServiceImpl implements RoleService {
-    RoleRepository roleRepository;
+    RoleRepository roleRepo;
     @Override
     public Role getRoleByName(String name) {
-        return roleRepository.findByRoleName(name);
+        return roleRepo.findByRoleName(name);
     }
 
     @Override
     public void addRole(Role role) {
-        roleRepository.save(role);
+        roleRepo.save(role);
     }
 }

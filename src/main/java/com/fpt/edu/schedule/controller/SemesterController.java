@@ -18,11 +18,9 @@ public class SemesterController {
     SemesterService semesterService;
     @PostMapping("/filter")
     public ResponseEntity getSemesterByCriteria(@RequestBody QueryParam queryParam) {
-        try {
+
             List<Semester> expectedList =semesterService.findByCriteria(queryParam);
             return new ResponseEntity(expectedList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

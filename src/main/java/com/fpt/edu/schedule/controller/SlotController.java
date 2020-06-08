@@ -19,11 +19,9 @@ public class SlotController {
     SlotService slotService;
     @PostMapping("/filter")
     public ResponseEntity<ClassName> getSlotByCriteria(@RequestBody QueryParam queryParam) {
-        try {
+
             List<Slot> slotList =slotService.findByCriteria(queryParam);
             return new ResponseEntity(slotList, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 }

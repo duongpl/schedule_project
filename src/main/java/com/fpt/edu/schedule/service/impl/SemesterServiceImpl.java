@@ -1,5 +1,6 @@
 package com.fpt.edu.schedule.service.impl;
 
+import com.fpt.edu.schedule.common.exception.InvalidRequestException;
 import com.fpt.edu.schedule.model.Semester;
 import com.fpt.edu.schedule.repository.base.BaseSpecifications;
 import com.fpt.edu.schedule.repository.base.QueryParam;
@@ -15,16 +16,16 @@ import java.util.List;
 @Transactional
 @AllArgsConstructor
 public class SemesterServiceImpl implements SemesterService {
-    SemesterRepository semesterRepository;
+    SemesterRepository semesterRepo;
 
     @Override
     public int countAllSemester() {
-        return semesterRepository.count();
+        return semesterRepo.count();
     }
 
     @Override
     public Semester save(Semester semester) {
-        return semesterRepository.save(semester);
+        return semesterRepo.save(semester);
     }
 
     @Override
@@ -32,7 +33,16 @@ public class SemesterServiceImpl implements SemesterService {
 
         BaseSpecifications cns = new BaseSpecifications(queryParam);
 
-        return semesterRepository.findAll(cns);
+        return semesterRepo.findAll(cns);
 
+    }
+
+    @Override
+    public Semester findById(int id) {
+        Semester semester = semesterRepo.findById(id);
+        if(semester == null){
+            throw new InvalidRequestException("Don't find this semester");
+        }
+        return semester;
     }
 }

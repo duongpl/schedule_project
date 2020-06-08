@@ -29,3 +29,6 @@ build/
 *.properties
 ### VS Code ###
 .vscode/
+
+## output files
+*.csv
